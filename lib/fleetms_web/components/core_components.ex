@@ -221,8 +221,13 @@ defmodule FleetmsWeb.CoreComponents do
       <.button phx-click="go" class="ml-2">Send!</.button>
   """
   attr :type, :string, default: nil
+  attr :size, :atom, values: [:xs, :sm, :md, :lg, :xl], default: :md
   attr :class, :string, default: nil
   attr :rest, :global, include: ~w(disabled form name value)
+
+  attr :kind, :atom,
+    values: [:primary, :info, :light, :success, :warning, :danger],
+    default: :primary
 
   slot :inner_block, required: true
 
@@ -231,8 +236,26 @@ defmodule FleetmsWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded-lg bg-zinc-900 hover:bg-zinc-700 py-2 px-3",
-        "text-sm font-semibold leading-6 text-white active:text-white/80",
+        @size == :xs && "px-3 py-2 text-xs text-center",
+        @size == :sm && "px-3 py-2 text-sm text-center",
+        @size == :md && "px-5 py-2.5 text-sm",
+        @size == :lg && "px-5 py-3 text-base text-center",
+        @size == :xl && "px-6 py-3.5 text-base",
+        @kind != :light && "text-white",
+        "focus:ring-4 font-medium rounded-lg text-sm  mr-2 mb-2 focus:outline-none",
+        @kind == :primary &&
+          "bg-primary-700 hover:bg-primary-800 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800",
+        @kind == :info &&
+          "bg-blue-700 hover:bg-blue-800 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800",
+        @kind == :light &&
+          "text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-gray-100 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700",
+        @kind == :success &&
+          "bg-green-700 hover:bg-green-800 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800",
+        @kind == :warning &&
+          "bg-yellow-700 hover:bg-yellow-800 focus:ring-yellow-300 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800",
+        @kind == :danger &&
+          "bg-red-700 hover:bg-red-800 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800",
+        "phx-submit-loading:opacity-75",
         @class
       ]}
       {@rest}
