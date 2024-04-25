@@ -14,8 +14,13 @@ defmodule FleetmsWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :public_layout do
+    plug :put_root_layout, html: {FleetmsWeb.Layouts, :public_root}
+    plug :put_layout, html: {FleetmsWeb.Layouts, :public}
+  end
+
   scope "/", FleetmsWeb do
-    pipe_through :browser
+    pipe_through [:browser, :public_layout]
 
     get "/", PageController, :home
   end
