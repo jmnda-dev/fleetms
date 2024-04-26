@@ -29,6 +29,10 @@ config :fleetms, FleetmsWeb.Endpoint,
     tailwind: {Tailwind, :install_and_run, [:fleetms, ~w(--watch)]}
   ]
 
+config :fleetms,
+       :token_signin_secret,
+       "lCej2EZOzkGf2nAt/41ic3uuBWUpdxe6EBw3HHMkUxpZblrMHoMXxeNPE1p7yBRS"
+
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed
