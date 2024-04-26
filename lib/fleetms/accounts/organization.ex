@@ -35,6 +35,10 @@ defmodule Fleetms.Accounts.Organization do
     defaults [:read, :destroy, create: :*, update: :*]
   end
 
+  identities do
+    identity :unique_name, [:name]
+  end
+
   postgres do
     table "organizations"
     repo Fleetms.Repo
