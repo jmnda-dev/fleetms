@@ -30,7 +30,7 @@ config :fleetms, FleetmsWeb.Endpoint,
   ]
 
 config :fleetms,
-       :token_signin_secret,
+       :token_signing_secret,
        "lCej2EZOzkGf2nAt/41ic3uuBWUpdxe6EBw3HHMkUxpZblrMHoMXxeNPE1p7yBRS"
 
 # ## SSL Support
