@@ -36,7 +36,9 @@ defmodule Fleetms.Accounts.Organization do
   end
 
   identities do
-    identity :unique_name, [:name]
+    identity :unique_name, [:name] do
+      eager_check? true
+    end
   end
 
   postgres do

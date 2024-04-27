@@ -86,7 +86,12 @@ defmodule Fleetms.Accounts.User do
   end
 
   identities do
-    identity :unique_email, [:email]
-    identity :unique_username, [:username]
+    identity :unique_email, [:email] do
+      eager_check? true
+    end
+
+    identity :unique_username, [:username] do
+      eager_check? true
+    end
   end
 end
