@@ -17,15 +17,28 @@ defmodule FleetmsWeb.AuthController do
 
   def failure(
         conn,
+        {:password, :register} = _activity,
+        _reason
+      ) do
+    conn
+    |> put_flash(
+      :error,
+      "An error occured while creating an account"
+    )
+    |> redirect(to: ~p"/sign-up")
+  end
+
+  def failure(
+        conn,
         _activity,
         _reason
       ) do
     conn
     |> put_flash(
       :error,
-      "Username or password is incorrect"
+      "Email or password is incorrect"
     )
-    |> redirect(to: "/sign-in")
+    |> redirect(to: ~p"/sign-in")
   end
 
   def sign_out(conn, _params) do
