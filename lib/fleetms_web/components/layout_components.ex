@@ -4,10 +4,13 @@ defmodule FleetmsWeb.LayoutComponents do
   """
   use Phoenix.Component
   import FleetmsWeb.CoreComponents, only: [button: 1]
+  use FleetmsWeb, :verified_routes
 
   @doc """
   A Navbar component for public pages
   """
+
+  attr :current_user, :map, required: true
 
   def public_navbar(assigns) do
     ~H"""
@@ -62,16 +65,71 @@ defmodule FleetmsWeb.LayoutComponents do
               <div class="tooltip-arrow" data-popper-arrow></div>
             </div>
 
-            <.link href="#">
-              <.button kind={:light}>
-                Log in
-              </.button>
-            </.link>
-            <.link href="#">
-              <.button>
-                Sign up
-              </.button>
-            </.link>
+            <%= if @current_user do %>
+              <button
+                class="flex items-center gap-4 hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg p-2 mr-2.5"
+                id="user-menu-button"
+                aria-expanded="false"
+                data-dropdown-toggle="dropdown"
+              >
+                <img
+                  class="w-10 h-10 rounded-full"
+                  src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+                  alt=""
+                />
+                <div class="font-medium dark:text-white">
+                  <div>Jese Leos</div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">
+                    <%= @current_user.email %>
+                  </div>
+                </div>
+              </button>
+              <!-- Dropdown menu -->
+              <div
+                class="hidden z-50 my-4 w-56 text-base list-none bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
+                id="dropdown"
+              >
+                <ul class="py-1 text-gray-500 dark:text-gray-400" aria-labelledby="dropdown">
+                  <li>
+                    <a
+                      href="#"
+                      class="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white"
+                    >
+                      My profile
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      class="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white"
+                    >
+                      Account settings
+                    </a>
+                  </li>
+                </ul>
+                <ul class="py-1 text-gray-500 dark:text-gray-400" aria-labelledby="dropdown">
+                  <li>
+                    <.link
+                      navigate={~p"/sign-out"}
+                      class="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                    >
+                      Sign out
+                    </.link>
+                  </li>
+                </ul>
+              </div>
+            <% else %>
+              <.link navigate={~p"/sign-in"}>
+                <.button kind={:light}>
+                  Sign In
+                </.button>
+              </.link>
+              <.link navigate={~p"/sign-up"}>
+                <.button>
+                  Sign up
+                </.button>
+              </.link>
+            <% end %>
             <button
               data-collapse-toggle="mobile-menu-2"
               type="button"
