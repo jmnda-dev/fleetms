@@ -1,0 +1,156 @@
+<section class="bg-white dark:bg-gray-900">
+  <div class="grid lg:h-screen lg:grid-cols-2">
+    <div class="flex justify-center items-center py-6 px-4 lg:py-0 sm:px-0">
+      <.simple_form
+        for={@form}
+        id="registration_form"
+        class="space-y-4 max-w-md md:space-y-6 xl:max-w-xl"
+        phx-submit="save"
+        phx-change="validate"
+        phx-trigger-action={@trigger_action}
+        action={~p"/auth/user/password/register"}
+        method="post"
+      >
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+          Create a free account
+        </h2>
+        <div class="w-full">
+          <.inputs_for :let={organization_form} field={@form[:organization]}>
+            <div>
+              <.input
+                field={organization_form[:name]}
+                type="text"
+                placeholder="Organization or Company name"
+                label="Company/Organization"
+                phx-debounce="500"
+              />
+            </div>
+          </.inputs_for>
+        </div>
+
+        <div class="grid gap-4 mb-4 sm:grid-cols-2">
+          <.inputs_for :let={user_profile_form} field={@form[:user_profile]}>
+            <div>
+              <.input
+                field={user_profile_form[:first_name]}
+                type="text"
+                placeholder="first name"
+                label="First Name"
+                phx-debounce="500"
+              />
+            </div>
+            <div>
+              <.input
+                field={user_profile_form[:last_name]}
+                type="text"
+                placeholder="last name"
+                label="Last Name (optional)"
+                phx-debounce="500"
+              />
+            </div>
+          </.inputs_for>
+        </div>
+        <div class="flex items-center">
+          <div class="w-4/5 h-0.5 bg-gray-200 dark:bg-gray-700"></div>
+          <div class="px-5 text-center text-gray-500 dark:text-gray-400">Login Credentials</div>
+          <div class="w-4/5 h-0.5 bg-gray-200 dark:bg-gray-700"></div>
+        </div>
+
+        <div class="grid gap-4 mb-4 sm:grid-cols-2">
+          <div>
+            <.input
+              field={@form[:email]}
+              type="email"
+              placeholder="name@company.com"
+              required
+              label="User Email"
+              phx-debounce="500"
+            />
+          </div>
+          <div>
+            <.input
+              field={@form[:password]}
+              type="password"
+              placeholder="••••••••"
+              required
+              label="Password"
+              phx-debounce="500"
+            />
+          </div>
+          <div>
+            <.input
+              field={@form[:password_confirmation]}
+              type="password"
+              placeholder="••••••••"
+              required
+              label="Confirm Password"
+              phx-debounce="500"
+            />
+          </div>
+        </div>
+        <div class="space-y-3">
+          <div class="flex items-start">
+            <div class="flex items-center h-5">
+              <input
+                id="terms"
+                aria-describedby="terms"
+                type="checkbox"
+                class="w-4 h-4 bg-gray-50 rounded border border-gray-300 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
+                required=""
+              />
+            </div>
+            <div class="ml-3 text-sm">
+              <label for="terms" class="font-light text-gray-500 dark:text-gray-300">
+                By signing up, you are creating a Flowbite account, and you agree to Flowbite’s
+                <a
+                  class="font-medium text-primary-600 dark:text-primary-500 hover:underline"
+                  href="#"
+                >
+                  Terms of Use
+                </a>
+                and <a
+                  class="font-medium text-primary-600 dark:text-primary-500 hover:underline"
+                  href="#"
+                >Privacy Policy</a>.
+              </label>
+            </div>
+          </div>
+        </div>
+        <.button
+          type="submit"
+          class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-700"
+          phx-disable-with="Creating Account..."
+        >
+          Create an account
+        </.button>
+        <p class="text-sm font-light text-gray-500 dark:text-gray-300">
+          Already have an account?
+          <.link
+            navigate={~p"/sign-in"}
+            class="font-medium text-primary-600 hover:underline dark:text-primary-500"
+          >
+            Login here
+          </.link>
+        </p>
+      </.simple_form>
+    </div>
+    <div class="flex justify-center items-center py-6 px-4 bg-primary-700 lg:py-0 sm:px-0">
+      <div class="max-w-md xl:max-w-xl">
+        <a href="#" class="flex items-center mb-4 text-2xl font-semibold text-white">
+          <img
+            src="/images/logo_light.svg"
+            class="hidden dark:block mr-2 h-20"
+            alt="Fleetms Logo"
+          />
+          <img src="/images/logo_dark.svg" class="dark:hidden mr-2 h-20" alt="Fleetms Logo" />
+        </a>
+        <h1 class="mb-4 text-3xl font-extrabold tracking-tight leading-none text-white xl:text-5xl">
+          Explore Fleetms
+        </h1>
+        <p class="mb-4 font-light text-primary-200 lg:mb-8">
+          Sign up for free to get started, explore how Fleetms features can help you streamline your Fleet management
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

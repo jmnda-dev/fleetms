@@ -1,5 +1,6 @@
 defmodule FleetmsWeb.Router do
   use FleetmsWeb, :router
+  use AshAuthentication.Phoenix.Router
   import AshAdmin.Router
 
   pipeline :browser do
@@ -9,6 +10,7 @@ defmodule FleetmsWeb.Router do
     plug :put_root_layout, html: {FleetmsWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :load_from_session
   end
 
   pipeline :api do
@@ -20,10 +22,35 @@ defmodule FleetmsWeb.Router do
     plug :put_layout, html: {FleetmsWeb.Layouts, :public}
   end
 
+  pipeline :auth_layout do
+    plug :put_root_layout, html: {FleetmsWeb.Layouts, :auth_root}
+  end
+
   scope "/", FleetmsWeb do
     pipe_through [:browser, :public_layout]
 
     get "/", PageController, :home
+  end
+
+  scope "/", FleetmsWeb do
+    pipe_through [:browser, :auth_layout]
+
+    ash_authentication_live_session :redirect_if_authenticated,
+      on_mount: [
+        {FleetmsWeb.LiveUserAuth, :redirect_if_authenticated},
+        {FleetmsWeb.LiveUserAuth, :user_optional}
+      ],
+      layout: {FleetmsWeb.Layouts, :auth} do
+      live "/sign-up", AuthLive.SignUp
+      live "/sign-in", AuthLive.SignIn
+    end
+  end
+
+  scope "/", FleetmsWeb do
+    pipe_through :browser
+
+    get "/sign-out", AuthController, :sign_out
+    auth_routes_for Fleetms.Accounts.User, to: AuthController
   end
 
   # Other scopes may use custom stacks.
