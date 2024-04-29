@@ -31,7 +31,7 @@ ENV PGHOSTADDR="127.0.0.1"
 ENV PGDATABASE="postgres"
 
 # Erlang dependencies
-RUN sudo install-packages build-essential autoconf m4 libncurses5-dev libwxgtk3.0-gtk3-dev libwxgtk-webview3.0-gtk3-dev \
+RUN sudo install-packages curl gnupg build-essential autoconf m4 libncurses5-dev libwxgtk3.0-gtk3-dev libwxgtk-webview3.0-gtk3-dev \
     libgl1-mesa-dev libglu1-mesa-dev libpng-dev libssh-dev unixodbc-dev xsltproc fop libxml2-utils libncurses-dev openjdk-11-jdk
 
 # Phoenix Dependencies
@@ -40,13 +40,13 @@ RUN sudo install-packages inotify-tools
 RUN brew install asdf \
     && asdf plugin add erlang \
     && asdf plugin add elixir \
-    && asdf plugin add nodejs \
+    # && asdf plugin add nodejs \
     && asdf install erlang 26.2.4 \
     && asdf global erlang 26.2.4 \
     && asdf install elixir 1.16.2-otp-26 \
     && asdf global elixir 1.16.2-otp-26 \
-    && asdf install nodejs lts \
-    && asdf global nodejs lts \
+    # && asdf install nodejs 20 \
+    # && asdf global nodejs 20 \
     && bash -c ". $(brew --prefix asdf)/libexec/asdf.sh \
         && mix local.hex --force \
         && mix local.rebar --force" \
