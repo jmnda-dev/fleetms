@@ -22,6 +22,7 @@ config :fleetms, FleetmsWeb.Endpoint,
 
 # In test we don't send emails.
 config :fleetms, Fleetms.Mailer, adapter: Swoosh.Adapters.Test
+config :fleetms, :token_signing_secret, "mwDGuzv3L5ZtPO5NDh3Ik"
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
@@ -35,3 +36,6 @@ config :phoenix, :plug_init_mode, :runtime
 config :phoenix_live_view,
   # Enable helpful, but potentially expensive runtime checks
   enable_expensive_runtime_checks: true
+
+config :bcrypt_elixir, log_rounds: 1
+config :ash, :disable_async?, true
