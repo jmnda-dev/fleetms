@@ -196,17 +196,24 @@ defmodule FleetmsWeb.CoreComponents do
     include: ~w(autocomplete name rel action enctype method novalidate target multipart),
     doc: "the arbitrary HTML attributes to apply to the form tag"
 
+  attr :container_class, :string, default: nil
   slot :inner_block, required: true
+
+  slot :extra_block,
+    required: false,
+    doc: "the optional extra block that renders extra form fields"
+
   slot :actions, doc: "the slot for form actions, such as a submit button"
 
   def simple_form(assigns) do
     ~H"""
     <.form :let={f} for={@for} as={@as} {@rest}>
-      <div class="mt-10 space-y-8 bg-white">
-        <%= render_slot(@inner_block, f) %>
-        <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
-          <%= render_slot(action, f) %>
-        </div>
+      <%= render_slot(@inner_block, f) %>
+      <div :for={action <- @actions} class={@container_class}>
+        <%= render_slot(action, f) %>
+      </div>
+      <div :if={@extra_block != []}>
+        <%= render_slot(@extra_block, f) %>
       </div>
     </.form>
     """
@@ -295,11 +302,12 @@ defmodule FleetmsWeb.CoreComponents do
   attr :name, :any
   attr :label, :string, default: nil
   attr :value, :any
+  attr :class, :string, default: nil
 
   attr :type, :string,
     default: "text",
     values: ~w(checkbox color date datetime-local email file month number password
-               range search select tel text textarea time url week)
+               range search select tel text textarea time url week hidden)
 
   attr :field, Phoenix.HTML.FormField,
     doc: "a form field struct retrieved from the form, for example: @form[:email]"
@@ -325,15 +333,13 @@ defmodule FleetmsWeb.CoreComponents do
     |> input()
   end
 
-  def input(%{type: "checkbox"} = assigns) do
+  def input(%{type: "checkbox", value: value} = assigns) do
     assigns =
-      assign_new(assigns, :checked, fn ->
-        Phoenix.HTML.Form.normalize_value("checkbox", assigns[:value])
-      end)
+      assign_new(assigns, :checked, fn -> Phoenix.HTML.Form.normalize_value("checkbox", value) end)
 
     ~H"""
     <div phx-feedback-for={@name}>
-      <label class="flex items-center gap-4 text-sm leading-6 text-zinc-600">
+      <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
         <input type="hidden" name={@name} value="false" />
         <input
           type="checkbox"
@@ -341,9 +347,31 @@ defmodule FleetmsWeb.CoreComponents do
           name={@name}
           value="true"
           checked={@checked}
-          class="rounded border-zinc-300 text-zinc-900 focus:ring-0"
+          class={[
+            "w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600",
+            @class
+          ]}
           {@rest}
         />
+        <%= @label %>
+      </label>
+      <.error :for={msg <- @errors}><%= msg %></.error>
+    </div>
+    """
+  end
+
+  def input(%{type: "radio"} = assigns) do
+    ~H"""
+    <div phx-feedback-for={@name} class="flex items-center mb-4">
+      <input
+        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+        type="radio"
+        name={@name}
+        value={@value}
+        id={@id}
+        checked={@checked}
+      />
+      <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300" for={@id}>
         <%= @label %>
       </label>
       <.error :for={msg <- @errors}><%= msg %></.error>
@@ -358,12 +386,16 @@ defmodule FleetmsWeb.CoreComponents do
       <select
         id={@id}
         name={@name}
-        class="mt-2 block w-full rounded-md border border-gray-300 bg-white shadow-sm focus:border-zinc-400 focus:ring-0 sm:text-sm"
+        class={[
+          "bg-gray-50 border phx-no-feedback:border-gray-300 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:phx-no-feedback:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500",
+          @class
+        ]}
         multiple={@multiple}
         {@rest}
       >
         <option :if={@prompt} value=""><%= @prompt %></option>
-        <%= Phoenix.HTML.Form.options_for_select(@options, @value) %>
+        <%!-- TODO: Properly handle cases where @options might be nil, for now we default to an empty list like so: <%= Phoenix.HTML.Form.options_for_select(@options || [], @value) %> --%>
+        <%= Phoenix.HTML.Form.options_for_select(@options || [], @value) %>
       </select>
       <.error :for={msg <- @errors}><%= msg %></.error>
     </div>
@@ -378,9 +410,8 @@ defmodule FleetmsWeb.CoreComponents do
         id={@id}
         name={@name}
         class={[
-          "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
-          "min-h-[6rem] phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400",
-          @errors == [] && "border-zinc-300 focus:border-zinc-400",
+          "block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg shadow-sm border phx-no-feedback:border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:phx-no-feedback:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500",
+          @class,
           @errors != [] && "border-rose-400 focus:border-rose-400"
         ]}
         {@rest}
@@ -401,9 +432,8 @@ defmodule FleetmsWeb.CoreComponents do
         id={@id}
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
         class={[
-          "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
-          "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400",
-          @errors == [] && "border-zinc-300 focus:border-zinc-400",
+          "bg-gray-50 border phx-no-feedback:border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:phx-no-feedback:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500",
+          @class,
           @errors != [] && "border-rose-400 focus:border-rose-400"
         ]}
         {@rest}
@@ -421,7 +451,7 @@ defmodule FleetmsWeb.CoreComponents do
 
   def label(assigns) do
     ~H"""
-    <label for={@for} class="block text-sm font-semibold leading-6 text-zinc-800">
+    <label for={@for} class="block text-sm font-semibold leading-6 text-gray-800 dark:text-white">
       <%= render_slot(@inner_block) %>
     </label>
     """

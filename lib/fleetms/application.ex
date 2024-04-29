@@ -14,6 +14,7 @@ defmodule Fleetms.Application do
       {Phoenix.PubSub, name: Fleetms.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: Fleetms.Finch},
+      {AshAuthentication.Supervisor, otp_app: :fleetms},
       # Start a worker by calling: Fleetms.Worker.start_link(arg)
       # {Fleetms.Worker, arg},
       # Start to serve requests, typically the last entry

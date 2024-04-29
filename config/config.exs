@@ -31,6 +31,9 @@ config :fleetms, FleetmsWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :fleetms, Fleetms.Mailer, adapter: Swoosh.Adapters.Local
 
+config :fleetms,
+  ash_domains: [Fleetms.Accounts]
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
@@ -60,6 +63,20 @@ config :logger, :console,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+config :spark, :formatter,
+  remove_parens?: true,
+  "Ash.Resource": [
+    type: Ash.Resource,
+    section_order: [
+      :authentication,
+      :token,
+      :attributes,
+      :relationships,
+      :policies,
+      :postgres
+    ]
+  ]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
