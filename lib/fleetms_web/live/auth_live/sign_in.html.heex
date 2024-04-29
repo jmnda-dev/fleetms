@@ -21,7 +21,7 @@
       </h2>
       <.simple_form
         for={@form}
-        id="sign-in_form"
+        id="sign_in_form"
         class="mt-8 space-y-6"
         action={~p"/auth/user/password/sign_in"}
         phx-trigger-action={@trigger_action}
@@ -66,12 +66,11 @@
             href="#"
             class="ml-auto text-sm text-primary-700 hover:underline dark:text-primary-500"
           >
-            Lost
-            Password?
+            Forgot your password?
           </.link>
         </div>
         <.button type="submit" phx-disable-with="Login In...">
-          Login to your account
+          Sign in to your account
         </.button>
         <div class="text-sm font-medium text-gray-500 dark:text-gray-400">
           Not registered?
@@ -79,8 +78,7 @@
             navigate={~p"/sign-up"}
             class="text-primary-700 hover:underline dark:text-primary-500"
           >
-            Create
-            account
+            Create account
           </.link>
         </div>
       </.simple_form>
