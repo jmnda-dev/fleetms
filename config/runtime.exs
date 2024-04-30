@@ -65,6 +65,13 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 
+  config :fleetms,
+         :token_signing_secret,
+         System.get_env("TOKEN_SIGNING_SECRET") ||
+           raise("""
+           environment variable TOKEN_SIGNING_SECRET is missing.
+           """)
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

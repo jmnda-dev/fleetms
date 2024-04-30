@@ -1,0 +1,41 @@
+# fly.toml app configuration file generated for fleetms on 2024-04-30T22:13:36+02:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'fleetms'
+primary_region = 'jnb'
+kill_signal = 'SIGTERM'
+
+[build]
+
+[deploy]
+  release_command = '/app/bin/migrate'
+
+[env]
+  PHX_HOST = 'fleetms.fly.dev'
+  PORT = '8080'
+  RELEASE_COOKIE = '3CJAPhDfR_tsKmT0tGHe8bJ6_aKjZ8EErlF84q_IXFq8XtsztZNPiC=='
+
+[[mounts]]
+  source = 'fleetms_data'
+  destination = '/app/bin/uploads'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+  [http_service.concurrency]
+    type = 'connections'
+    hard_limit = 1000
+    soft_limit = 1000
+
+[[vm]]
+  size = 'shared-cpu-2x'
+  memory = '768mb'
+  cpu_kind = 'shared'
+  cpus = 2
