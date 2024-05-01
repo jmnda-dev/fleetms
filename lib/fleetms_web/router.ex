@@ -33,6 +33,18 @@ defmodule FleetmsWeb.Router do
   end
 
   scope "/", FleetmsWeb do
+    pipe_through :browser
+
+    ash_authentication_live_session :require_authenticated_user,
+      on_mount: [
+        {FleetmsWeb.LiveUserAuth, :require_authenticated_user}
+      ] do
+      live "/dashboard", DashboardLive
+      live "/users", UserLive
+    end
+  end
+
+  scope "/", FleetmsWeb do
     pipe_through [:browser, :auth_layout]
 
     ash_authentication_live_session :redirect_if_authenticated,
