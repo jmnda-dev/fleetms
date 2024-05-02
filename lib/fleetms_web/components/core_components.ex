@@ -497,6 +497,7 @@ defmodule FleetmsWeb.CoreComponents do
   end
 
   @doc ~S"""
+
   Renders a table with generic styling.
 
   ## Examples
@@ -517,11 +518,86 @@ defmodule FleetmsWeb.CoreComponents do
 
   slot :col, required: true do
     attr :label, :string
+    attr :class, :string
   end
 
   slot :action, doc: "the slot for showing user actions in the last table column"
 
   def table(assigns) do
+    assigns =
+      with %{rows: %Phoenix.LiveView.LiveStream{}} <- assigns do
+        assign(assigns, row_id: assigns.row_id || fn {id, _item} -> id end)
+      end
+
+    ~H"""
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            <th :for={col <- @col} scope="col" class={["px-4 py-3", col[:class]]}>
+              <%= col[:label] %>
+            </th>
+            <th scope="col" class="px-4 py-3">
+              <span class="sr-only"><%= gettext("Actions") %></span>
+            </th>
+          </tr>
+        </thead>
+        <tbody id={@id} phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}>
+          <tr
+            :for={row <- @rows}
+            id={@row_id && @row_id.(row)}
+            class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            <td
+              :for={{col, i} <- Enum.with_index(@col)}
+              phx-click={@row_click && @row_click.(row)}
+              scope={i == 0 && "row"}
+              class={[
+                i == 0 && "flex items-center",
+                @row_click && "hover:cursor-pointer",
+                "px-4 py-3 font-medium text-gray-900 whitespace-normal dark:text-white"
+              ]}
+            >
+              <%= render_slot(col, @row_item.(row)) %>
+            </td>
+            <td :if={@action != []} class="px-4 py-3">
+              <%= for action <- @action do %>
+                <%= render_slot(action, @row_item.(row)) %>
+              <% end %>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    """
+  end
+
+  @doc ~S"""
+  Renders a table with generic styling.
+
+  ## Examples
+
+      <.table_2 id="users" rows={@users}>
+        <:col :let={user} label="id"><%= user.id %></:col>
+        <:col :let={user} label="username"><%= user.username %></:col>
+      </.table_2>
+  """
+  attr :id, :string, required: true
+  attr :rows, :list, required: true
+  attr :row_id, :any, default: nil, doc: "the function for generating the row id"
+  attr :row_click, :any, default: nil, doc: "the function for handling phx-click on each row"
+
+  attr :row_item, :any,
+    default: &Function.identity/1,
+    doc: "the function for mapping each row before calling the :col and :action slots"
+
+  slot :col, required: true do
+    attr :label, :string
+  end
+
+  slot :action, doc: "the slot for showing user actions in the last table column"
+
+  def table_2(assigns) do
     assigns =
       with %{rows: %Phoenix.LiveView.LiveStream{}} <- assigns do
         assign(assigns, row_id: assigns.row_id || fn {id, _item} -> id end)
@@ -649,6 +725,46 @@ defmodule FleetmsWeb.CoreComponents do
   def icon(%{name: "hero-" <> _} = assigns) do
     ~H"""
     <span class={[@name, @class]} />
+    """
+  end
+
+  @doc """
+  Renders a badge component.
+
+  ## Examples
+
+      <.badge kind={:success} label="Back to posts" />
+      <.badge kind={:success}>Back to posts<.badge/>
+  """
+  attr :label, :string, default: nil
+
+  attr :kind, :atom,
+    values: [:primary, :secondary, :success, :danger, :warning, :info],
+    default: :primary
+
+  attr :class, :string, default: nil
+
+  attr :rest, :global
+  slot :inner_block
+
+  def badge(assigns) do
+    ~H"""
+    <span
+      class={[
+        "text-sm font-medium mr-2 px-2.5 py-0.5 rounded",
+        @kind == :primary && "bg-blue-100 text-blue-800  dark:bg-blue-900 dark:text-blue-300",
+        @kind == :secondary && "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
+        @kind == :success && "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+        @kind == :danger && "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+        @kind == :warning && "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+        @kind == :info && "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300",
+        @class
+      ]}
+      {@rest}
+    >
+      <%= @label %>
+      <%= render_slot(@inner_block) %>
+    </span>
     """
   end
 
