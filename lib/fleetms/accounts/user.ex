@@ -46,6 +46,13 @@ defmodule Fleetms.Accounts.User do
       sensitive? true
     end
 
+    attribute :status, :atom do
+      allow_nil? false
+      default :active
+      writable? false
+      constraints one_of: Fleetms.Enums.user_statuses()
+    end
+
     create_timestamp :created_at
     update_timestamp :updated_at
   end
@@ -64,7 +71,7 @@ defmodule Fleetms.Accounts.User do
   end
 
   actions do
-    defaults [:read, :destroy, create: :*, update: :*]
+    defaults [:destroy, create: :*, update: :*]
 
     create :register_with_password do
       allow_nil_input [:hashed_password]
@@ -132,6 +139,16 @@ defmodule Fleetms.Accounts.User do
       change manage_relationship(:organization_id, :organization, type: :append_and_remove)
       change manage_relationship(:user_profile, type: :direct_control)
     end
+
+    read :list do
+      primary? true
+
+      prepare build(load: [:full_name])
+    end
+  end
+
+  calculations do
+    calculate :full_name, :string, expr(user_profile.full_name)
   end
 
   identities do

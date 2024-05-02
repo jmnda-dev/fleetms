@@ -61,6 +61,10 @@ defmodule Fleetms.Accounts.UserProfile do
     end
   end
 
+  calculations do
+    calculate :full_name, :string, expr((first_name || "") <> " " <> (last_name || ""))
+  end
+
   actions do
     defaults [:read, :destroy, create: :*, update: :*]
   end
