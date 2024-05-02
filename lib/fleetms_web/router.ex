@@ -40,7 +40,7 @@ defmodule FleetmsWeb.Router do
         {FleetmsWeb.LiveUserAuth, :require_authenticated_user}
       ] do
       live "/dashboard", DashboardLive
-      live "/users", UserLive
+      live "/users", UserLive.List
     end
   end
 
