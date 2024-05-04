@@ -135,10 +135,9 @@
               </div>
             </div>
           </:col>
-          <:col :let={{id, user}} label="Status">
+          <:col :let={{_id, user}} label="Status">
             <.badge
-              id={["col_", id]}
-              phx-hook="HumanizeText"
+              data-humanize
               kind={if user.status == :active, do: :success, else: :danger}
               label={user.status}
             />

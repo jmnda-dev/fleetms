@@ -1,6 +1,6 @@
 import darkModeToggleJs from "./dark-mode.js"
 import sidebarInitJs from "./sidebar.js"
-import {humanizeString} from "./utils.js"
+import { humanizeString } from "./utils.js"
 
 Hooks = {}
 Hooks.initDarkModeToggle = {
@@ -20,11 +20,14 @@ Hooks.initSidebarJs = {
 
 Hooks.HumanizeText = {
   mounted() {
-    const string = this.el.textContent
+    document.querySelectorAll('[data-humanize]').forEach((element) => {
+      let text = element.textContent.trim();
 
-    if (string) {
-      this.el.textContent = humanizeString(string)
-    }
+      if (text) {
+        let humanizedText = humanizeString(text);
+        element.textContent = humanizedText;
+      }
+    });
   }
 }
 export default Hooks
