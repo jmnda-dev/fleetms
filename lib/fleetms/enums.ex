@@ -10,4 +10,15 @@ defmodule Fleetms.Enums do
       :inactive
     ]
   end
+
+  @doc false
+  def basic_user_roles do
+    [
+      :admin,
+      :fleet_manager,
+      :technician,
+      :driver,
+      :viewer
+    ]
+  end
 end
