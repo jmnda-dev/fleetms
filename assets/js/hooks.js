@@ -22,7 +22,7 @@ Hooks.HumanizeText = {
   mounted() {
     this.el.querySelectorAll('[data-humanize]').forEach((element) => {
       text = element.textContent.trim();
-      humanizedString = humanizedString(text)
+      humanizedString = humanizeString(text)
 
       element.textContent = humanizedString;
     });
