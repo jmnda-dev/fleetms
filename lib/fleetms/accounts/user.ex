@@ -53,6 +53,10 @@ defmodule Fleetms.Accounts.User do
       constraints one_of: Fleetms.Enums.user_statuses()
     end
 
+    attribute :roles, {:array, :atom} do
+      allow_nil? false
+    end
+
     create_timestamp :created_at
     update_timestamp :updated_at
   end
@@ -104,11 +108,12 @@ defmodule Fleetms.Accounts.User do
 
       change manage_relationship(:organization, type: :direct_control)
       change manage_relationship(:user_profile, type: :direct_control)
+      change set_attribute(:roles, [:admin])
     end
 
     create :organization_internal_user do
       allow_nil_input [:hashed_password]
-      accept [:email]
+      accept [:email, :roles]
 
       argument :password, :string do
         sensitive? true
