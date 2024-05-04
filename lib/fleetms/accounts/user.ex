@@ -131,8 +131,8 @@ defmodule Fleetms.Accounts.User do
         message "Invalid password format. Password much contain at least one lowercase and uppercase letter, and at leat one of these characters: !#$%&?"
       end
 
-      validate AshAuthentication.Strategy.Password.PasswordConfirmationValidation
       change set_context(%{strategy_name: :password})
+      validate AshAuthentication.Strategy.Password.PasswordConfirmationValidation
       change AshAuthentication.Strategy.Password.HashPasswordChange
       change AshAuthentication.GenerateTokenChange
 
