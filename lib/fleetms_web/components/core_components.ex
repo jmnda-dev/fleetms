@@ -83,7 +83,10 @@ defmodule FleetmsWeb.CoreComponents do
                   class="-m-3 flex-none p-3"
                   aria-label={gettext("close")}
                 >
-                <.icon name="hero-x-mark-solid text-gray-800 dark:text-gray-100 font-bold" class="h-5 w-5" />
+                  <.icon
+                    name="hero-x-mark-solid text-gray-800 dark:text-gray-100 font-bold"
+                    class="h-5 w-5"
+                  />
                 </button>
               </div>
               <div id={"#{@id}-content"}>
@@ -524,6 +527,8 @@ defmodule FleetmsWeb.CoreComponents do
     default: &Function.identity/1,
     doc: "the function for mapping each row before calling the :col and :action slots"
 
+  attr :rest, :global, include: ~w(phx-hook)
+
   slot :col, required: true do
     attr :label, :string
     attr :class, :string
@@ -550,7 +555,7 @@ defmodule FleetmsWeb.CoreComponents do
             </th>
           </tr>
         </thead>
-        <tbody id={@id} phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}>
+        <tbody id={@id} phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"} {@rest}>
           <tr
             :for={row <- @rows}
             id={@row_id && @row_id.(row)}
@@ -626,6 +631,7 @@ defmodule FleetmsWeb.CoreComponents do
           id={@id}
           phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
           class="relative divide-y divide-zinc-100 border-t border-zinc-200 text-sm leading-6 text-zinc-700"
+          {@rest}
         >
           <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-zinc-50">
             <td
