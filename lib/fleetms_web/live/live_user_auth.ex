@@ -29,4 +29,13 @@ defmodule FleetmsWeb.LiveUserAuth do
       {:cont, socket}
     end
   end
+
+  def on_mount(:load_user_profile, _params, _session, socket) do
+    if user = socket.assigns[:current_user] do
+      user_with_profile = Ash.load!(user, [:full_name, :user_profile])
+      {:cont, assign(socket, :current_user, user_with_profile)}
+    else
+      {:cont, socket}
+    end
+  end
 end
