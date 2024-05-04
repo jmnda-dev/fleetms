@@ -83,7 +83,7 @@ defmodule FleetmsWeb.LayoutComponents do
                   alt=""
                 />
                 <div class="font-medium dark:text-white">
-                  <div>Jese Leos</div>
+                  <div><%= @current_user.full_name %></div>
                   <div class="text-sm text-gray-500 dark:text-gray-400">
                     <%= @current_user.email %>
                   </div>
@@ -216,6 +216,8 @@ defmodule FleetmsWeb.LayoutComponents do
     </header>
     """
   end
+
+  attr :current_user, :map, required: true
 
   def navbar(assigns) do
     ~H"""
@@ -487,10 +489,10 @@ defmodule FleetmsWeb.LayoutComponents do
               >
                 <div class="py-3 px-4" role="none">
                   <p class="text-sm text-gray-900 dark:text-white" role="none">
-                    Neil Sims
+                    <%= @current_user.full_name %>
                   </p>
                   <p class="text-sm font-medium text-gray-900 truncate dark:text-gray-300" role="none">
-                    neil.sims@flowbite.com
+                    <%= @current_user.email %>
                   </p>
                 </div>
                 <ul class="py-1" role="none">
