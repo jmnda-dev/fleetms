@@ -164,6 +164,10 @@ defmodule Fleetms.Accounts.User do
       allow_nil_input [:hashed_password]
       accept [:email, :roles]
 
+      argument :user_status, :atom do
+        constraints one_of: Fleetms.Enums.user_statuses()
+      end
+
       argument :password, :string do
         sensitive? true
         constraints min_length: 8, max_length: 32
@@ -185,6 +189,7 @@ defmodule Fleetms.Accounts.User do
       change set_context(%{strategy_name: :password})
       validate AshAuthentication.Strategy.Password.PasswordConfirmationValidation
       change AshAuthentication.Strategy.Password.HashPasswordChange
+      change set_attribute(:status, arg(:user_status))
     end
   end
 
