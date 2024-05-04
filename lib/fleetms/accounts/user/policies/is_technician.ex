@@ -1,4 +1,3 @@
-
 defmodule Fleetms.Accounts.User.Policies.IsTechnician do
   @moduledoc """
   Checks if the actor/user has a `technician` role

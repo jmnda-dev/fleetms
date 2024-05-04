@@ -80,7 +80,7 @@ defmodule Fleetms.Accounts.User do
       authorize_if always()
     end
 
-    policy action(:listing) do
+    policy action(:list) do
       authorize_if IsFleetManager
       authorize_if IsTechnician
     end
@@ -128,7 +128,7 @@ defmodule Fleetms.Accounts.User do
       change set_attribute(:roles, [:admin])
     end
 
-    create :organization_internal_user do
+    create :create_organization_user do
       allow_nil_input [:hashed_password]
       accept [:email, :roles]
 
