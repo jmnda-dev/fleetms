@@ -37,7 +37,8 @@ defmodule FleetmsWeb.Router do
 
     ash_authentication_live_session :require_authenticated_user,
       on_mount: [
-        {FleetmsWeb.LiveUserAuth, :require_authenticated_user}
+        {FleetmsWeb.LiveUserAuth, :require_authenticated_user},
+        {FleetmsWeb.LiveUserAuth, :load_user_profile}
       ] do
       live "/dashboard", DashboardLive
       live "/users", UserLive.List, :listing
