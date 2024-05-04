@@ -18,6 +18,9 @@
         <.input field={user_profile_form[:state]} type="text" label="State" />
         <.input field={user_profile_form[:postal_code]} type="text" label="Postal Code" />
       </.inputs_for>
+
+
+      <.input field={@form[:roles]} type="select" label="Roles" options={atom_list_to_options_for_select(user_roles_options())} multiple required />
     </div>
 
     <h4 class="text-lg text-gray-900 dark:text-white">Login Credentials</h4>

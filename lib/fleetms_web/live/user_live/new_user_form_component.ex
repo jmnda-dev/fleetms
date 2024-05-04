@@ -2,6 +2,8 @@ defmodule FleetmsWeb.UserLive.NewUserFormComponent do
   use FleetmsWeb, :live_component
   alias Fleetms.Accounts.User
 
+  import Fleetms.Utils, only: [atom_list_to_options_for_select: 1]
+
   @impl Phoenix.LiveComponent
   def update(assigns, socket) do
     {:ok,
@@ -49,4 +51,6 @@ defmodule FleetmsWeb.UserLive.NewUserFormComponent do
 
     assign(socket, :form, to_form(form))
   end
+
+  defp user_roles_options, do: Fleetms.Enums.basic_user_roles()
 end
