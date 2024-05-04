@@ -1,0 +1,76 @@
+<div>
+  <.header><%= @title %></.header>
+
+  <.simple_form
+    for={@form}
+    id="user_form"
+    phx-target={@myself}
+    phx-change="validate"
+    phx-submit="save"
+    phx-hook="HumanizeText"
+  >
+    <section :if={@action == :edit} class="bg-gray-50 dark:bg-gray-800 rounded-md">
+      <div class="py-8 px-4 mx-auto max-w-2xl">
+        <h2 class="mb-4 text-xl font-semibold leading-none text-gray-900 md:text-2xl dark:text-white sm:mb-5">
+          <%= @user.full_name %>
+        </h2>
+        <dl>
+          <dt class="mb-2 font-semibold leading-none text-gray-900 dark:text-white">Roles</dt>
+          <dd class="mb-4 font-light text-gray-500 sm:mb-5 dark:text-gray-400">
+            <.badge :for={role <- @user.roles} label={role} data-humanize />
+          </dd>
+        </dl>
+      </div>
+    </section>
+    <div :if={@action == :new} class="grid gap-4 mb-4 sm:grid-cols-2">
+      <.inputs_for :let={user_profile_form} field={@form[:user_profile]}>
+        <.input field={user_profile_form[:first_name]} type="text" label="First Name" required />
+        <.input field={user_profile_form[:other_name]} type="text" label="Other Name" />
+        <.input field={user_profile_form[:last_name]} type="text" label="Last Name" />
+        <.input field={user_profile_form[:address]} type="textarea" label="Address" />
+        <.input field={user_profile_form[:city]} type="text" label="City" />
+        <.input field={user_profile_form[:state]} type="text" label="State" />
+        <.input field={user_profile_form[:postal_code]} type="text" label="Postal Code" />
+      </.inputs_for>
+    </div>
+
+    <div class="mb-4">
+      <.input
+        field={@form[:roles]}
+        type="select"
+        label="Roles"
+        options={atom_list_to_options_for_select(user_roles_options())}
+        multiple
+        required
+      />
+    </div>
+    <h4 class="text-lg text-gray-900 dark:text-white mb-2">
+      <%= if @action == :edit do %>
+        Update Login Credentials
+      <% else %>
+        Login Credentials
+      <% end %>
+    </h4>
+    <div class="grid gap-4 mb-4 sm:grid-cols-2">
+      <.input field={@form[:email]} type="email" label="Email" required />
+
+      <div>
+        <.input
+          field={@form[:password]}
+          type="password"
+          label={if @action == :edit, do: "New Password", else: "Password"}
+        />
+      </div>
+
+      <div>
+        <.input field={@form[:password_confirmation]} type="password" label="Confirm Password" />
+      </div>
+    </div>
+
+    <:actions>
+      <.button phx-disable-with="Saving...">
+        Save User
+      </.button>
+    </:actions>
+  </.simple_form>
+</div>

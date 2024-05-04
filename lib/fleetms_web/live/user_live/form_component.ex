@@ -1,15 +1,17 @@
-defmodule FleetmsWeb.UserLive.NewUserFormComponent do
+defmodule FleetmsWeb.UserLive.FormComponent do
   use FleetmsWeb, :live_component
   alias Fleetms.Accounts.User
 
   import Fleetms.Utils, only: [atom_list_to_options_for_select: 1]
 
   @impl Phoenix.LiveComponent
-  def update(assigns, socket) do
-    {:ok,
-     socket
-     |> assign(assigns)
-     |> assign_form()}
+  def update(%{user: user} = assigns, socket) do
+    socket =
+      socket
+      |> assign(assigns)
+      |> assign_form(user)
+
+    {:ok, socket}
   end
 
   @impl Phoenix.LiveComponent
@@ -40,14 +42,22 @@ defmodule FleetmsWeb.UserLive.NewUserFormComponent do
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 
-  defp assign_form(socket) do
+  defp assign_form(socket, user) do
     form =
-      User
-      |> AshPhoenix.Form.for_create(:organization_internal_user,
-        as: "user",
-        forms: [auto?: true]
-      )
-      |> AshPhoenix.Form.add_form(:user_profile)
+      if not is_nil(user) do
+        user
+        |> AshPhoenix.Form.for_update(:update,
+          as: "user",
+          forms: [auto?: true]
+        )
+      else
+        User
+        |> AshPhoenix.Form.for_create(:organization_internal_user,
+          as: "user",
+          forms: [auto?: true]
+        )
+        |> AshPhoenix.Form.add_form(:user_profile)
+      end
 
     assign(socket, :form, to_form(form))
   end

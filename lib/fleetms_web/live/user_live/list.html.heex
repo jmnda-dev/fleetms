@@ -119,7 +119,7 @@
   <div class="overflow-x-auto">
     <div class="inline-block min-w-full align-middle">
       <div class="overflow-hidden shadow">
-        <.table id="users" rows={@streams.users}>
+        <.table id="users" phx-hook="HumanizeText" rows={@streams.users}>
           <:col :let={{_id, user}} label="Full Name">
             <img
               class="w-10 h-10 rounded-full"
@@ -142,16 +142,19 @@
               label={user.status}
             />
           </:col>
+          <:col :let={{_id, user}} label="Roles">
+            <.badge :for={role <- user.roles} label={role} data-humanize />
+          </:col>
 
-          <:action :let={{_id, _user}}>
-            <button
-              type="button"
-              data-modal-target="user-modal"
-              data-modal-toggle="user-modal"
-              class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-            >
-              <.icon name="hero-pencil-square" class="w-5 h-5 mr-2" /> Edit user
-            </button>
+          <:action :let={{_id, user}}>
+            <.link patch={~p"/users/#{user}/edit"}>
+              <button
+                type="button"
+                class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+              >
+                <.icon name="hero-pencil-square" class="w-5 h-5 mr-2" /> Edit user
+              </button>
+            </.link>
           </:action>
         </.table>
       </div>
@@ -160,17 +163,18 @@
 </div>
 
 <.modal
-  :if={@live_action == :new}
-  id="new_user_modal"
+  :if={@live_action in [:new, :edit]}
+  id="user_form_modal"
   show
   on_cancel={JS.navigate(~p"/users")}
   phx_click_away={false}
 >
   <.live_component
-    module={FleetmsWeb.UserLive.NewUserFormComponent}
+    module={FleetmsWeb.UserLive.FormComponent}
     id={:new}
     title={@page_title}
     action={@live_action}
+    user={@user}
     current_user={@current_user}
     patch={~p"/users"}
   />

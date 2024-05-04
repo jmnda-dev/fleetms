@@ -42,6 +42,7 @@ defmodule FleetmsWeb.Router do
       live "/dashboard", DashboardLive
       live "/users", UserLive.List, :listing
       live "/users/new", UserLive.List, :new
+      live "/users/:id/edit", UserLive.List, :edit
     end
   end
 
