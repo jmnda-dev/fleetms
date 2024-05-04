@@ -5,24 +5,26 @@ defmodule Fleetms.Accounts.User do
   use Ash.Resource,
     data_layer: AshPostgres.DataLayer,
     extensions: [AshAuthentication],
+    authorizers: [Ash.Policy.Authorizer],
     domain: Fleetms.Accounts
 
   alias Fleetms.Accounts.{Organization, Token, UserProfile}
+  alias Fleetms.Accounts.User.Policies.{IsAdmin, IsFleetManager, IsTechnician}
 
   authentication do
     strategies do
       password :password do
-        identity_field :email
+        identity_field(:email)
       end
     end
 
     tokens do
-      enabled? true
-      token_resource Token
+      enabled?(true)
+      token_resource(Token)
 
-      signing_secret fn _, _ ->
+      signing_secret(fn _, _ ->
         Application.fetch_env(:fleetms, :token_signing_secret)
-      end
+      end)
     end
   end
 
@@ -69,13 +71,28 @@ defmodule Fleetms.Accounts.User do
     has_one :user_profile, UserProfile
   end
 
+  policies do
+    bypass AshAuthentication.Checks.AshAuthenticationInteraction do
+      authorize_if always()
+    end
+
+    bypass IsAdmin do
+      authorize_if always()
+    end
+
+    policy action(:listing) do
+      authorize_if IsFleetManager
+      authorize_if IsTechnician
+    end
+  end
+
   postgres do
     table "users"
     repo Fleetms.Repo
   end
 
   actions do
-    defaults [:destroy, create: :*]
+    defaults [:destroy]
 
     create :register_with_password do
       allow_nil_input [:hashed_password]
@@ -193,10 +210,6 @@ defmodule Fleetms.Accounts.User do
     end
   end
 
-  calculations do
-    calculate :full_name, :string, expr(user_profile.full_name)
-  end
-
   identities do
     identity :unique_email, [:email] do
       eager_check? true
@@ -205,5 +218,9 @@ defmodule Fleetms.Accounts.User do
     identity :unique_username, [:username] do
       eager_check? true
     end
+  end
+
+  calculations do
+    calculate :full_name, :string, expr(user_profile.full_name)
   end
 end
