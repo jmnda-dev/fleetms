@@ -58,9 +58,10 @@ defmodule Fleetms.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.2"},
-      {:ash, "~> 3.0.0-rc.31"},
+      {:ash, "~> 3.0.0-rc.45"},
       {:picosat_elixir, "~> 0.2"},
       {:ash_postgres, "~> 2.0.0-rc.11"},
+      {:ash_phoenix, "~> 2.0.0-rc.8"},
       {:ash_authentication, "~> 4.0.0-rc.6"},
       {:ash_authentication_phoenix, "~> 2.0.0-rc.2"},
       {:ash_admin, "~> 0.10.10-rc.1"}
