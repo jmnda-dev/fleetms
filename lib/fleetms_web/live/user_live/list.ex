@@ -5,6 +5,15 @@ defmodule FleetmsWeb.UserLive.List do
   alias Fleetms.Accounts.User
 
   @impl Phoenix.LiveView
+  def mount(_params, _session, socket) do
+    if Ash.can?({User, :list}, socket.assigns.current_user) do
+      {:ok, socket}
+    else
+      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Not Authorized"
+    end
+  end
+
+  @impl Phoenix.LiveView
   def handle_params(params, _uri, socket) do
     users = Ash.read!(User, actor: socket.assigns.current_user)
 
@@ -18,17 +27,27 @@ defmodule FleetmsWeb.UserLive.List do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    user = Accounts.get_user_by_id!(id, actor: socket.assigns.current_user)
+    current_user = socket.assigns.current_user
 
-    socket
-    |> assign(:page_title, "Edit User")
-    |> assign(:user, user)
+    if Ash.can?({User, :update}, current_user) do
+      user = Accounts.get_user_by_id!(id, actor: current_user)
+
+      socket
+      |> assign(:page_title, "Edit User")
+      |> assign(:user, user)
+    else
+      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Not Authorized"
+    end
   end
 
   defp apply_action(socket, :new, _params) do
-    socket
-    |> assign(:page_title, "New User")
-    |> assign(:user, nil)
+    if Ash.can?({User, :create_organization_user}, socket.assigns.current_user) do
+      socket
+      |> assign(:page_title, "New User")
+      |> assign(:user, nil)
+    else
+      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Not Authorized"
+    end
   end
 
   defp apply_action(socket, :listing, _params) do

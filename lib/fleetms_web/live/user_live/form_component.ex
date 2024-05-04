@@ -53,7 +53,7 @@ defmodule FleetmsWeb.UserLive.FormComponent do
         )
       else
         User
-        |> AshPhoenix.Form.for_create(:organization_internal_user,
+        |> AshPhoenix.Form.for_create(:create_organization_user,
           as: "user",
           forms: [auto?: true]
         )

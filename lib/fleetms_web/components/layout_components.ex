@@ -6,6 +6,8 @@ defmodule FleetmsWeb.LayoutComponents do
   import FleetmsWeb.CoreComponents, only: [button: 1, icon: 1]
   use FleetmsWeb, :verified_routes
 
+  alias Fleetms.Accounts.User
+
   @doc """
   A Navbar component for public pages
   """
@@ -524,6 +526,8 @@ defmodule FleetmsWeb.LayoutComponents do
     """
   end
 
+  attr :current_user, :map, required: true
+
   def sidebar(assigns) do
     ~H"""
     <aside
@@ -565,7 +569,7 @@ defmodule FleetmsWeb.LayoutComponents do
                   </div>
                 </form>
               </li>
-              <li :for={sidebar_item <- sidebar_links()}>
+              <li :for={sidebar_item <- sidebar_links(@current_user)} :if={sidebar_item.show_link?}>
                 <.link
                   navigate={sidebar_item.link}
                   class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700"
@@ -601,10 +605,15 @@ defmodule FleetmsWeb.LayoutComponents do
     """
   end
 
-  defp sidebar_links do
+  defp sidebar_links(actor) do
     [
-      %{link: ~p"/dashboard", title: "Dashboard", icon_name: "hero-chart-pie"},
-      %{link: ~p"/users", title: "Users", icon_name: "hero-users"}
+      %{link: ~p"/dashboard", title: "Dashboard", icon_name: "hero-chart-pie", show_link?: true},
+      %{
+        link: ~p"/users",
+        title: "Users",
+        icon_name: "hero-users",
+        show_link?: Ash.can?({User, :list}, actor)
+      }
     ]
   end
 end
