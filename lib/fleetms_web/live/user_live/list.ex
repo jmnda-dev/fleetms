@@ -6,7 +6,7 @@ defmodule FleetmsWeb.UserLive.List do
 
   @impl Phoenix.LiveView
   def handle_params(params, _uri, socket) do
-    users = Ash.read!(User)
+    users = Ash.read!(User, actor: socket.assigns.current_user)
 
     socket = stream(socket, :users, users)
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
@@ -18,7 +18,7 @@ defmodule FleetmsWeb.UserLive.List do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    user = Accounts.get_user_by_id!(id)
+    user = Accounts.get_user_by_id!(id, actor: socket.assigns.current_user)
 
     socket
     |> assign(:page_title, "Edit User")

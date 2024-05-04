@@ -48,7 +48,8 @@ defmodule FleetmsWeb.UserLive.FormComponent do
         user
         |> AshPhoenix.Form.for_update(:update,
           as: "user",
-          forms: [auto?: true]
+          forms: [auto?: true],
+          actor: socket.assigns.current_user
         )
       else
         User
@@ -63,4 +64,5 @@ defmodule FleetmsWeb.UserLive.FormComponent do
   end
 
   defp user_roles_options, do: Fleetms.Enums.basic_user_roles()
+  defp user_status_options, do: Fleetms.Enums.user_statuses()
 end

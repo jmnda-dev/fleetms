@@ -34,7 +34,7 @@
       </.inputs_for>
     </div>
 
-    <div class="mb-4">
+    <div class="mb-2">
       <.input
         field={@form[:roles]}
         type="select"
@@ -42,6 +42,15 @@
         options={atom_list_to_options_for_select(user_roles_options())}
         multiple
         required
+      />
+    </div>
+    <div class="mb-2">
+      <.input
+        :if={@action == :edit}
+        field={@form[:user_status]}
+        type="select"
+        label="Status"
+        options={atom_list_to_options_for_select(user_status_options())}
       />
     </div>
     <h4 class="text-lg text-gray-900 dark:text-white mb-2">
