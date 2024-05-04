@@ -86,9 +86,11 @@
         </form>
       </div>
       <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
-        <button class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-          <.icon name="hero-plus" class="w-6 h-6 mr-2 -ml-1" /> Add user
-        </button>
+        <.link patch={~p"/users/new"}>
+          <button class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+            <.icon name="hero-plus" class="w-6 h-6 mr-2 -ml-1" /> Add user
+          </button>
+        </.link>
         <a
           href="#"
           class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
@@ -157,3 +159,20 @@
     </div>
   </div>
 </div>
+
+<.modal
+  :if={@live_action == :new}
+  id="new_user_modal"
+  show
+  on_cancel={JS.navigate(~p"/users")}
+  phx_click_away={false}
+>
+  <.live_component
+    module={FleetmsWeb.UserLive.NewUserFormComponent}
+    id={:new}
+    title={@page_title}
+    action={@live_action}
+    current_user={@current_user}
+    patch={~p"/users"}
+  />
+</.modal>
