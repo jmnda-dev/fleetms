@@ -20,14 +20,16 @@ Hooks.initSidebarJs = {
 
 Hooks.HumanizeText = {
   mounted() {
-    document.querySelectorAll('[data-humanize]').forEach((element) => {
-      let text = element.textContent.trim();
+    this.el.querySelectorAll('[data-humanize]').forEach((element) => {
+      text = element.textContent.trim();
+      humanizedString = humanizedString(text)
 
-      if (text) {
-        let humanizedText = humanizeString(text);
-        element.textContent = humanizedText;
-      }
+      element.textContent = humanizedString;
     });
+  },
+  updated() {
+    this.mounted()
   }
 }
+
 export default Hooks
