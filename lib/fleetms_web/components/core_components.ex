@@ -39,6 +39,10 @@ defmodule FleetmsWeb.CoreComponents do
   attr :id, :string, required: true
   attr :show, :boolean, default: false
   attr :on_cancel, JS, default: %JS{}
+  attr :max_width, :string, default: "max-w-3xl"
+  attr :phx_key, :string, default: "escape"
+  attr :phx_click_away, :boolean, default: true
+  attr :phx_window_keydown, :boolean, default: true
   slot :inner_block, required: true
 
   def modal(assigns) do
@@ -50,7 +54,11 @@ defmodule FleetmsWeb.CoreComponents do
       data-cancel={JS.exec(@on_cancel, "phx-remove")}
       class="relative z-50 hidden"
     >
-      <div id={"#{@id}-bg"} class="bg-zinc-50/90 fixed inset-0 transition-opacity" aria-hidden="true" />
+      <div
+        id={"#{@id}-bg"}
+        class="bg-gray-700/70 dark:bg-gray-900/70 fixed inset-0 transition-opacity"
+        aria-hidden="true"
+      />
       <div
         class="fixed inset-0 overflow-y-auto"
         aria-labelledby={"#{@id}-title"}
@@ -60,22 +68,25 @@ defmodule FleetmsWeb.CoreComponents do
         tabindex="0"
       >
         <div class="flex min-h-full items-center justify-center">
-          <div class="w-full max-w-3xl p-4 sm:p-6 lg:py-8">
+          <div class={["w-full p-4 sm:p-6 lg:py-8", @max_width]}>
             <.focus_wrap
               id={"#{@id}-container"}
-              phx-window-keydown={JS.exec("data-cancel", to: "##{@id}")}
-              phx-key="escape"
-              phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
-              class="shadow-zinc-700/10 ring-zinc-700/10 relative hidden rounded-2xl bg-white p-14 shadow-lg ring-1 transition"
+              phx-window-keydown={@phx_window_keydown && JS.exec("data-cancel", to: "##{@id}")}
+              phx-key={@phx_key}
+              phx-click-away={@phx_click_away && JS.exec("data-cancel", to: "##{@id}")}
+              class="shadow-gray-700/10 ring-gray-700/10 relative hidden rounded-2xl bg-white p-14 shadow-lg ring-1 transition dark:bg-gray-800"
             >
               <div class="absolute top-6 right-5">
                 <button
                   phx-click={JS.exec("data-cancel", to: "##{@id}")}
                   type="button"
-                  class="-m-3 flex-none p-3 opacity-20 hover:opacity-40"
+                  class="-m-3 flex-none p-3"
                   aria-label={gettext("close")}
                 >
-                  <.icon name="hero-x-mark-solid" class="h-5 w-5" />
+                  <.icon
+                    name="hero-x-mark-solid text-gray-800 dark:text-gray-100 font-bold"
+                    class="h-5 w-5"
+                  />
                 </button>
               </div>
               <div id={"#{@id}-content"}>
@@ -484,10 +495,10 @@ defmodule FleetmsWeb.CoreComponents do
     ~H"""
     <header class={[@actions != [] && "flex items-center justify-between gap-6", @class]}>
       <div>
-        <h1 class="text-lg font-semibold leading-8 text-zinc-800">
+        <h1 class="text-lg font-semibold leading-8 text-gray-800 dark:text-gray-100">
           <%= render_slot(@inner_block) %>
         </h1>
-        <p :if={@subtitle != []} class="mt-2 text-sm leading-6 text-zinc-600">
+        <p :if={@subtitle != []} class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
           <%= render_slot(@subtitle) %>
         </p>
       </div>
@@ -497,6 +508,7 @@ defmodule FleetmsWeb.CoreComponents do
   end
 
   @doc ~S"""
+
   Renders a table with generic styling.
 
   ## Examples
@@ -515,13 +527,90 @@ defmodule FleetmsWeb.CoreComponents do
     default: &Function.identity/1,
     doc: "the function for mapping each row before calling the :col and :action slots"
 
+  attr :rest, :global, include: ~w(phx-hook)
+
+  slot :col, required: true do
+    attr :label, :string
+    attr :class, :string
+  end
+
+  slot :action, doc: "the slot for showing user actions in the last table column"
+
+  def table(assigns) do
+    assigns =
+      with %{rows: %Phoenix.LiveView.LiveStream{}} <- assigns do
+        assign(assigns, row_id: assigns.row_id || fn {id, _item} -> id end)
+      end
+
+    ~H"""
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            <th :for={col <- @col} scope="col" class={["px-4 py-3", col[:class]]}>
+              <%= col[:label] %>
+            </th>
+            <th scope="col" class="px-4 py-3">
+              <span class="sr-only"><%= gettext("Actions") %></span>
+            </th>
+          </tr>
+        </thead>
+        <tbody id={@id} phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"} {@rest}>
+          <tr
+            :for={row <- @rows}
+            id={@row_id && @row_id.(row)}
+            class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            <td
+              :for={{col, i} <- Enum.with_index(@col)}
+              phx-click={@row_click && @row_click.(row)}
+              scope={i == 0 && "row"}
+              class={[
+                i == 0 && "flex items-center",
+                @row_click && "hover:cursor-pointer",
+                "px-4 py-3 font-medium text-gray-900 whitespace-normal dark:text-white"
+              ]}
+            >
+              <%= render_slot(col, @row_item.(row)) %>
+            </td>
+            <td :if={@action != []} class="px-4 py-3">
+              <%= for action <- @action do %>
+                <%= render_slot(action, @row_item.(row)) %>
+              <% end %>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    """
+  end
+
+  @doc ~S"""
+  Renders a table with generic styling.
+
+  ## Examples
+
+      <.table_2 id="users" rows={@users}>
+        <:col :let={user} label="id"><%= user.id %></:col>
+        <:col :let={user} label="username"><%= user.username %></:col>
+      </.table_2>
+  """
+  attr :id, :string, required: true
+  attr :rows, :list, required: true
+  attr :row_id, :any, default: nil, doc: "the function for generating the row id"
+  attr :row_click, :any, default: nil, doc: "the function for handling phx-click on each row"
+
+  attr :row_item, :any,
+    default: &Function.identity/1,
+    doc: "the function for mapping each row before calling the :col and :action slots"
+
   slot :col, required: true do
     attr :label, :string
   end
 
   slot :action, doc: "the slot for showing user actions in the last table column"
 
-  def table(assigns) do
+  def table_2(assigns) do
     assigns =
       with %{rows: %Phoenix.LiveView.LiveStream{}} <- assigns do
         assign(assigns, row_id: assigns.row_id || fn {id, _item} -> id end)
@@ -542,6 +631,7 @@ defmodule FleetmsWeb.CoreComponents do
           id={@id}
           phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
           class="relative divide-y divide-zinc-100 border-t border-zinc-200 text-sm leading-6 text-zinc-700"
+          {@rest}
         >
           <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-zinc-50">
             <td
@@ -649,6 +739,46 @@ defmodule FleetmsWeb.CoreComponents do
   def icon(%{name: "hero-" <> _} = assigns) do
     ~H"""
     <span class={[@name, @class]} />
+    """
+  end
+
+  @doc """
+  Renders a badge component.
+
+  ## Examples
+
+      <.badge kind={:success} label="Back to posts" />
+      <.badge kind={:success}>Back to posts<.badge/>
+  """
+  attr :label, :string, default: nil
+
+  attr :kind, :atom,
+    values: [:primary, :secondary, :success, :danger, :warning, :info],
+    default: :primary
+
+  attr :class, :string, default: nil
+
+  attr :rest, :global
+  slot :inner_block
+
+  def badge(assigns) do
+    ~H"""
+    <span
+      class={[
+        "text-sm font-medium mr-2 px-2.5 py-0.5 rounded",
+        @kind == :primary && "bg-blue-100 text-blue-800  dark:bg-blue-900 dark:text-blue-300",
+        @kind == :secondary && "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
+        @kind == :success && "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+        @kind == :danger && "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+        @kind == :warning && "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+        @kind == :info && "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300",
+        @class
+      ]}
+      {@rest}
+    >
+      <%= @label %>
+      <%= render_slot(@inner_block) %>
+    </span>
     """
   end
 

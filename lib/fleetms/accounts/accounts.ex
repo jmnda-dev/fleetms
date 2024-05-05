@@ -7,7 +7,11 @@ defmodule Fleetms.Accounts do
 
   resources do
     resource Fleetms.Accounts.Organization
-    resource Fleetms.Accounts.User
+
+    resource Fleetms.Accounts.User do
+      define :get_user_by_id, action: :get_by_id, args: [:id]
+    end
+
     resource Fleetms.Accounts.UserProfile
     resource Fleetms.Accounts.Token
   end

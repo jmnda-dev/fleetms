@@ -7,7 +7,7 @@ defmodule Fleetms.AccountsFixtures do
   alias Fleetms.Accounts.{Organization, User}
 
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
-  def valid_user_password, do: "Hello world!5"
+  def valid_user_password, do: "Hello2theWorld!"
 
   def valid_organization_attributes(attrs \\ %{}) do
     Enum.into(attrs, %{
@@ -47,21 +47,33 @@ defmodule Fleetms.AccountsFixtures do
     {:ok, user} =
       User
       |> Ash.Changeset.for_create(:register_with_password, attrs)
+      # Set the `ash_authentication?: true` in context to make the `AshAuthentication.Checks.AshAuthenticationInteraction` policy in the User resource pass.
+      |> Ash.Changeset.set_context(%{private: %{ash_authentication?: true}})
       |> Ash.create()
 
-    user
+    Ash.load!(user, :full_name)
   end
 
-  def org_user_fixture(%Organization{id: id}, attrs \\ %{}) do
-    attrs =
-      Enum.into(%{organization_id: id}, attrs)
-      |> valid_org_user_attributes()
-
+  def org_user_fixture(attrs \\ %{}) do
     {:ok, user} =
       User
-      |> Ash.Changeset.for_create(:organization_internal_user, attrs)
+      |> Ash.Changeset.for_create(:create_organization_user, valid_org_user_attributes(attrs))
+      # Set the `ash_authentication?: true` in context to make the `AshAuthentication.Checks.AshAuthenticationInteraction` policy in the User resource pass.
+      |> Ash.Changeset.set_context(%{private: %{ash_authentication?: true}})
       |> Ash.create()
 
-    user
+    Ash.load!(user, :full_name)
+  end
+
+  def organization_fixture(attrs \\ %{}) do
+    merged_attrs =
+      Enum.into(attrs, valid_organization_attributes())
+
+    {:ok, organization} =
+      Organization
+      |> Ash.Changeset.for_create(:create, merged_attrs)
+      |> Ash.create()
+
+    organization
   end
 end
