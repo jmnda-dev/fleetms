@@ -11,6 +11,9 @@ defmodule Fleetms.Accounts.User do
   alias Fleetms.Accounts.{Organization, Token, UserProfile}
   alias Fleetms.Accounts.User.Policies.{IsAdmin, IsFleetManager, IsTechnician}
 
+  @password_regex ~r/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$\-_+])[A-Za-z\d!@#$\-_+]+$/
+  @invalid_password_msg "Invalid password format. Password should be a combination of lowercase and uppercase letters, numbers, and at least one of these characters: @#$-_+"
+
   authentication do
     strategies do
       password :password do
@@ -115,8 +118,8 @@ defmodule Fleetms.Accounts.User do
         message "Invalid email format"
       end
 
-      validate match(:password, ~r/^.*(?=.{8,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%&? "]).*$/) do
-        message "Invalid password format. Password much contain at least one lowercase and uppercase letter, and at leat one of these characters: !#$%&?"
+      validate match(:password, @password_regex) do
+        message @invalid_password_msg
       end
 
       validate AshAuthentication.Strategy.Password.PasswordConfirmationValidation
@@ -149,8 +152,8 @@ defmodule Fleetms.Accounts.User do
         message "Invalid email format"
       end
 
-      validate match(:password, ~r/^.*(?=.{8,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%&? "]).*$/) do
-        message "Invalid password format. Password much contain at least one lowercase and uppercase letter, and at leat one of these characters: !#$%&?"
+      validate match(:password, @password_regex) do
+        message @invalid_password_msg
       end
 
       change set_context(%{strategy_name: :password})
@@ -199,8 +202,8 @@ defmodule Fleetms.Accounts.User do
         message "Invalid email format"
       end
 
-      validate match(:password, ~r/^.*(?=.{8,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%&? "]).*$/) do
-        message "Invalid password format. Password much contain at least one lowercase and uppercase letter, and at leat one of these characters: !#$%&?"
+      validate match(:password, @password_regex) do
+        message @invalid_password_msg
       end
 
       change set_context(%{strategy_name: :password})
