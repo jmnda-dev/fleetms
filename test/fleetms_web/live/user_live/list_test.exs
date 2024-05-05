@@ -34,7 +34,7 @@ defmodule FleetmsWeb.UserLive.ListTest do
     %{admin_user: user}
   end
 
-  describe "Listing" do
+  describe "User Listing Page" do
     setup [:create_initial_org_and_user]
 
     test "lists all users", %{conn: conn, admin_user: admin_user} do
@@ -45,6 +45,89 @@ defmodule FleetmsWeb.UserLive.ListTest do
 
       assert html =~ "All users"
       assert html =~ admin_user.full_name
+    end
+
+    test "User with `fleet_manager`, `technician`, or `driver` role cannot add user", %{
+      conn: conn,
+      admin_user: admin_user
+    } do
+      user =
+        org_user_fixture(%{
+          organization_id: admin_user.organization_id,
+          roles: [:fleet_manager, :technician, :driver]
+        })
+
+      {:ok, user_list_live, html} =
+        conn
+        |> log_in_user(user)
+        |> live(~p"/users")
+
+      assert html =~ "All users"
+      assert html =~ admin_user.full_name
+      assert html =~ user.full_name
+      refute has_element?(user_list_live, "button", "Add user")
+
+      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Unauthorized action", fn ->
+        conn
+        |> log_in_user(user)
+        |> live(~p"/users/new")
+      end
+    end
+
+    test "User with `fleet_manager`, `technician`, or `driver` roles cannot update user", %{
+      conn: conn,
+      admin_user: admin_user
+    } do
+      user =
+        org_user_fixture(%{
+          organization_id: admin_user.organization_id,
+          roles: [:fleet_manager, :technician, :driver]
+        })
+
+      {:ok, user_list_live, html} =
+        conn
+        |> log_in_user(user)
+        |> live(~p"/users")
+
+      assert html =~ "All users"
+      assert html =~ admin_user.full_name
+      assert html =~ user.full_name
+      refute has_element?(user_list_live, ~s{[href="/users/#{admin_user.id}/edit"]}, "Edit user")
+
+      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Unauthorized action", fn ->
+        conn
+        |> log_in_user(user)
+        |> live(~p"/users/#{user}/edit")
+      end
+    end
+
+    test "User with `viewer` role cannot view users list, add or update a user", %{
+      conn: conn,
+      admin_user: admin_user
+    } do
+      user =
+        org_user_fixture(%{
+          organization_id: admin_user.organization_id,
+          roles: [:viewer]
+        })
+
+      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Unauthorized action", fn ->
+        conn
+        |> log_in_user(user)
+        |> live(~p"/users")
+      end
+
+      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Unauthorized action", fn ->
+        conn
+        |> log_in_user(user)
+        |> live(~p"/users/new")
+      end
+
+      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Unauthorized action", fn ->
+        conn
+        |> log_in_user(user)
+        |> live(~p"/users/#{user}/edit")
+      end
     end
 
     test "creates a new user", %{conn: conn, admin_user: admin_user} do
@@ -82,6 +165,7 @@ defmodule FleetmsWeb.UserLive.ListTest do
       html = render(user_list_live)
       assert html =~ "User created successfully"
       assert html =~ "jackdoe@example.com"
+      assert html =~ admin_user.full_name
       assert html =~ "fleet_manager"
     end
 

@@ -51,20 +51,18 @@ defmodule Fleetms.AccountsFixtures do
       |> Ash.Changeset.set_context(%{private: %{ash_authentication?: true}})
       |> Ash.create()
 
-    user
+    Ash.load!(user, :full_name)
   end
 
-  def org_user_fixture(%Organization{id: id}, attrs \\ %{}) do
-    attrs =
-      Enum.into(%{organization_id: id}, attrs)
-      |> valid_org_user_attributes()
-
+  def org_user_fixture(attrs \\ %{}) do
     {:ok, user} =
       User
-      |> Ash.Changeset.for_create(:create_organization_user, attrs)
+      |> Ash.Changeset.for_create(:create_organization_user, valid_org_user_attributes(attrs))
+      # Set the `ash_authentication?: true` in context to make the `AshAuthentication.Checks.AshAuthenticationInteraction` policy in the User resource pass.
+      |> Ash.Changeset.set_context(%{private: %{ash_authentication?: true}})
       |> Ash.create()
 
-    user
+    Ash.load!(user, :full_name)
   end
 
   def organization_fixture(attrs \\ %{}) do

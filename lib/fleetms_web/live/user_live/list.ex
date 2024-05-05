@@ -9,7 +9,7 @@ defmodule FleetmsWeb.UserLive.List do
     if Ash.can?({User, :list}, socket.assigns.current_user) do
       {:ok, socket}
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Not Authorized"
+      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Unauthorized action"
     end
   end
 
@@ -36,7 +36,7 @@ defmodule FleetmsWeb.UserLive.List do
       |> assign(:page_title, "Edit User")
       |> assign(:user, user)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Not Authorized"
+      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Unauthorized action"
     end
   end
 
@@ -46,7 +46,7 @@ defmodule FleetmsWeb.UserLive.List do
       |> assign(:page_title, "New User")
       |> assign(:user, nil)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Not Authorized"
+      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Unauthorized action"
     end
   end
 
