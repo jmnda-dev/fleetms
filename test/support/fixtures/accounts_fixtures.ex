@@ -7,7 +7,7 @@ defmodule Fleetms.AccountsFixtures do
   alias Fleetms.Accounts.{Organization, User}
 
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
-  def valid_user_password, do: "Hello world!5"
+  def valid_user_password, do: "Hello2theWorld!"
 
   def valid_organization_attributes(attrs \\ %{}) do
     Enum.into(attrs, %{
@@ -47,6 +47,8 @@ defmodule Fleetms.AccountsFixtures do
     {:ok, user} =
       User
       |> Ash.Changeset.for_create(:register_with_password, attrs)
+      # Set the `ash_authentication?: true` in context to make the `AshAuthentication.Checks.AshAuthenticationInteraction` policy in the User resource pass.
+      |> Ash.Changeset.set_context(%{private: %{ash_authentication?: true}})
       |> Ash.create()
 
     user
