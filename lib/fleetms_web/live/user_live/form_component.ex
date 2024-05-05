@@ -32,7 +32,7 @@ defmodule FleetmsWeb.UserLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "User created successfully")
+         |> put_flash(:info, get_success_message(socket))
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -55,7 +55,8 @@ defmodule FleetmsWeb.UserLive.FormComponent do
         User
         |> AshPhoenix.Form.for_create(:create_organization_user,
           as: "user",
-          forms: [auto?: true]
+          forms: [auto?: true],
+          actor: socket.assigns.current_user
         )
         |> AshPhoenix.Form.add_form(:user_profile)
       end
@@ -65,4 +66,12 @@ defmodule FleetmsWeb.UserLive.FormComponent do
 
   defp user_roles_options, do: Fleetms.Enums.basic_user_roles()
   defp user_status_options, do: Fleetms.Enums.user_statuses()
+
+  defp get_success_message(%{assigns: %{action: action}} = _socket) do
+    if action == :new do
+      "User created successfully"
+    else
+      "User updated successfully"
+    end
+  end
 end
