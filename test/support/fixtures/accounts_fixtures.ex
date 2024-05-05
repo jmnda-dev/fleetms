@@ -61,9 +61,21 @@ defmodule Fleetms.AccountsFixtures do
 
     {:ok, user} =
       User
-      |> Ash.Changeset.for_create(:organization_internal_user, attrs)
+      |> Ash.Changeset.for_create(:create_organization_user, attrs)
       |> Ash.create()
 
     user
+  end
+
+  def organization_fixture(attrs \\ %{}) do
+    merged_attrs =
+      Enum.into(attrs, valid_organization_attributes())
+
+    {:ok, organization} =
+      Organization
+      |> Ash.Changeset.for_create(:create, merged_attrs)
+      |> Ash.create()
+
+    organization
   end
 end
