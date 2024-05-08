@@ -782,6 +782,62 @@ defmodule FleetmsWeb.CoreComponents do
     """
   end
 
+  @doc """
+  Renders a breadcrumb component.
+
+  ## Example
+
+      <.breadcrumb links={[
+        %{label: "Home", to: ~p"/", link_type: :navigate},
+        %{label: "Users", to: ~p"/users", link_type: :navigate, active: true}
+      ]} />
+  """
+  attr :links, :list, required: true
+
+  def breadcrumb(assigns) do
+    ~H"""
+    <nav class="flex mb-5" aria-label="Breadcrumb">
+      <ol class="inline-flex items-center space-x-1 md:space-x-2">
+        <li
+          :for={{link_item, index} <- Enum.with_index(@links)}
+          class={index == 0 && "inline-flex items-center"}
+        >
+          <.link
+            :if={index == 0}
+            navigate={link_item[:link_type] == :navigate && link_item.to}
+            patch={link_item[:link_type] == :patch && link_item.to}
+            href={link_item[:link_type] == :href && link_item.to}
+            class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-white"
+          >
+            <.icon name="hero-home" class="w-6 h-6 text-gray-400" />
+            <%= link_item.label %>
+          </.link>
+
+          <div :if={index > 0} class="flex items-center">
+            <.icon name="hero-chevron-right" class="w-6 h-6 text-gray-400" />
+            <.link
+              :if={link_item[:active] != true}
+              navigate={link_item[:link_type] == :navigate && link_item.to}
+              patch={link_item[:link_type] == :patch && link_item.to}
+              href={link_item[:link_type] == :href && link_item.to}
+              class="ml-1 text-sm font-medium md:ml-2 text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-white"
+            >
+              <%= link_item.label %>
+            </.link>
+            <span
+              :if={link_item[:active]}
+              class="ml-1 text-sm font-medium md:ml-2 text-gray-400 dark:text-gray-500"
+              aria-current="page"
+            >
+              <%= link_item.label %>
+            </span>
+          </div>
+        </li>
+      </ol>
+    </nav>
+    """
+  end
+
   ## JS Commands
 
   def show(js \\ %JS{}, selector) do
