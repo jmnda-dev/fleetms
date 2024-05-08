@@ -51,6 +51,7 @@ defmodule Fleetms.Accounts.UserProfile do
       constraints max_length: 50
     end
 
+    # TODO: Add more attributes related to user profile
     create_timestamp :created_at
     update_timestamp :updated_at
   end
