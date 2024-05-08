@@ -757,6 +757,7 @@ defmodule FleetmsWeb.CoreComponents do
     default: :primary
 
   attr :class, :string, default: nil
+  attr :size, :atom, values: [:md, :lg], default: :md
 
   attr :rest, :global
   slot :inner_block
@@ -765,8 +766,10 @@ defmodule FleetmsWeb.CoreComponents do
     ~H"""
     <span
       class={[
-        "text-sm font-medium mr-2 px-2.5 py-0.5 rounded",
-        @kind == :primary && "bg-blue-100 text-blue-800  dark:bg-blue-900 dark:text-blue-300",
+        "text-sm font-medium mr-2 rounded",
+        @size == :md && "px-2.5 py-0.5",
+        @size == :lg && "text-base font-medium px-3 py-1.5",
+        @kind == :primary && "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
         @kind == :secondary && "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
         @kind == :success && "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
         @kind == :danger && "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
@@ -789,7 +792,7 @@ defmodule FleetmsWeb.CoreComponents do
 
       <.breadcrumb links={[
         %{label: "Home", to: ~p"/", link_type: :navigate},
-        %{label: "Users", to: ~p"/users", link_type: :navigate, active: true}
+        %{label: "Users", link_type: :navigate, active: true}
       ]} />
   """
   attr :links, :list, required: true
