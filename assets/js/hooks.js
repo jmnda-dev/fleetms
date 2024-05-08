@@ -31,5 +31,26 @@ Hooks.HumanizeText = {
     this.mounted()
   }
 }
+Hooks.FormatDateAndTime = {
+  mounted() {
+    this.updated();
+  },
+  updated() {
+    textContent = this.el.textContent.trim();
+    excludeTime = this.el.getAttribute('data-exclude-time')
 
+    console.log(excludeTime)
+    if (textContent) {
+      let dt = new Date(textContent);
+      if (excludeTime) {
+        this.el.textContent = dt.toDateString()
+      } else {
+        this.el.textContent = dt.toDateString() + " " + dt.toLocaleTimeString();
+      }
+    } else {
+      this.el.innerHTML = "--";
+    }
+    this.el.classList.remove("invisible");
+  }
+}
 export default Hooks
