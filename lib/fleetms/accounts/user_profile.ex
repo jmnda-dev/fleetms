@@ -27,6 +27,23 @@ defmodule Fleetms.Accounts.UserProfile do
       constraints max_length: 100
     end
 
+    attribute :phone_number, :string do
+      allow_nil? true
+      public? true
+      constraints min_length: 10, max_length: 18
+    end
+
+    attribute :secondary_phone_number, :string do
+      allow_nil? true
+      public? true
+      constraints min_length: 10, max_length: 18
+    end
+
+    attribute :date_of_birth, :date do
+      allow_nil? true
+      public? true
+    end
+
     attribute :address, :string do
       allow_nil? true
       public? true
@@ -51,6 +68,12 @@ defmodule Fleetms.Accounts.UserProfile do
       constraints max_length: 50
     end
 
+    attribute :profile_photo, :string do
+      allow_nil? true
+      public? true
+      writable? false
+    end
+
     # TODO: Add more attributes related to user profile
     create_timestamp :created_at
     update_timestamp :updated_at
@@ -68,6 +91,8 @@ defmodule Fleetms.Accounts.UserProfile do
 
   actions do
     defaults [:read, :destroy, create: :*, update: :*]
+
+    update :profile_photo
   end
 
   identities do

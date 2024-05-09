@@ -1,0 +1,197 @@
+{
+  "attributes": [
+    {
+      "default": "fragment(\"gen_random_uuid()\")",
+      "size": null,
+      "type": "uuid",
+      "source": "id",
+      "references": null,
+      "allow_nil?": false,
+      "generated?": false,
+      "primary_key?": true
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "text",
+      "source": "first_name",
+      "references": null,
+      "allow_nil?": false,
+      "generated?": false,
+      "primary_key?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "text",
+      "source": "last_name",
+      "references": null,
+      "allow_nil?": true,
+      "generated?": false,
+      "primary_key?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "text",
+      "source": "other_name",
+      "references": null,
+      "allow_nil?": true,
+      "generated?": false,
+      "primary_key?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "text",
+      "source": "phone_number",
+      "references": null,
+      "allow_nil?": true,
+      "generated?": false,
+      "primary_key?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "text",
+      "source": "secondary_phone_number",
+      "references": null,
+      "allow_nil?": true,
+      "generated?": false,
+      "primary_key?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "date",
+      "source": "date_of_birth",
+      "references": null,
+      "allow_nil?": true,
+      "generated?": false,
+      "primary_key?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "text",
+      "source": "address",
+      "references": null,
+      "allow_nil?": true,
+      "generated?": false,
+      "primary_key?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "text",
+      "source": "city",
+      "references": null,
+      "allow_nil?": true,
+      "generated?": false,
+      "primary_key?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "text",
+      "source": "state",
+      "references": null,
+      "allow_nil?": true,
+      "generated?": false,
+      "primary_key?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "text",
+      "source": "postal_code",
+      "references": null,
+      "allow_nil?": true,
+      "generated?": false,
+      "primary_key?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "text",
+      "source": "profile_photo",
+      "references": null,
+      "allow_nil?": true,
+      "generated?": false,
+      "primary_key?": false
+    },
+    {
+      "default": "fragment(\"(now() AT TIME ZONE 'utc')\")",
+      "size": null,
+      "type": "utc_datetime_usec",
+      "source": "created_at",
+      "references": null,
+      "allow_nil?": false,
+      "generated?": false,
+      "primary_key?": false
+    },
+    {
+      "default": "fragment(\"(now() AT TIME ZONE 'utc')\")",
+      "size": null,
+      "type": "utc_datetime_usec",
+      "source": "updated_at",
+      "references": null,
+      "allow_nil?": false,
+      "generated?": false,
+      "primary_key?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "uuid",
+      "source": "user_id",
+      "references": {
+        "name": "user_profiles_user_id_fkey",
+        "table": "users",
+        "schema": "public",
+        "on_delete": null,
+        "multitenancy": {
+          "global": null,
+          "strategy": null,
+          "attribute": null
+        },
+        "primary_key?": true,
+        "destination_attribute": "id",
+        "deferrable": false,
+        "match_type": null,
+        "match_with": null,
+        "on_update": null,
+        "destination_attribute_default": null,
+        "destination_attribute_generated": null
+      },
+      "allow_nil?": false,
+      "generated?": false,
+      "primary_key?": false
+    }
+  ],
+  "table": "user_profiles",
+  "hash": "8F4028725CABE17A4A5BCED833AF6A652BA59C6FE8E73FB28019EA2BE2F3B053",
+  "repo": "Elixir.Fleetms.Repo",
+  "schema": null,
+  "identities": [
+    {
+      "name": "unique_user_profile",
+      "keys": [
+        "user_id"
+      ],
+      "all_tenants?": false,
+      "index_name": "user_profiles_unique_user_profile_index",
+      "base_filter": null
+    }
+  ],
+  "multitenancy": {
+    "global": null,
+    "strategy": null,
+    "attribute": null
+  },
+  "base_filter": null,
+  "check_constraints": [],
+  "custom_indexes": [],
+  "custom_statements": [],
+  "has_create_action": true
+}
