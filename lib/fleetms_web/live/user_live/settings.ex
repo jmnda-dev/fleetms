@@ -12,14 +12,14 @@ defmodule FleetmsWeb.UserLive.Settings do
     {:ok, socket}
   end
 
-  @impl Phoenix.LiveComponent
+  @impl Phoenix.LiveView
   def handle_event("validate_profile_form", %{"user_profile" => user_profile_params}, socket) do
     form = AshPhoenix.Form.validate(socket.assigns.profile_form, user_profile_params)
 
     {:noreply, assign(socket, :profile_form, form)}
   end
 
-  @impl Phoenix.LiveComponent
+  @impl Phoenix.LiveView
   def handle_event("save_profile", %{"user_profile" => user_profile_params}, socket) do
     case AshPhoenix.Form.submit(socket.assigns.profile_form, params: user_profile_params) do
       {:ok, _user_profile} ->
