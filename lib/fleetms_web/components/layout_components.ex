@@ -106,12 +106,12 @@ defmodule FleetmsWeb.LayoutComponents do
                     </.link>
                   </li>
                   <li>
-                    <a
-                      href="#"
+                    <.link
+                      navigate={~p"/settings"}
                       class="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white"
                     >
                       Account settings
-                    </a>
+                    </.link>
                   </li>
                 </ul>
                 <ul class="py-1 text-gray-500 dark:text-gray-400" aria-labelledby="dropdown">
@@ -508,13 +508,13 @@ defmodule FleetmsWeb.LayoutComponents do
                     </.link>
                   </li>
                   <li>
-                    <a
-                      href="#"
+                    <.link
+                      navigate={~p"/settings"}
                       class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
                       role="menuitem"
                     >
                       Settings
-                    </a>
+                    </.link>
                   </li>
                   <li>
                     <.link
