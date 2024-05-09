@@ -5,7 +5,9 @@
       %{label: "My Profile", active: true}
     ]} />
     <div class="flex items-center justify-end">
-      <.button><.icon name="hero-pencil-square" class="w-5 h-5 mr-2" />Update Settings</.button>
+      <.link navigate={~p"/settings"}>
+        <.button><.icon name="hero-pencil-square" class="w-5 h-5 mr-2" />Update Settings</.button>
+      </.link>
     </div>
   </div>
   <!-- Right Content -->
@@ -37,7 +39,7 @@
               Address
             </div>
             <div class="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-              <%= @current_user.user_profile.address %>
+              <%= @current_user.user_profile.address %>, <%= @current_user.user_profile.city %>, <%= @current_user.user_profile.state %>, <%= @current_user.user_profile.postal_code %>
             </div>
           </address>
         </div>
@@ -91,6 +93,26 @@
           <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Organization</dt>
           <dd class="text-sm font-semibold text-gray-900 dark:text-white">
             <%= @current_user.organization.name %>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Phone Number</dt>
+          <dd class="text-sm font-semibold text-gray-900 dark:text-white">
+            <%= @current_user.user_profile.phone_number %>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+            Secondary Phone Number
+          </dt>
+          <dd class="text-sm font-semibold text-gray-900 dark:text-white">
+            <%= @current_user.user_profile.secondary_phone_number %>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Date of Birth</dt>
+          <dd class="text-sm font-semibold text-gray-900 dark:text-white">
+            <%= @current_user.user_profile.date_of_birth %>
           </dd>
         </div>
       </dl>
