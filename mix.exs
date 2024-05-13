@@ -64,7 +64,8 @@ defmodule Fleetms.MixProject do
       {:ash_phoenix, "~> 2.0.0-rc.8"},
       {:ash_authentication, "~> 4.0.0-rc.6"},
       {:ash_authentication_phoenix, "~> 2.0.0-rc.2"},
-      {:ash_admin, "~> 0.10.10-rc.1"}
+      {:ash_admin, "~> 0.10.10-rc.1"},
+      {:waffle, "~> 1.1"}
     ]
   end
 
