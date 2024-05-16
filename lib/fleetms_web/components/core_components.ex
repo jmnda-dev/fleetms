@@ -841,6 +841,46 @@ defmodule FleetmsWeb.CoreComponents do
     """
   end
 
+  @doc """
+  A progress bar component.
+  """
+  attr :progress, :integer, default: 0
+
+  def progress_bar(assigns) do
+    ~H"""
+    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+      <div class="bg-primary-600 h-2.5 rounded-full" style={"width: #{@progress}%"}></div>
+    </div>
+    """
+  end
+
+  @doc """
+  A simple alert component.
+  """
+  attr :kind, :atom, values: [:info, :success, :warning, :error], default: :info
+  attr :class, :string, default: nil
+  attr :rest, :global
+  slot :inner_block, required: true
+
+  def alert(assigns) do
+    ~H"""
+    <div
+      class={[
+        "p-4 mb-4 text-sm rounded-lg",
+        @kind == :info && "text-blue-800 bg-blue-50 dark:bg-gray-800 dark:text-blue-400",
+        @kind == :success && "text-green-800 bg-green-50 dark:bg-gray-800 dark:text-green-400",
+        @kind == :warning && "text-yellow-800 bg-yellow-50 dark:bg-gray-800 dark:text-yellow-400",
+        @kind == :error && "text-red-800 bg-red-50 dark:bg-gray-800 dark:text-red-400",
+        @class
+      ]}
+      {@rest}
+      role="alert"
+    >
+      <%= render_slot(@inner_block) %>
+    </div>
+    """
+  end
+
   ## JS Commands
 
   def show(js \\ %JS{}, selector) do

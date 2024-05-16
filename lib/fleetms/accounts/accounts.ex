@@ -12,7 +12,11 @@ defmodule Fleetms.Accounts do
       define :get_user_by_id, action: :get_by_id, args: [:id]
     end
 
-    resource Fleetms.Accounts.UserProfile
+    resource Fleetms.Accounts.UserProfile do
+      define :update_profile_photo, action: :set_profile_photo
+      define :remove_profile_photo, action: :remove_photo
+    end
+
     resource Fleetms.Accounts.Token
   end
 

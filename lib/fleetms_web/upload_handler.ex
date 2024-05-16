@@ -23,13 +23,11 @@ defmodule FleetmsWeb.UploadHandler do
           list()
   def save(socket, uploads_ref, definition, scope) do
     consume_uploaded_entries(socket, uploads_ref, fn %{path: path}, entry ->
-      file_extenstion = ext(entry)
-
       new_filename =
         Ecto.UUID.generate()
         |> String.replace("-", "")
 
-      definition.store({%{path: path, filename: "#{new_filename}.#{file_extenstion}"}, scope})
+      definition.store({%{path: path, filename: new_filename}, scope})
     end)
   end
 

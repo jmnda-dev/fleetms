@@ -48,8 +48,13 @@
           <:col :let={{_id, user}} label="Full Name">
             <img
               class="w-10 h-10 rounded-full"
-              src="http://localhost:1313/images/users/bonnie-green.png"
-              alt="Bonnie Green avatar"
+              src={
+                Fleetms.UserProfilePhoto.url(
+                  {user.user_profile.profile_photo, user.user_profile},
+                  :thumb
+                )
+              }
+              alt={"#{user.full_name} Profile Photo"}
             />
             <div class="text-sm font-normal text-gray-500 dark:text-gray-400 ml-2">
               <div class="text-base font-semibold text-gray-900 dark:text-white">

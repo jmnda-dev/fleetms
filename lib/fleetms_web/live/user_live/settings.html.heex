@@ -33,12 +33,50 @@
             <h3 class="mb-1 text-2xl font-bold text-gray-900 dark:text-white">
               <%= @current_user.full_name %>
             </h3>
-            <a
-              href="#"
-              class="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            <.button type="button" size={:sm}>
+              <label for={@uploads.profile_photo.ref}>
+                <.live_file_input upload={@uploads.profile_photo} class="hidden" />
+                <.icon name="hero-cloud-arrow-up" class="mr-2 -ml-1 w-4 h-4" /> Change picture
+              </label>
+            </.button>
+            <.button
+              type="button"
+              size={:sm}
+              kind={:warning}
+              phx-click="remove_profile_photo"
+              data-confirm="Are you sure you want to remove your profile photo?"
             >
-              <.icon name="hero-cloud-arrow-up" class="mr-2 -ml-1 w-4 h-4" /> Change picture
-            </a>
+              <.icon name="hero-trash" class="mr-2 -ml-1 w-4 h-4" /> Remove Picture
+            </.button>
+          </div>
+          <div>
+            <%= for {entry, _i} <- Enum.with_index(@uploads.profile_photo.entries) do %>
+              <div>
+                <.live_img_preview entry={entry} width="200" height="200" />
+                <div class="my-2">
+                  <.alert :for={err <- upload_errors(@uploads.profile_photo, entry)} kind={:error}>
+                    <%= error_to_string(err) %>
+                  </.alert>
+                </div>
+                <div class="my-2">
+                  <.progress_bar progress={entry.progress} />
+                </div>
+                <div>
+                  <.button
+                    kind={:danger}
+                    size={:xs}
+                    type="button"
+                    phx-click="remove_photo"
+                    phx-value-ref={entry.ref}
+                  >
+                    <.icon name="hero-trash" class="mr-2 -ml-1 w-4 h-4" /> Remove
+                  </.button>
+                  <.button kind={:success} size={:sm} type="submit" phx-disable-with="Saving...">
+                    Upload
+                  </.button>
+                </div>
+              </div>
+            <% end %>
           </div>
         </div>
       </div>

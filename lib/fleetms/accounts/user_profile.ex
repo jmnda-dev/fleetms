@@ -92,7 +92,39 @@ defmodule Fleetms.Accounts.UserProfile do
   actions do
     defaults [:read, :destroy, create: :*, update: :*]
 
-    update :profile_photo
+    update :set_profile_photo do
+      require_atomic? false
+
+      argument :profile_photo, :string do
+        allow_nil? false
+      end
+
+      change fn changeset, _context ->
+        Ash.Changeset.force_change_attribute(
+          changeset,
+          :profile_photo,
+          changeset.arguments.profile_photo
+        )
+      end
+    end
+
+    update :remove_photo do
+      require_atomic? false
+
+      change fn changeset, _context ->
+        Ash.Changeset.force_change_attribute(
+          changeset,
+          :profile_photo,
+          nil
+        )
+        |> Ash.Changeset.after_action(fn changeset, updated_user_profile ->
+          photo = Ash.Changeset.get_data(changeset, :profile_photo)
+          Fleetms.UserProfilePhoto.delete({photo, updated_user_profile})
+
+          {:ok, updated_user_profile}
+        end)
+      end
+    end
   end
 
   identities do

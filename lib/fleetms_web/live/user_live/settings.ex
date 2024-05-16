@@ -1,6 +1,8 @@
 defmodule FleetmsWeb.UserLive.Settings do
   use FleetmsWeb, :live_view
 
+  @photo_upload_ref :profile_photo
+
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     profile_update_form =
@@ -10,7 +12,7 @@ defmodule FleetmsWeb.UserLive.Settings do
 
     socket =
       assign(socket, :profile_form, profile_update_form)
-      |> allow_upload(:profile_photo,
+      |> allow_upload(@photo_upload_ref,
         accept: ~w(.jpg .jpeg .png),
         max_entries: 1,
         max_file_size: 4096_000
@@ -34,7 +36,9 @@ defmodule FleetmsWeb.UserLive.Settings do
   @impl Phoenix.LiveView
   def handle_event("save_profile", %{"user_profile" => user_profile_params}, socket) do
     case AshPhoenix.Form.submit(socket.assigns.profile_form, params: user_profile_params) do
-      {:ok, _user_profile} ->
+      {:ok, user_profile} ->
+        maybe_handle_upload(socket, user_profile)
+
         {:noreply,
          socket
          |> put_flash(:info, "Profile information was updated successfully")
@@ -42,6 +46,38 @@ defmodule FleetmsWeb.UserLive.Settings do
 
       {:error, form} ->
         {:noreply, assign(socket, :profile_form, form)}
+    end
+  end
+
+  @impl Phoenix.LiveView
+  def handle_event("remove_photo", %{"ref" => ref}, socket) do
+    {:noreply, cancel_upload(socket, @photo_upload_ref, ref)}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_event("remove_profile_photo", _params, socket) do
+    Fleetms.Accounts.remove_profile_photo!(socket.assigns.current_user.user_profile)
+
+    {:noreply,
+     socket
+     |> put_flash(:info, "Your Profile was removed")
+     |> push_redirect(to: ~p"/settings")}
+  end
+
+  defp maybe_handle_upload(socket, user_profile_resource) do
+    definition_module = Fleetms.UserProfilePhoto
+
+    case FleetmsWeb.UploadHandler.save(
+           socket,
+           @photo_upload_ref,
+           definition_module,
+           user_profile_resource
+         ) do
+      [] ->
+        :ok
+
+      [filename | _] ->
+        Fleetms.Accounts.update_profile_photo!(user_profile_resource, %{profile_photo: filename})
     end
   end
 end
