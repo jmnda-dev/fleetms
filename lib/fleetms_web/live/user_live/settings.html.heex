@@ -1,44 +1,51 @@
-<div class="grid grid-cols-1 px-4 pt-6 xl:grid-cols-3 xl:gap-4 dark:bg-gray-900">
-  <div class="col-span-full mb-4 xl:mb-2">
-    <.breadcrumb links={[
-      %{label: "Home", to: ~p"/", link_type: :navigate},
-      %{label: "Settings", active: true}
-    ]} />
-    <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">User settings</h1>
-  </div>
-  <!-- Right Content -->
-  <div class="col-span-full">
-    <div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 dark:bg-gray-800 mb-4">
-      <div class="items-center sm:flex xl:block 2xl:flex sm:space-x-4 xl:space-x-0 2xl:space-x-4">
-        <img
-          class="mb-4 w-28 h-28 rounded-lg sm:mb-0 xl:mb-4 2xl:mb-0"
-          src="http://localhost:1313/images/users/jese-leos-2x.png"
-          alt="Jese picture"
-        />
-        <div>
-          <h3 class="mb-1 text-2xl font-bold text-gray-900 dark:text-white">
-            <%= @current_user.full_name %>
-          </h3>
-          <a
-            href="#"
-            class="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-          >
-            <.icon name="hero-cloud-arrow-up" class="mr-2 -ml-1 w-4 h-4" /> Change picture
-          </a>
+<.simple_form
+  for={@profile_form}
+  id="user_profile_form"
+  phx-change="validate_profile_form"
+  phx-submit="save_profile"
+  phx-hook="HumanizeText"
+>
+  <div class="grid grid-cols-1 px-4 pt-6 xl:grid-cols-3 xl:gap-4 dark:bg-gray-900">
+    <div class="col-span-full mb-4 xl:mb-2">
+      <.breadcrumb links={[
+        %{label: "Home", to: ~p"/", link_type: :navigate},
+        %{label: "Settings", active: true}
+      ]} />
+      <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+        User settings
+      </h1>
+    </div>
+    <!-- Right Content -->
+    <div class="col-span-full">
+      <div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 dark:bg-gray-800 mb-4">
+        <div class="items-center sm:flex xl:block 2xl:flex sm:space-x-4 xl:space-x-0 2xl:space-x-4">
+          <img
+            class="mb-4 w-28 h-28 rounded-lg sm:mb-0 xl:mb-4 2xl:mb-0"
+            src={
+              Fleetms.UserProfilePhoto.url(
+                {@current_user.user_profile.profile_photo, @current_user.user_profile},
+                :thumb
+              )
+            }
+            alt={"#{@current_user.full_name} Profile Photo"}
+          />
+          <div>
+            <h3 class="mb-1 text-2xl font-bold text-gray-900 dark:text-white">
+              <%= @current_user.full_name %>
+            </h3>
+            <a
+              href="#"
+              class="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            >
+              <.icon name="hero-cloud-arrow-up" class="mr-2 -ml-1 w-4 h-4" /> Change picture
+            </a>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="col-span-3">
-    <div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 dark:bg-gray-800 mb-4">
-      <h3 class="mb-4 text-xl font-bold dark:text-white">General information</h3>
-      <.simple_form
-        for={@profile_form}
-        id="user_profile_form"
-        phx-change="validate_profile_form"
-        phx-submit="save_profile"
-        phx-hook="HumanizeText"
-      >
+    <div class="col-span-3">
+      <div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 dark:bg-gray-800 mb-4">
+        <h3 class="mb-4 text-xl font-bold dark:text-white">General information</h3>
         <div class="grid grid-cols-6 gap-6">
           <div class="col-span-6 sm:col-span-3">
             <.input
@@ -138,88 +145,91 @@
             </.button>
           </div>
         </div>
-      </.simple_form>
+      </div>
     </div>
-    <div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 dark:bg-gray-800 mb-4">
-      <h3 class="mb-4 text-xl font-bold dark:text-white">Password information</h3>
-      <form action="#">
-        <div class="grid grid-cols-6 gap-6">
-          <div class="col-span-6 sm:col-span-3">
-            <label
-              for="current-password"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Current password
-            </label>
-            <input
-              type="text"
-              name="current-password"
-              id="current-password"
-              class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-          <div class="col-span-6 sm:col-span-3">
-            <label
-              for="new-password"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              New
-              password
-            </label>
-            <input
-              type="text"
-              name="new-password"
-              id="new-password"
-              class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-          <div class="col-span-6 sm:col-span-3">
-            <label
-              for="confirm-password"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Confirm password
-            </label>
-            <input
-              type="text"
-              name="confirm-password"
-              id="confirm-password"
-              class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-          <div class="col-span-full">
-            <div class="text-sm font-medium dark:text-white">Password requirements:</div>
-            <div class="mb-1 text-sm font-normal text-gray-500 dark:text-gray-400">
-              Ensure that these
-              requirements are met:
-            </div>
-            <ul class="pl-4 space-y-1 text-gray-500 dark:text-gray-400">
-              <li class="text-xs font-normal">
-                At least 10 characters (and up to 100 characters)
-              </li>
-              <li class="text-xs font-normal">At least one lowercase character</li>
-              <li class="text-xs font-normal">
-                Inclusion of at least one special character, e.g., ! @ # ?
-              </li>
-              <li class="text-xs font-normal">Some text here zoltan</li>
-            </ul>
-          </div>
-          <div class="col-span-6 sm:col-full">
-            <button
-              class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-              type="submit"
-            >
-              Save all
-            </button>
-          </div>
+  </div>
+</.simple_form>
+
+<div class="px-4 pt-6 dark:bg-gray-900">
+  <div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 dark:bg-gray-800 mb-4">
+    <h3 class="mb-4 text-xl font-bold dark:text-white">Password information</h3>
+    <form action="#">
+      <div class="grid grid-cols-6 gap-6">
+        <div class="col-span-6 sm:col-span-3">
+          <label
+            for="current-password"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            Current password
+          </label>
+          <input
+            type="text"
+            name="current-password"
+            id="current-password"
+            class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+            placeholder="••••••••"
+            required
+          />
         </div>
-      </form>
-    </div>
+        <div class="col-span-6 sm:col-span-3">
+          <label
+            for="new-password"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            New
+            password
+          </label>
+          <input
+            type="text"
+            name="new-password"
+            id="new-password"
+            class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+            placeholder="••••••••"
+            required
+          />
+        </div>
+        <div class="col-span-6 sm:col-span-3">
+          <label
+            for="confirm-password"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            Confirm password
+          </label>
+          <input
+            type="text"
+            name="confirm-password"
+            id="confirm-password"
+            class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+            placeholder="••••••••"
+            required
+          />
+        </div>
+        <div class="col-span-full">
+          <div class="text-sm font-medium dark:text-white">Password requirements:</div>
+          <div class="mb-1 text-sm font-normal text-gray-500 dark:text-gray-400">
+            Ensure that these
+            requirements are met:
+          </div>
+          <ul class="pl-4 space-y-1 text-gray-500 dark:text-gray-400">
+            <li class="text-xs font-normal">
+              At least 10 characters (and up to 100 characters)
+            </li>
+            <li class="text-xs font-normal">At least one lowercase character</li>
+            <li class="text-xs font-normal">
+              Inclusion of at least one special character, e.g., ! @ # ?
+            </li>
+            <li class="text-xs font-normal">Some text here zoltan</li>
+          </ul>
+        </div>
+        <div class="col-span-6 sm:col-full">
+          <button
+            class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            type="submit"
+          >
+            Save all
+          </button>
+        </div>
+      </div>
+    </form>
   </div>
 </div>

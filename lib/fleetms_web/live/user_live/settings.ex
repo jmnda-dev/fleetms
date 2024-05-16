@@ -8,7 +8,14 @@ defmodule FleetmsWeb.UserLive.Settings do
       |> AshPhoenix.Form.for_update(:update, as: "user_profile")
       |> to_form()
 
-    socket = assign(socket, :profile_form, profile_update_form)
+    socket =
+      assign(socket, :profile_form, profile_update_form)
+      |> allow_upload(:profile_photo,
+        accept: ~w(.jpg .jpeg .png),
+        max_entries: 1,
+        max_file_size: 4096_000
+      )
+
     {:ok, socket}
   end
 

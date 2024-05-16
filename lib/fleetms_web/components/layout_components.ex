@@ -81,8 +81,13 @@ defmodule FleetmsWeb.LayoutComponents do
               >
                 <img
                   class="w-10 h-10 rounded-full"
-                  src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-                  alt=""
+                  src={
+                    Fleetms.UserProfilePhoto.url(
+                      {@current_user.user_profile.profile_photo, @current_user.user_profile},
+                      :thumb
+                    )
+                  }
+                  alt={"#{@current_user.full_name} Profile Photo"}
                 />
                 <div class="font-medium dark:text-white">
                   <div><%= @current_user.full_name %></div>
@@ -479,8 +484,13 @@ defmodule FleetmsWeb.LayoutComponents do
                   <span class="sr-only">Open user menu</span>
                   <img
                     class="w-8 h-8 rounded-full"
-                    src="http://localhost:1313/images/users/neil-sims.png"
-                    alt="user photo"
+                    src={
+                      Fleetms.UserProfilePhoto.url(
+                        {@current_user.user_profile.profile_photo, @current_user.user_profile},
+                        :thumb
+                      )
+                    }
+                    alt={"#{@current_user.full_name} Profile Photo"}
                   />
                 </button>
               </div>

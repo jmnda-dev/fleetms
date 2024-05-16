@@ -16,8 +16,13 @@
       <div class="sm:flex xl:block sm:space-x-4 xl:space-x-0">
         <img
           class="mb-2 w-20 h-20 rounded-lg"
-          src="http://localhost:1313/images/users/jese-leos-2x.png"
-          alt="Jese portrait"
+          src={
+            Fleetms.UserProfilePhoto.url(
+              {@current_user.user_profile.profile_photo, @current_user.user_profile},
+              :thumb
+            )
+          }
+          alt={"#{@current_user.full_name} Profile Photo"}
         />
         <div>
           <h2 class="text-xl font-bold dark:text-white"><%= @current_user.full_name %></h2>
