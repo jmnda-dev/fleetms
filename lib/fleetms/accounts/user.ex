@@ -8,6 +8,7 @@ defmodule Fleetms.Accounts.User do
     authorizers: [Ash.Policy.Authorizer],
     domain: Fleetms.Accounts
 
+  require Ash.Resource.Change.Builtins
   alias Fleetms.Accounts.{Organization, Token, UserProfile}
   alias Fleetms.Accounts.User.Policies.{IsAdmin, IsFleetManager, IsTechnician}
 
@@ -162,6 +163,10 @@ defmodule Fleetms.Accounts.User do
 
       change manage_relationship(:organization_id, :organization, type: :append_and_remove)
       change manage_relationship(:user_profile, type: :direct_control)
+
+      change after_action(fn _changeset, created_user, _context ->
+               {:ok, Ash.load!(created_user, :full_name)}
+             end)
     end
 
     read :list do

@@ -22,7 +22,7 @@ defmodule FleetmsWeb.UploadHandler do
         ) ::
           list()
   def save(socket, uploads_ref, definition, scope) do
-    consume_uploaded_entries(socket, uploads_ref, fn %{path: path}, entry ->
+    consume_uploaded_entries(socket, uploads_ref, fn %{path: path}, _entry ->
       new_filename =
         Ecto.UUID.generate()
         |> String.replace("-", "")
