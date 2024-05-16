@@ -175,7 +175,6 @@ defmodule Fleetms.Accounts.User do
 
       get? true
       filter expr(id == ^arg(:id))
-      prepare build(load: [:full_name, :user_profile])
     end
 
     update :update do
@@ -221,6 +220,10 @@ defmodule Fleetms.Accounts.User do
     identity :unique_username, [:username] do
       eager_check? true
     end
+  end
+
+  preparations do
+    prepare build(load: [:full_name, :user_profile])
   end
 
   calculations do
