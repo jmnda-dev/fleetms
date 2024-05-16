@@ -86,6 +86,7 @@ defmodule FleetmsWeb do
       # Core UI components and translation
       import FleetmsWeb.CoreComponents
       import FleetmsWeb.LayoutComponents
+      import FleetmsWeb.LiveHelpers
       import FleetmsWeb.Gettext
 
       # Shortcut for generating JS commands

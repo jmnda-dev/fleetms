@@ -757,6 +757,7 @@ defmodule FleetmsWeb.CoreComponents do
     default: :primary
 
   attr :class, :string, default: nil
+  attr :size, :atom, values: [:md, :lg], default: :md
 
   attr :rest, :global
   slot :inner_block
@@ -765,8 +766,10 @@ defmodule FleetmsWeb.CoreComponents do
     ~H"""
     <span
       class={[
-        "text-sm font-medium mr-2 px-2.5 py-0.5 rounded",
-        @kind == :primary && "bg-blue-100 text-blue-800  dark:bg-blue-900 dark:text-blue-300",
+        "text-sm font-medium mr-2 rounded",
+        @size == :md && "px-2.5 py-0.5",
+        @size == :lg && "text-base font-medium px-3 py-1.5",
+        @kind == :primary && "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
         @kind == :secondary && "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
         @kind == :success && "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
         @kind == :danger && "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
@@ -789,7 +792,7 @@ defmodule FleetmsWeb.CoreComponents do
 
       <.breadcrumb links={[
         %{label: "Home", to: ~p"/", link_type: :navigate},
-        %{label: "Users", to: ~p"/users", link_type: :navigate, active: true}
+        %{label: "Users", link_type: :navigate, active: true}
       ]} />
   """
   attr :links, :list, required: true
@@ -835,6 +838,46 @@ defmodule FleetmsWeb.CoreComponents do
         </li>
       </ol>
     </nav>
+    """
+  end
+
+  @doc """
+  A progress bar component.
+  """
+  attr :progress, :integer, default: 0
+
+  def progress_bar(assigns) do
+    ~H"""
+    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+      <div class="bg-primary-600 h-2.5 rounded-full" style={"width: #{@progress}%"}></div>
+    </div>
+    """
+  end
+
+  @doc """
+  A simple alert component.
+  """
+  attr :kind, :atom, values: [:info, :success, :warning, :error], default: :info
+  attr :class, :string, default: nil
+  attr :rest, :global
+  slot :inner_block, required: true
+
+  def alert(assigns) do
+    ~H"""
+    <div
+      class={[
+        "p-4 mb-4 text-sm rounded-lg",
+        @kind == :info && "text-blue-800 bg-blue-50 dark:bg-gray-800 dark:text-blue-400",
+        @kind == :success && "text-green-800 bg-green-50 dark:bg-gray-800 dark:text-green-400",
+        @kind == :warning && "text-yellow-800 bg-yellow-50 dark:bg-gray-800 dark:text-yellow-400",
+        @kind == :error && "text-red-800 bg-red-50 dark:bg-gray-800 dark:text-red-400",
+        @class
+      ]}
+      {@rest}
+      role="alert"
+    >
+      <%= render_slot(@inner_block) %>
+    </div>
     """
   end
 
