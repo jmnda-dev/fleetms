@@ -109,5 +109,7 @@ defmodule FleetmsWeb.UserLive.SettingsTest do
       assert html =~ @update_attrs.city
       assert html =~ @update_attrs.state
     end
+
+    # TODO: Write test for profile photo upload
   end
 end
