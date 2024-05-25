@@ -31,8 +31,8 @@ defmodule FleetmsWeb.UploadHandler do
     end)
   end
 
-  defp ext(entry) do
-    [ext | _] = MIME.extensions(entry.client_type)
-    ext
-  end
+  # defp ext(entry) do
+  #   [ext | _] = MIME.extensions(entry.client_type)
+  #   ext
+  # end
 end
