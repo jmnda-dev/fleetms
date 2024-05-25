@@ -31,7 +31,20 @@ defmodule Fleetms.Vehicles.VehicleMake do
   end
 
   actions do
-    defaults [:read, :destroy, create: :*, update: :*]
+    defaults [:read, :destroy, update: :*]
+
+    create :create do
+      primary? true
+      accept :*
+
+      upsert? true
+      upsert_fields [:name]
+      upsert_identity :unique_name
+    end
+  end
+
+  identities do
+    identity :unique_name, [:name]
   end
 
   postgres do

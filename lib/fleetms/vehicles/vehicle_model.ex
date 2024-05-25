@@ -42,7 +42,46 @@ defmodule Fleetms.Vehicles.VehicleModel do
   end
 
   actions do
-    defaults [:read, :destroy, create: :*, update: :*]
+    defaults [:read, :destroy]
+
+    create :create do
+      primary? true
+      accept [:name, :details]
+
+      upsert? true
+      upsert_fields [:name]
+      upsert_identity :unique_name
+
+      argument :vehicle_make, :map, allow_nil?: false
+
+      change manage_relationship(:vehicle_make,
+               on_lookup: :relate_and_update,
+               on_match: :update,
+               on_no_match: :create,
+               identity_priority: [:unique_name],
+               use_identities: [:unique_name]
+             )
+    end
+
+    update :update do
+      primary? true
+      require_atomic? false
+      accept [:name, :details]
+
+      argument :vehicle_make, :map, allow_nil?: false
+
+      change manage_relationship(:vehicle_make,
+               on_lookup: :relate_and_update,
+               on_match: :update,
+               on_no_match: :create,
+               identity_priority: [:unique_name],
+               use_identities: [:unique_name]
+             )
+    end
+  end
+
+  identities do
+    identity :unique_name, [:name]
   end
 
   multitenancy do
