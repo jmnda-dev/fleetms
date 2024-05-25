@@ -39,6 +39,8 @@ defmodule Fleetms.Vehicles.VehicleModel do
     belongs_to :vehicle_make, Fleetms.Vehicles.VehicleMake do
       allow_nil? false
     end
+
+    has_many :vehicles, Fleetms.Vehicles.Vehicle
   end
 
   actions do

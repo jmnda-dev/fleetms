@@ -9,6 +9,11 @@ defmodule Fleetms.Vehicles do
   resources do
     resource Fleetms.Vehicles.VehicleMake
     resource Fleetms.Vehicles.VehicleModel
+
+    resource Fleetms.Vehicles.Vehicle do
+      define :add_vehicle, action: :create, args: [:vehicle_model]
+      define :update_vehicle, action: :create, args: [:vehicle_model]
+    end
   end
 
   admin do
