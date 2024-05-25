@@ -9,7 +9,7 @@ defmodule Fleetms.Repo do
 
   def all_tenants do
     for org <- Fleetms.Accounts.get_all_tenants!() do
-      org
+      Ash.ToTenant.to_tenant(org, org)
     end
   end
 end
