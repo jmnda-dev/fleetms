@@ -50,7 +50,7 @@ alias Fleetms.Repo
 alias Fleetms.{Accounts, Vehicles}
 
 alias Fleetms.Accounts.{Organization, User, UserProfile}
-alias Fleetms.Vehicles.{VehicleMake, VehicleModel}
+alias Fleetms.Vehicles.{VehicleMake, VehicleModel, Vehicle}
 
 defmodule :_exit do
   defdelegate exit(), to: System, as: :halt
