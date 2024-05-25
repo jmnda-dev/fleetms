@@ -6,7 +6,9 @@ defmodule Fleetms.Accounts do
     extensions: [AshAdmin.Domain]
 
   resources do
-    resource Fleetms.Accounts.Organization
+    resource Fleetms.Accounts.Organization do
+      define :get_all_tenants, action: :all
+    end
 
     resource Fleetms.Accounts.User do
       define :get_user_by_id, action: :get_by_id, args: [:id]

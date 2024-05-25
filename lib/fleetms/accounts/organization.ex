@@ -6,7 +6,17 @@ defmodule Fleetms.Accounts.Organization do
     data_layer: AshPostgres.DataLayer,
     domain: Fleetms.Accounts
 
+  alias __MODULE__
+
   @schema_prefix "fleetms_org_"
+
+  def get_schema_prefix, do: @schema_prefix
+
+  defimpl Ash.ToTenant do
+    def to_tenant(%{id: id}, _resource) do
+      "#{Organization.get_schema_prefix()}#{id}"
+    end
+  end
 
   attributes do
     uuid_primary_key :id
@@ -33,6 +43,8 @@ defmodule Fleetms.Accounts.Organization do
 
   actions do
     defaults [:read, :destroy, create: :*, update: :*]
+
+    read :all
   end
 
   identities do
