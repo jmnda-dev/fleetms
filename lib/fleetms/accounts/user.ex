@@ -8,7 +8,8 @@ defmodule Fleetms.Accounts.User do
     authorizers: [Ash.Policy.Authorizer],
     domain: Fleetms.Accounts
 
-  require Ash.Resource.Change.Builtins
+  require Ash.Query
+
   alias Fleetms.Accounts.{Organization, Token, UserProfile}
   alias Fleetms.Accounts.User.Policies.{IsAdmin, IsFleetManager, IsTechnician}
 
@@ -228,6 +229,14 @@ defmodule Fleetms.Accounts.User do
   end
 
   preparations do
+    prepare fn query, %{actor: actor} = _context ->
+      if is_nil(actor) do
+        query
+      else
+        Ash.Query.filter(query, organization_id == ^actor.organization_id)
+      end
+    end
+
     prepare build(load: [:full_name, :user_profile])
   end
 
