@@ -4,7 +4,10 @@ defmodule Fleetms.Vehicles.Vehicle do
   """
   use Ash.Resource,
     domain: Fleetms.Vehicles,
-    data_layer: AshPostgres.DataLayer
+    data_layer: AshPostgres.DataLayer,
+    authorizers: [Ash.Policy.Authorizer]
+
+  alias Fleetms.Accounts.User.Policies.{IsAdmin, IsFleetManager, IsTechnician}
 
   attributes do
     uuid_primary_key :id
@@ -101,6 +104,21 @@ defmodule Fleetms.Vehicles.Vehicle do
     end
   end
 
+  policies do
+    bypass AshAuthentication.Checks.AshAuthenticationInteraction do
+      authorize_if always()
+    end
+
+    bypass IsAdmin do
+      authorize_if always()
+    end
+
+    policy action(:list) do
+      authorize_if IsFleetManager
+      authorize_if IsTechnician
+    end
+  end
+
   actions do
     defaults [:read, :destroy]
 
@@ -125,7 +143,7 @@ defmodule Fleetms.Vehicles.Vehicle do
       accept [:*]
       require_atomic? false
 
-      argument :vehicle_model, :map, allow_nil?: false
+      argument :vehicle_model, :map
 
       change manage_relationship(:vehicle_model,
                identity_priority: [:unique_name],
@@ -136,6 +154,8 @@ defmodule Fleetms.Vehicles.Vehicle do
                on_missing: :destroy
              )
     end
+
+    read :list
   end
 
   identities do

@@ -12,7 +12,8 @@ defmodule Fleetms.Vehicles do
 
     resource Fleetms.Vehicles.Vehicle do
       define :add_vehicle, action: :create, args: [:vehicle_model]
-      define :update_vehicle, action: :create, args: [:vehicle_model]
+      define :update_vehicle, action: :update, args: [:vehicle_model]
+      define :list_vehicles, action: :list
     end
   end
 

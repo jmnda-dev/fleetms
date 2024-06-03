@@ -1,0 +1,107 @@
+<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+  <div class="w-full mb-1">
+    <div class="mb-4">
+      <.breadcrumb links={[
+        %{label: "Home", to: ~p"/", link_type: :navigate},
+        %{label: "Vehicles", to: ~p"/vehicles", link_type: :navigate, active: true}
+      ]} />
+
+      <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+        All Vehicles
+      </h1>
+    </div>
+    <div class="sm:flex">
+      <div class="items-center hidden mb-3 sm:flex sm:divide-x sm:divide-gray-100 sm:mb-0 dark:divide-gray-700">
+        <form class="lg:pr-3" action="#" method="GET">
+          <label for="vehicles-search" class="sr-only">Search</label>
+          <div class="relative mt-1 lg:w-64 xl:w-96">
+            <input
+              type="text"
+              name="search"
+              id="vehicles-search"
+              class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Search for vehicles"
+            />
+          </div>
+        </form>
+      </div>
+      <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
+        <.link href="">
+          <.button size={:sm}>
+            <.icon name="hero-plus" class="w-6 h-6 mr-2 -ml-1" />Add vehicle
+          </.button>
+        </.link>
+        <.button size={:sm} kind={:light}>
+          <.icon name="hero-arrow-down-tray" class="w-6 h-6 mr-2 -ml-1" />Export
+        </.button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="flex flex-col bg-gray-50 dark:bg-gray-800">
+  <div class="overflow-x-auto">
+    <div class="inline-block min-w-full align-middle">
+      <div class="overflow-hidden shadow">
+        <.table id="vehicles" phx-hook="HumanizeText" rows={@streams.vehicles}>
+          <:col :let={{_id, vehicle}} label="Full Name">
+            <img
+              class="w-10 h-10 rounded-full"
+              src={
+                Fleetms.VehiclePhoto.url(
+                  {vehicle.photo, @current_user.user_profile},
+                  :thumb
+                )
+              }
+              alt={"#{vehicle.name} Photo"}
+            />
+            <div class="text-sm font-normal text-gray-500 dark:text-gray-400 ml-2">
+              <div class="text-base font-semibold text-gray-900 dark:text-white">
+                <%= vehicle.name %>
+              </div>
+              <div data-humanize class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                <%= vehicle.type %>
+              </div>
+            </div>
+          </:col>
+          <:col :let={{_id, vehicle}} label="Status">
+            <.badge
+              data-humanize
+              kind={
+                case vehicle.status do
+                  :active ->
+                    :success
+
+                  :under_maintenance ->
+                    :warning
+
+                  status when status in [:out_of_service, :decommissioned] ->
+                    :danger
+                end
+              }
+              label={vehicle.status}
+            />
+          </:col>
+        </.table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="user_form_modal"
+  show
+  on_cancel={JS.navigate(~p"/users")}
+  phx_click_away={false}
+>
+  <.live_component
+    module={FleetmsWeb.UserLive.FormComponent}
+    id={:new}
+    title={@page_title}
+    action={@live_action}
+    user={@user}
+    current_user={@current_user}
+    patch={~p"/users"}
+  />
+</.modal>
