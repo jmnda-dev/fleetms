@@ -44,26 +44,26 @@
     <div class="inline-block min-w-full align-middle">
       <div class="overflow-hidden shadow">
         <.table id="vehicles" phx-hook="HumanizeText" rows={@streams.vehicles}>
-          <:col :let={{_id, vehicle}} label="Full Name">
+          <:col :let={{_id, vehicle}} label="Name">
             <img
-              class="w-10 h-10 rounded-full"
-              src={
-                Fleetms.VehiclePhoto.url(
-                  {vehicle.photo, @current_user.user_profile},
-                  :thumb
-                )
-              }
-              alt={"#{vehicle.name} Photo"}
+              src={Fleetms.VehiclePhoto.url({vehicle.photo, vehicle}, :thumb)}
+              class="h-8 w-auto mr-3 rounded-md"
+              alt={vehicle.name}
             />
-            <div class="text-sm font-normal text-gray-500 dark:text-gray-400 ml-2">
-              <div class="text-base font-semibold text-gray-900 dark:text-white">
-                <%= vehicle.name %>
-              </div>
-              <div data-humanize class="text-sm font-normal text-gray-500 dark:text-gray-400">
-                <%= vehicle.type %>
-              </div>
-            </div>
+            <%= vehicle.name %>
           </:col>
+          <:col :let={{_id, vehicle}} label="Make"><%= vehicle.make %></:col>
+          <:col :let={{_id, vehicle}} label="Model"><%= vehicle.model %></:col>
+          <:col :let={{_id, vehicle}} label="Model">
+            <.badge data-humanize kind={:info} label={vehicle.type} />
+          </:col>
+
+          <:col :let={{_id, vehicle}} label="License plate">
+            <%= vehicle.license_plate %>
+          </:col>
+          <:col :let={{_id, vehicle}} label="VIN"><%= vehicle.vin %></:col>
+          <:col :let={{_id, vehicle}} label="Year"><%= vehicle.year %></:col>
+          <:col :let={{_id, vehicle}} label="Mileage"><%= vehicle.mileage_in_distance %></:col>
           <:col :let={{_id, vehicle}} label="Status">
             <.badge
               data-humanize
@@ -82,26 +82,45 @@
               label={vehicle.status}
             />
           </:col>
+
+          <:action :let={{id, vehicle}}>
+            <button
+              id={"#{id}-dropdown-button"}
+              data-dropdown-toggle={"#{id}-dropdown"}
+              class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
+              type="button"
+            >
+              <svg
+                class="w-5 h-5"
+                aria-hidden="true"
+                fill="currentColor"
+                viewbox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+              </svg>
+            </button>
+            <div
+              id={"#{id}-dropdown"}
+              class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
+            >
+              <ul
+                class="py-1 text-sm text-gray-700 dark:text-gray-200"
+                aria-labelledby={"#{id}-dropdown-button"}
+              >
+                <li :if={Ash.can?({Vehicle, :update}, @current_user)}>
+                  <.link
+                    patch={~p"/vehicles/#{vehicle}/edit"}
+                    class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                  >
+                    Edit
+                  </.link>
+                </li>
+              </ul>
+            </div>
+          </:action>
         </.table>
       </div>
     </div>
   </div>
 </div>
-
-<.modal
-  :if={@live_action in [:new, :edit]}
-  id="user_form_modal"
-  show
-  on_cancel={JS.navigate(~p"/users")}
-  phx_click_away={false}
->
-  <.live_component
-    module={FleetmsWeb.UserLive.FormComponent}
-    id={:new}
-    title={@page_title}
-    action={@live_action}
-    user={@user}
-    current_user={@current_user}
-    patch={~p"/users"}
-  />
-</.modal>

@@ -155,11 +155,18 @@ defmodule Fleetms.Vehicles.Vehicle do
              )
     end
 
-    read :list
+    read :list do
+      prepare build(load: [:make, :model])
+    end
   end
 
   identities do
     identity :unique_name, [:name]
+  end
+
+  aggregates do
+    first :model, :vehicle_model, :name
+    first :make, [:vehicle_model, :vehicle_make], :name
   end
 
   postgres do
