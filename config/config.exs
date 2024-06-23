@@ -32,7 +32,7 @@ config :fleetms, FleetmsWeb.Endpoint,
 config :fleetms, Fleetms.Mailer, adapter: Swoosh.Adapters.Local
 
 config :fleetms,
-  ash_domains: [Fleetms.Accounts]
+  ash_domains: [Fleetms.Accounts, Fleetms.Vehicles]
 
 # Configure esbuild (the version is required)
 config :esbuild,

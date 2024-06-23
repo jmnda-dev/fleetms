@@ -7,6 +7,7 @@ defmodule FleetmsWeb.LayoutComponents do
   use FleetmsWeb, :verified_routes
 
   alias Fleetms.Accounts.User
+  alias Fleetms.Vehicles.Vehicle
 
   @doc """
   A Navbar component for public pages
@@ -632,6 +633,12 @@ defmodule FleetmsWeb.LayoutComponents do
         title: "Users",
         icon_name: "hero-users",
         show_link?: Ash.can?({User, :list}, actor)
+      },
+      %{
+        link: ~p"/vehicles",
+        title: "Vehicles",
+        icon_name: "hero-truck",
+        show_link?: Ash.can?({Vehicle, :list}, actor)
       }
     ]
   end

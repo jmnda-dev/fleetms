@@ -6,4 +6,10 @@ defmodule Fleetms.Repo do
     # first time you generate migrations.
     ["ash-functions", "uuid-ossp", "citext"]
   end
+
+  def all_tenants do
+    for org <- Fleetms.Accounts.get_all_tenants!() do
+      Ash.ToTenant.to_tenant(org, org)
+    end
+  end
 end
