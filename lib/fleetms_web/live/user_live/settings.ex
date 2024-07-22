@@ -17,6 +17,7 @@ defmodule FleetmsWeb.UserLive.Settings do
         max_entries: 1,
         max_file_size: 4096_000
       )
+      |> assign(:active_link, nil)
 
     {:ok, socket}
   end
@@ -42,7 +43,7 @@ defmodule FleetmsWeb.UserLive.Settings do
         {:noreply,
          socket
          |> put_flash(:info, "Profile information was updated successfully")
-         |> push_redirect(to: ~p"/settings")}
+         |> push_navigate(to: ~p"/settings")}
 
       {:error, form} ->
         {:noreply, assign(socket, :profile_form, form)}
@@ -61,7 +62,7 @@ defmodule FleetmsWeb.UserLive.Settings do
     {:noreply,
      socket
      |> put_flash(:info, "Your Profile was removed")
-     |> push_redirect(to: ~p"/settings")}
+     |> push_navigate(to: ~p"/settings")}
   end
 
   defp maybe_handle_upload(socket, user_profile_resource) do

@@ -23,15 +23,15 @@ config :fleetms, FleetmsWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "lCej2EZOzkGf2nAt/41ic3uuBWUpdxe6EBw3HHMkUxpZblrMHoMXxeNPE1p7yBRS",
+  secret_key_base: "SDFOULbu+UdvREQlC3RiEejAVLkv/XDGfLKARryJeP50LokewrrrsKmqxU7btPpo",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:fleetms, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:fleetms, ~w(--watch)]}
+    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
+    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
   ]
 
 config :fleetms,
        :token_signing_secret,
-       "lCej2EZOzkGf2nAt/41ic3uuBWUpdxe6EBw3HHMkUxpZblrMHoMXxeNPE1p7yBRS"
+       "SDFOULbu+UdvREQlC3RiEejAVLkv/XDGfLKARryJeP50LokewrrrsKmqxU7btPpo"
 
 # ## SSL Support
 #
@@ -60,7 +60,7 @@ config :fleetms,
 config :fleetms, FleetmsWeb.Endpoint,
   live_reload: [
     patterns: [
-      ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
+      ~r"priv/static/(?!uploads).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/fleetms_web/(controllers|live|components)/.*(ex|heex)$"
     ]
@@ -78,12 +78,6 @@ config :phoenix, :stacktrace_depth, 20
 
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
-
-config :phoenix_live_view,
-  # Include HEEx debug annotations as HTML comments in rendered markup
-  debug_heex_annotations: true,
-  # Enable helpful, but potentially expensive runtime checks
-  enable_expensive_runtime_checks: true
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false

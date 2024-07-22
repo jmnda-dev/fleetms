@@ -14,13 +14,12 @@ config :fleetms,
 # Configures the endpoint
 config :fleetms, FleetmsWeb.Endpoint,
   url: [host: "localhost"],
-  adapter: Bandit.PhoenixAdapter,
   render_errors: [
     formats: [html: FleetmsWeb.ErrorHTML, json: FleetmsWeb.ErrorJSON],
     layout: false
   ],
   pubsub_server: Fleetms.PubSub,
-  live_view: [signing_salt: "HRnb8s8s"]
+  live_view: [signing_salt: "9Pz72d98"]
 
 # Configures the mailer
 #
@@ -31,23 +30,20 @@ config :fleetms, FleetmsWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :fleetms, Fleetms.Mailer, adapter: Swoosh.Adapters.Local
 
-config :fleetms,
-  ash_domains: [Fleetms.Accounts, Fleetms.Vehicles]
-
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
-  fleetms: [
+  default: [
     args:
-      ~w(js/app.js js/public_pages.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
+      ~w(js/app.js js/public-pages.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
     cd: Path.expand("../assets", __DIR__),
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
 
 # Configure tailwind (the version is required)
 config :tailwind,
-  version: "3.4.0",
-  fleetms: [
+  version: "3.3.2",
+  default: [
     args: ~w(
       --config=tailwind.config.js
       --input=css/app.css
@@ -63,6 +59,8 @@ config :logger, :console,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+config :phoenix_live_view, debug_heex_annotations: true
+config :triplex, repo: Fleetms.Repo, tenant_prefix: "fleetms_org_"
 
 config :spark, :formatter,
   remove_parens?: true,
@@ -78,9 +76,31 @@ config :spark, :formatter,
     ]
   ]
 
+config :ash, :known_types, [AshMoney.Types.Money]
+
+config :fleetms,
+  ash_domains: [
+    Fleetms.Accounts,
+    Fleetms.Common,
+    Fleetms.Vehicles,
+    Fleetms.Inspection,
+    Fleetms.Issues,
+    Fleetms.Inventory,
+    Fleetms.Service,
+    Fleetms.FuelTracking
+  ]
+
 config :waffle,
   storage: Waffle.Storage.Local
 
+config :ex_cldr,
+  default_locale: "en",
+  default_backend: Fleetms.Cldr
+
+config :ex_money,
+  default_currency: :ZMW
+
+# config :ash, :policies, log_successful_policy_breakdowns: :error
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

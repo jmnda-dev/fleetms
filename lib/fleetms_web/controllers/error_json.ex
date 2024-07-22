@@ -1,10 +1,4 @@
 defmodule FleetmsWeb.ErrorJSON do
-  @moduledoc """
-  This module is invoked by your endpoint in case of errors on JSON requests.
-
-  See config/config.exs.
-  """
-
   # If you want to customize a particular status code,
   # you may add your own clauses, such as:
   #

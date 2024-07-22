@@ -1,3 +1,4 @@
+
 export function humanizeString(string) {
     string = string.replace(/[_-]/g, ' ');
 

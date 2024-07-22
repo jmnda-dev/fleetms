@@ -2,9 +2,9 @@ defmodule FleetmsWeb.CoreComponents do
   @moduledoc """
   Provides core UI components.
 
-  At first glance, this module may seem daunting, but its goal is to provide
-  core building blocks for your application, such as modals, tables, and
-  forms. The components consist mostly of markup and are well-documented
+  At the first glance, this module may seem daunting, but its goal is
+  to provide some core building blocks in your application, such as modals,
+  tables, and forms. The components are mostly markup and well documented
   with doc strings and declarative assigns. You may customize and style
   them in any way you want, based on your application growth and needs.
 
@@ -83,10 +83,7 @@ defmodule FleetmsWeb.CoreComponents do
                   class="-m-3 flex-none p-3"
                   aria-label={gettext("close")}
                 >
-                  <.icon
-                    name="hero-x-mark-solid text-gray-800 dark:text-gray-100 font-bold"
-                    class="h-5 w-5"
-                  />
+                  <i class="fa-solid fa-xmark h-8 w-8 text-gray-800 dark:text-white" />
                 </button>
               </div>
               <div id={"#{@id}-content"}>
@@ -108,7 +105,7 @@ defmodule FleetmsWeb.CoreComponents do
       <.flash kind={:info} flash={@flash} />
       <.flash kind={:info} phx-mounted={show("#flash")}>Welcome Back!</.flash>
   """
-  attr :id, :string, doc: "the optional id of flash container"
+  attr :id, :string, default: "flash", doc: "the optional id of flash container"
   attr :flash, :map, default: %{}, doc: "the map of flash messages to display"
   attr :title, :string, default: nil
   attr :kind, :atom, values: [:info, :error], doc: "used for styling and flash lookup"
@@ -117,16 +114,15 @@ defmodule FleetmsWeb.CoreComponents do
   slot :inner_block, doc: "the optional inner block that renders the flash message"
 
   def flash(assigns) do
-    assigns = assign_new(assigns, :id, fn -> "flash-#{assigns.kind}" end)
-
     ~H"""
     <div
       :if={msg = render_slot(@inner_block) || Phoenix.Flash.get(@flash, @kind)}
       id={@id}
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       role="alert"
+      style="z-index: 200;"
       class={[
-        "fixed top-2 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
+        "fixed top-2 right-2 w-80 sm:w-96 rounded-lg p-3 ring-1",
         @kind == :info && "bg-emerald-50 text-emerald-800 ring-emerald-500 fill-cyan-900",
         @kind == :error && "bg-rose-50 text-rose-900 shadow-md ring-rose-500 fill-rose-900"
       ]}
@@ -153,37 +149,33 @@ defmodule FleetmsWeb.CoreComponents do
       <.flash_group flash={@flash} />
   """
   attr :flash, :map, required: true, doc: "the map of flash messages"
-  attr :id, :string, default: "flash-group", doc: "the optional id of flash container"
 
   def flash_group(assigns) do
     ~H"""
-    <div id={@id}>
-      <.flash kind={:info} title={gettext("Success!")} flash={@flash} />
-      <.flash kind={:error} title={gettext("Error!")} flash={@flash} />
-      <.flash
-        id="client-error"
-        kind={:error}
-        title={gettext("We can't find the internet")}
-        phx-disconnected={show(".phx-client-error #client-error")}
-        phx-connected={hide("#client-error")}
-        hidden
-      >
-        <%= gettext("Attempting to reconnect") %>
-        <.icon name="hero-arrow-path" class="ml-1 h-3 w-3 animate-spin" />
-      </.flash>
+    <.flash kind={:info} title="Success!" flash={@flash} />
+    <.flash kind={:error} title="Error!" flash={@flash} />
+    <.flash
+      id="client-error"
+      kind={:error}
+      title="We can't find the internet"
+      phx-disconnected={show(".phx-client-error #client-error")}
+      phx-connected={hide("#client-error")}
+      hidden
+    >
+      Attempting to reconnect <.icon name="hero-arrow-path" class="ml-1 h-3 w-3 animate-spin" />
+    </.flash>
 
-      <.flash
-        id="server-error"
-        kind={:error}
-        title={gettext("Something went wrong!")}
-        phx-disconnected={show(".phx-server-error #server-error")}
-        phx-connected={hide("#server-error")}
-        hidden
-      >
-        <%= gettext("Hang in there while we get back on track") %>
-        <.icon name="hero-arrow-path" class="ml-1 h-3 w-3 animate-spin" />
-      </.flash>
-    </div>
+    <.flash
+      id="server-error"
+      kind={:error}
+      title="Something went wrong!"
+      phx-disconnected={show(".phx-server-error #server-error")}
+      phx-connected={hide("#server-error")}
+      hidden
+    >
+      Hang in there while we get back on track
+      <.icon name="hero-arrow-path" class="ml-1 h-3 w-3 animate-spin" />
+    </.flash>
     """
   end
 
@@ -301,8 +293,7 @@ defmodule FleetmsWeb.CoreComponents do
     * For live file uploads, see `Phoenix.Component.live_file_input/1`
 
   See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
-  for more information. Unsupported types, such as hidden and radio,
-  are best written directly in your templates.
+  for more information.
 
   ## Examples
 
@@ -317,8 +308,8 @@ defmodule FleetmsWeb.CoreComponents do
 
   attr :type, :string,
     default: "text",
-    values: ~w(checkbox color date datetime-local email file month number password
-               range search select tel text textarea time url week hidden)
+    values: ~w(checkbox color date datetime-local email file hidden month number password
+               range radio search select tel text textarea time url week)
 
   attr :field, Phoenix.HTML.FormField,
     doc: "a form field struct retrieved from the form, for example: @form[:email]"
@@ -476,7 +467,7 @@ defmodule FleetmsWeb.CoreComponents do
   def error(assigns) do
     ~H"""
     <p class="mt-3 flex gap-3 text-sm leading-6 text-rose-600 phx-no-feedback:hidden">
-      <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
+      <i class="fa-solid fa-circle-exclamation mt-1.5 h-5 w-5 flex-none"></i>
       <%= render_slot(@inner_block) %>
     </p>
     """
@@ -495,10 +486,10 @@ defmodule FleetmsWeb.CoreComponents do
     ~H"""
     <header class={[@actions != [] && "flex items-center justify-between gap-6", @class]}>
       <div>
-        <h1 class="text-lg font-semibold leading-8 text-gray-800 dark:text-gray-100">
+        <h1 class="text-lg font-semibold leading-8 text-gray-800 dark:text-white">
           <%= render_slot(@inner_block) %>
         </h1>
-        <p :if={@subtitle != []} class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+        <p :if={@subtitle != []} class="mt-2 text-sm leading-6 text-gray-600 dark:text-white">
           <%= render_slot(@subtitle) %>
         </p>
       </div>
@@ -508,7 +499,6 @@ defmodule FleetmsWeb.CoreComponents do
   end
 
   @doc ~S"""
-
   Renders a table with generic styling.
 
   ## Examples
@@ -527,11 +517,8 @@ defmodule FleetmsWeb.CoreComponents do
     default: &Function.identity/1,
     doc: "the function for mapping each row before calling the :col and :action slots"
 
-  attr :rest, :global, include: ~w(phx-hook)
-
   slot :col, required: true do
     attr :label, :string
-    attr :class, :string
   end
 
   slot :action, doc: "the slot for showing user actions in the last table column"
@@ -543,95 +530,18 @@ defmodule FleetmsWeb.CoreComponents do
       end
 
     ~H"""
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-          <tr>
-            <th :for={col <- @col} scope="col" class={["px-4 py-3", col[:class]]}>
-              <%= col[:label] %>
-            </th>
-            <th scope="col" class="px-4 py-3">
-              <span class="sr-only"><%= gettext("Actions") %></span>
-            </th>
-          </tr>
-        </thead>
-        <tbody id={@id} phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"} {@rest}>
-          <tr
-            :for={row <- @rows}
-            id={@row_id && @row_id.(row)}
-            class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-          >
-            <td
-              :for={{col, i} <- Enum.with_index(@col)}
-              phx-click={@row_click && @row_click.(row)}
-              scope={i == 0 && "row"}
-              class={[
-                i == 0 && "flex items-center",
-                @row_click && "hover:cursor-pointer",
-                "px-4 py-3 font-medium text-gray-900 whitespace-normal dark:text-white"
-              ]}
-            >
-              <%= render_slot(col, @row_item.(row)) %>
-            </td>
-            <td :if={@action != []} class="px-4 py-3">
-              <%= for action <- @action do %>
-                <%= render_slot(action, @row_item.(row)) %>
-              <% end %>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    """
-  end
-
-  @doc ~S"""
-  Renders a table with generic styling.
-
-  ## Examples
-
-      <.table_2 id="users" rows={@users}>
-        <:col :let={user} label="id"><%= user.id %></:col>
-        <:col :let={user} label="username"><%= user.username %></:col>
-      </.table_2>
-  """
-  attr :id, :string, required: true
-  attr :rows, :list, required: true
-  attr :row_id, :any, default: nil, doc: "the function for generating the row id"
-  attr :row_click, :any, default: nil, doc: "the function for handling phx-click on each row"
-
-  attr :row_item, :any,
-    default: &Function.identity/1,
-    doc: "the function for mapping each row before calling the :col and :action slots"
-
-  slot :col, required: true do
-    attr :label, :string
-  end
-
-  slot :action, doc: "the slot for showing user actions in the last table column"
-
-  def table_2(assigns) do
-    assigns =
-      with %{rows: %Phoenix.LiveView.LiveStream{}} <- assigns do
-        assign(assigns, row_id: assigns.row_id || fn {id, _item} -> id end)
-      end
-
-    ~H"""
     <div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0">
       <table class="w-[40rem] mt-11 sm:w-full">
         <thead class="text-sm text-left leading-6 text-zinc-500">
           <tr>
-            <th :for={col <- @col} class="p-0 pb-4 pr-6 font-normal"><%= col[:label] %></th>
-            <th :if={@action != []} class="relative p-0 pb-4">
-              <span class="sr-only"><%= gettext("Actions") %></span>
-            </th>
+            <th :for={col <- @col} class="p-0 pr-6 pb-4 font-normal"><%= col[:label] %></th>
+            <th class="relative p-0 pb-4"><span class="sr-only"><%= gettext("Actions") %></span></th>
           </tr>
         </thead>
         <tbody
           id={@id}
           phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
           class="relative divide-y divide-zinc-100 border-t border-zinc-200 text-sm leading-6 text-zinc-700"
-          {@rest}
         >
           <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-zinc-50">
             <td
@@ -664,6 +574,123 @@ defmodule FleetmsWeb.CoreComponents do
     """
   end
 
+  @doc ~S"""
+  Renders a table with generic styling.
+
+  ## Examples
+
+      <.table_2 id="users" rows={@users}>
+        <:col :let={user} label="id"><%= user.id %></:col>
+        <:col :let={user} label="username"><%= user.username %></:col>
+      </.table_2>
+  """
+  attr :id, :string, required: true
+  attr :rows, :list, required: true
+  attr :row_id, :any, default: nil, doc: "the function for generating the row id"
+  attr :row_click, :any, default: nil, doc: "the function for handling phx-click on each row"
+
+  attr :row_item, :any,
+    default: &Function.identity/1,
+    doc: "the function for mapping each row before calling the :col and :action slots"
+
+  slot :col, required: true do
+    attr :label, :string
+    attr :class, :string
+  end
+
+  slot :action, doc: "the slot for showing user actions in the last table column"
+
+  def table_2(assigns) do
+    assigns =
+      with %{rows: %Phoenix.LiveView.LiveStream{}} <- assigns do
+        assign(assigns, row_id: assigns.row_id || fn {id, _item} -> id end)
+      end
+
+    ~H"""
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            <th :for={col <- @col} scope="col" class={["px-4 py-3", col[:class]]}>
+              <%= col[:label] %>
+            </th>
+            <th scope="col" class="px-4 py-3">
+              <span class="sr-only"><%= gettext("Actions") %></span>
+            </th>
+          </tr>
+        </thead>
+        <tbody id={@id} phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}>
+          <tr
+            :for={row <- @rows}
+            id={@row_id && @row_id.(row)}
+            class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            <td
+              :for={{col, i} <- Enum.with_index(@col)}
+              phx-click={@row_click && @row_click.(row)}
+              scope={i == 0 && "row"}
+              class={[
+                i == 0 && "flex items-center",
+                @row_click && "hover:cursor-pointer",
+                "px-4 py-3 font-medium text-gray-900 whitespace-normal dark:text-white"
+              ]}
+            >
+              <%= render_slot(col, @row_item.(row)) %>
+            </td>
+            <td :if={@action != []} class="px-4 py-3">
+              <%= for action <- @action do %>
+                <%= render_slot(action, @row_item.(row)) %>
+              <% end %>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    """
+  end
+
+  attr :ref, :string, required: true
+  attr :upload, :map, required: true
+  attr :width, :string, default: "w-full"
+  slot :label, required: true
+  slot :description, required: false
+
+  def upload_input(assigns) do
+    ~H"""
+    <div class={["flex items-center justify-center", @width]} phx-drop-target={@ref}>
+      <label
+        for={@ref}
+        class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+      >
+        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+          <svg
+            class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 20 16"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+            />
+          </svg>
+          <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+            <%= render_slot(@label) %>
+          </p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            <%= render_slot(@description) %>
+          </p>
+        </div>
+        <.live_file_input upload={@upload} class="hidden" />
+      </label>
+    </div>
+    """
+  end
+
   @doc """
   Renders a data list.
 
@@ -676,15 +703,25 @@ defmodule FleetmsWeb.CoreComponents do
   """
   slot :item, required: true do
     attr :title, :string, required: true
+    attr :title_class, :string
   end
 
   def list(assigns) do
     ~H"""
-    <div class="mt-14">
-      <dl class="-my-4 divide-y divide-zinc-100">
+    <div>
+      <dl class="-my-4 divide-y divide-gray-200 dark:divide-gray-600">
         <div :for={item <- @item} class="flex gap-4 py-4 text-sm leading-6 sm:gap-8">
-          <dt class="w-1/4 flex-none text-zinc-500"><%= item.title %></dt>
-          <dd class="text-zinc-700"><%= render_slot(item) %></dd>
+          <dt
+            class={[
+              "w-1/4 font-semibold flex-none text-gray-900 dark:text-white",
+              item[:title_class]
+            ]}
+            id={item[:id]}
+            phx-hook={item[:phx_hook]}
+          >
+            <%= item.title %>
+          </dt>
+          <dd class="text-gray-600 dark:text-gray-300"><%= render_slot(item) %></dd>
         </div>
       </dl>
     </div>
@@ -706,7 +743,7 @@ defmodule FleetmsWeb.CoreComponents do
     <div class="mt-16">
       <.link
         navigate={@navigate}
-        class="text-sm font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
+        class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-700 dark:text-white dark:hover:text-gray-300"
       >
         <.icon name="hero-arrow-left-solid" class="h-3 w-3" />
         <%= render_slot(@inner_block) %>
@@ -725,8 +762,8 @@ defmodule FleetmsWeb.CoreComponents do
   You can customize the size and colors of the icons by setting
   width, height, and background color classes.
 
-  Icons are extracted from the `deps/heroicons` directory and bundled within
-  your compiled app.css by the plugin in your `assets/tailwind.config.js`.
+  Icons are extracted from your `assets/vendor/heroicons` directory and bundled
+  within your compiled app.css by the plugin in your `assets/tailwind.config.js`.
 
   ## Examples
 
@@ -877,6 +914,125 @@ defmodule FleetmsWeb.CoreComponents do
       role="alert"
     >
       <%= render_slot(@inner_block) %>
+    </div>
+    """
+  end
+
+  attr :active, :boolean, default: nil
+  attr :icon_class, :string, default: nil
+  attr :label, :string, required: true
+  attr :rest, :global, include: ~w(patch navigate href)
+
+  def tab(assigns) do
+    ~H"""
+    <.link
+      class={[
+        "inline-flex items-center justify-center p-4 group rounded-t-lg",
+        !@active &&
+          "border-b-2 border-transparent  hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300",
+        @active &&
+          "font-semibold text-primary-500 border-b-2 border-primary-500 rounded-t-lg active dark:text-primary-400 dark:border-primary-400"
+      ]}
+      aria-current={@active && "page"}
+      {@rest}
+    >
+      <i
+        :if={not is_nil(@icon_class)}
+        class={[
+          @icon_class,
+          !@active &&
+            "text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-300",
+          @active && "text-primary-600 dark:text-primary-500"
+        ]}
+      />
+
+      <%= @label %>
+    </.link>
+    """
+  end
+
+  attr :id, :string, default: "dropdownMenuIconHorizontalButton"
+  attr :dropdown_id, :string, default: "dropdownDotsHorizontal"
+  slot :dropdown_item, required: true
+
+  def dropdown(assigns) do
+    ~H"""
+    <button
+      id={@id}
+      data-dropdown-toggle={@dropdown_id}
+      class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+      type="button"
+    >
+      <svg
+        class="w-6 h-6"
+        aria-hidden="true"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z">
+        </path>
+      </svg>
+    </button>
+    <!-- Dropdown menu -->
+    <div id={@dropdown_id} class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow">
+      <ul class="py-1 text-sm text-gray-700" aria-labelledby={@id}>
+        <li :for={item <- @dropdown_item}>
+          <%= render_slot(item) %>
+        </li>
+      </ul>
+    </div>
+    """
+  end
+
+  @doc """
+  A spinner component
+  """
+  attr :rest, :global
+
+  def spinner(assigns) do
+    ~H"""
+    <div role="status" {@rest}>
+      <svg
+        aria-hidden="true"
+        class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+        viewBox="0 0 100 101"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+          fill="currentColor"
+        />
+        <path
+          d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+          fill="currentFill"
+        />
+      </svg>
+      <span class="sr-only">Loading...</span>
+    </div>
+    """
+  end
+
+  @doc """
+  A tooltip component
+  """
+  attr :id, :string, required: true
+  attr :class, :string, default: nil
+  slot :inner_block, required: true
+
+  def tooltip(assigns) do
+    ~H"""
+    <div
+      id={@id}
+      role="tooltip"
+      class={[
+        "absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700",
+        @class
+      ]}
+    >
+      <%= render_slot(@inner_block) %>
+      <div class="tooltip-arrow" data-popper-arrow></div>
     </div>
     """
   end

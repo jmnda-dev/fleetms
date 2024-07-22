@@ -1,0 +1,180 @@
+<nav class="p-4 lg:mt-1.5 flex" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <.link
+        navigate={~p"/"}
+        class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
+      >
+        <svg
+          class="w-3 h-3 mr-2.5"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
+        </svg>
+        Home
+      </.link>
+    </li>
+    <li aria-current="page">
+      <.link navigate={~p"/inventory_locations"}>
+        <div class="flex items-center">
+          <svg
+            class="w-3 h-3 text-gray-400 mx-1"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 6 10"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 9 4-4-4-4"
+            />
+          </svg>
+          <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2 dark:text-gray-400">
+            Inventory Locations
+          </span>
+        </div>
+      </.link>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg
+          class="w-3 h-3 text-gray-400 mx-1"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 6 10"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m1 9 4-4-4-4"
+          />
+        </svg>
+        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">
+          <%= @inventory_location.name %>
+        </span>
+      </div>
+    </li>
+  </ol>
+</nav>
+
+<div class="mx-2">
+  <section class="bg-white dark:bg-gray-800 shadow-md rounded-md">
+    <div class="py-8 px-4 mx-auto max-w-2xl lg:py-16">
+      <h2 class="mb-2 text-xl font-semibold leading-none text-gray-900 md:text-2xl dark:text-white">
+        <%= @inventory_location.name %>
+      </h2>
+      <p class="mb-4 text-xl font-extrabold leading-none text-gray-900 md:text-2xl dark:text-white">
+        <%= @inventory_location.count_of_parts %> total parts
+      </p>
+      <dl>
+        <dt class="mb-2 font-semibold leading-none text-gray-900 dark:text-white">Description</dt>
+        <dd class="mb-4 font-light text-gray-500 sm:mb-5 dark:text-gray-400">
+          <%= render_value(@inventory_location.description) %>
+        </dd>
+      </dl>
+      <div class="flex items-center space-x-4">
+        <.link
+          :if={Ash.can?(
+              {Fleetms.Inventory.InventoryLocation, :update},
+              @current_user
+            )
+          }
+          patch={~p"/inventory_locations/#{@inventory_location}/detail/edit"}
+        >
+          <button
+            type="button"
+            class="text-white inline-flex items-center bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+          >
+            <svg
+              aria-hidden="true"
+              class="mr-1 -ml-1 w-5 h-5"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z">
+              </path>
+              <path
+                fill-rule="evenodd"
+                d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                clip-rule="evenodd"
+              >
+              </path>
+            </svg>
+            Edit
+          </button>
+        </.link>
+        <button
+          :if={Ash.can?(
+              {Fleetms.Inventory.InventoryLocation, :destroy},
+              @current_user
+            )
+          }
+          type="button"
+          class="inline-flex items-center text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-900"
+        >
+          <svg
+            aria-hidden="true"
+            class="w-5 h-5 mr-1.5 -ml-1"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+              clip-rule="evenodd"
+            >
+            </path>
+          </svg>
+          Delete
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div class="shadow-md rounded-md bg-white dark:bg-gray-800 p-4">
+    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+      <li class="mr-2">
+        <.tab id="inventory_parts-tab" active={true} label="Inventory Parts" />
+      </li>
+    </ul>
+
+    <div class="grid gap-4 mt-2">
+      <.live_component
+        module={FleetmsWeb.InventoryLocationLive.InventoryLocationPartTableComponent}
+        id="inventory_location_parts-table"
+        inventory_location={@inventory_location}
+        current_user={@current_user}
+        tenant={@tenant}
+      />
+    </div>
+  </div>
+</div>
+
+<.modal
+  :if={@live_action == :edit}
+  id="inventory_location-modal"
+  show
+  on_cancel={JS.navigate(~p"/inventory_locations/#{@inventory_location}")}
+>
+  <.live_component
+    module={FleetmsWeb.InventoryLocationLive.FormComponent}
+    id={@inventory_location.id}
+    title={@page_title}
+    action={@live_action}
+    inventory_location={@inventory_location}
+    current_user={@current_user}
+    tenant={@tenant}
+    patch={~p"/inventory_locations/#{@inventory_location}"}
+  />
+</.modal>

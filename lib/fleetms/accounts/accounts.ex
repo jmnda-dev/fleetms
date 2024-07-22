@@ -12,6 +12,12 @@ defmodule Fleetms.Accounts do
 
     resource Fleetms.Accounts.User do
       define :get_user_by_id, action: :get_by_id, args: [:id]
+      define :get_all_users, action: :get_all
+      define :list_users, action: :list, args: [
+        :paginate_sort_opts,
+        :search_query,
+        :advanced_filter_params
+      ]
     end
 
     resource Fleetms.Accounts.UserProfile do

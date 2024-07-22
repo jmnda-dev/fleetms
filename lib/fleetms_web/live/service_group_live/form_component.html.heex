@@ -1,0 +1,34 @@
+<div>
+  <.header>
+    <%= @title %>
+  </.header>
+
+  <.simple_form
+    for={@form}
+    id="service_group-form"
+    phx-target={@myself}
+    phx-change="validate"
+    phx-submit="save"
+  >
+    <.input field={@form[:name]} type="text" label="Name" />
+    <.input field={@form[:description]} type="textarea" label="Description" />
+    <div id="vehicles-input" phx-update="ignore">
+      <.input
+        field={@form[:vehicles]}
+        type="select"
+        options={@vehicles}
+        value={@service_group && Enum.map(@service_group.vehicles, & &1.id)}
+        multiple
+        phx-hook="select2JS"
+        style="width: 100%;"
+        label="Vehicles"
+      />
+    </div>
+
+    <:actions>
+      <.button phx-disable-with="Saving...">
+        <i class="fa-solid fa-floppy-disk me-1"></i>Save Service Group
+      </.button>
+    </:actions>
+  </.simple_form>
+</div>

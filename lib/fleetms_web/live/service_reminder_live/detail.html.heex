@@ -1,0 +1,175 @@
+<nav class="p-4 lg:mt-1.5 flex" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a
+        href="#"
+        class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
+      >
+        <svg
+          class="w-3 h-3 mr-2.5"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
+        </svg>
+        Home
+      </a>
+    </li>
+    <li aria-current="page">
+      <.link navigate={~p"/service_reminders"}>
+        <div class="flex items-center">
+          <svg
+            class="w-3 h-3 text-gray-400 mx-1"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 6 10"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 9 4-4-4-4"
+            />
+          </svg>
+          <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2 dark:text-gray-400">
+            Service Reminders
+          </span>
+        </div>
+      </.link>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg
+          class="w-3 h-3 text-gray-400 mx-1"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 6 10"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m1 9 4-4-4-4"
+          />
+        </svg>
+        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">
+          <%= @service_reminder.vehicle.full_name %> Reminder
+        </span>
+      </div>
+    </li>
+  </ol>
+</nav>
+
+<div class="mx-2">
+  <div class="border-b border-gray-200 shadow-md rounded-md bg-white dark:bg-gray-800 dark:border-gray-700">
+    <div class="flex justify-between mb-4 rounded-t sm:mb-5">
+      <div class="flex items-center rounded-md bg-white dark:bg-gray-800 p-2">
+        <img
+          class="w-14 h-14 mr-2 rounded-md sm:mr-4"
+          src={
+            Fleetms.VehiclePhoto.url(
+              {@service_reminder.vehicle.photo, @service_reminder.vehicle},
+              :thumb
+            )
+          }
+          alt={@service_reminder.vehicle.full_name}
+        />
+        <div>
+          <h3 class="text-lg font-bold text-gray-900 md:text-xl dark:text-white">
+            <%= @service_reminder.service_task.name %>
+          </h3>
+          <p class="text-gray-900 dark:text-white">
+            <%= cond do %>
+              <% @service_reminder.mileage_interval && @service_reminder.time_interval -> %>
+                <.badge label={"Every #{@service_reminder.mileage_interval}km or #{@service_reminder.time_interval} #{@service_reminder.time_interval_unit}"} />
+              <% @service_reminder.mileage_interval -> %>
+                <.badge label={"Every #{@service_reminder.mileage_interval}km"} />
+              <% @service_reminder.time_interval -> %>
+                <.badge label={"Every #{@service_reminder.time_interval} #{@service_reminder.time_interval_unit}"} />
+              <% true -> %>
+                --
+            <% end %>
+          </p>
+        </div>
+      </div>
+      <div
+        :if={
+Ash.can?(
+            {Fleetms.Service.ServiceReminder, :update},
+            @current_user
+          )
+        }
+        class="mt-3"
+      >
+        <.link navigate={~p"/service_reminders/#{@service_reminder}/detail/edit"}>
+          <.button type="button" class="btn-sm mb-0">
+            <i class="fa-solid fa-pen-to-square text-sm" aria-hidden="true"></i> Edit
+          </.button>
+        </.link>
+      </div>
+    </div>
+    <div class="p-4">
+      <.list>
+        <:item title="Status">
+          <.badge
+            :if={@service_reminder.due_status == :Upcoming}
+            kind={:info}
+            label={@service_reminder.due_status}
+          />
+          <.badge
+            :if={@service_reminder.due_status == :"Due Soon"}
+            kind={:warning}
+            label={@service_reminder.due_status}
+          />
+          <.badge
+            :if={@service_reminder.due_status == :Overdue}
+            kind={:danger}
+            label={@service_reminder.due_status}
+          />
+        </:item>
+        <:item title="Service Group">
+          <%= render_value(@service_reminder.service_group_name) %>
+        </:item>
+        <:item title="Service Task Description">
+          <%= render_value(@service_reminder.service_task.description) %>
+        </:item>
+        <:item title="Mileage Interval">
+          <%= render_value(@service_reminder.mileage_interval) %> km
+        </:item>
+        <:item title="Mileage Threshold">
+          <%= render_value(@service_reminder.mileage_threshold) %> km
+        </:item>
+        <:item title="Time Interval">
+          <%= render_value(@service_reminder.time_interval) %> <%= @service_reminder.time_interval_unit %>
+        </:item>
+        <:item title="Time Threshold">
+          <%= render_value(@service_reminder.time_threshold) %> <%= @service_reminder.time_threshold_unit %>
+        </:item>
+      </.list>
+    </div>
+  </div>
+</div>
+
+<.modal
+  :if={@live_action == :edit}
+  id="service_reminder-modal"
+  show
+  on_cancel={JS.navigate(~p"/service_reminders/#{@service_reminder}")}
+>
+  <.live_component
+    module={FleetmsWeb.ServiceReminderLive.FormComponent}
+    id={@service_reminder.id}
+    title={@page_title}
+    action={@live_action}
+    service_reminder={@service_reminder}
+    current_user={@current_user}
+    tenant={@tenant}
+    patch={~p"/service_reminders/#{@service_reminder}"}
+  />
+</.modal>

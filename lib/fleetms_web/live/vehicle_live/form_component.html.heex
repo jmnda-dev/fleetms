@@ -1,0 +1,974 @@
+<div>
+  <.header>
+    <%= @title %>
+  </.header>
+  <.simple_form
+    for={@form}
+    id="vehicle-form"
+    phx-target={@myself}
+    phx-change="validate"
+    phx-submit="save"
+  >
+    <div class="grid gap-4 mb-4 sm:grid-cols-2">
+      <div>
+        <.input field={@form[:name]} type="text" label="Name" />
+      </div>
+      <.inputs_for :let={vehicle_model_form} field={@form[:vehicle_model]}>
+        <.inputs_for :let={vehicle_make_form} field={vehicle_model_form[:vehicle_make]}>
+          <div id="vehicle-make-input" phx-update="ignore">
+            <.input
+              field={vehicle_make_form[:name]}
+              type="select"
+              label="Make"
+              options={Enum.map(@vehicle_makes, &{&1.name, &1.name})}
+              prompt=""
+              phx-target={@myself}
+              phx-hook="select2JS"
+              style="width: 100%;"
+              data-placeholder="Select Vehicle Make"
+              data-input-for="vehicle-make"
+              data-child-input-id={vehicle_model_form[:name].id}
+            />
+          </div>
+        </.inputs_for>
+        <div id="vehicle-model-input" phx-update="ignore">
+          <.input
+            field={vehicle_model_form[:name]}
+            type="select"
+            options={Enum.map(@vehicle_models, &{&1.name, &1.name})}
+            prompt=""
+            label="model"
+            phx-hook="select2JS"
+            style="width: 100%;"
+            data-placeholder="Select Vehicle Model"
+            data-input-for="vehicle-model"
+          />
+        </div>
+      </.inputs_for>
+
+      <div>
+        <.input field={@form[:model_code]} type="text" label="Model Code" />
+      </div>
+
+      <div>
+        <.input
+          field={@form[:category]}
+          type="select"
+          prompt=""
+          options={Fleetms.Enums.vehicle_categories()}
+          label="Category"
+        />
+      </div>
+
+      <div>
+        <.input
+          field={@form[:type]}
+          type="select"
+          prompt=""
+          options={Fleetms.Enums.vehicle_types()}
+          label="Type"
+        />
+      </div>
+      <div>
+        <.input
+          field={@form[:body_style]}
+          type="select"
+          options={Fleetms.Enums.body_style()}
+          prompt=""
+          label="Body Style"
+        />
+      </div>
+
+      <div>
+        <.input field={@form[:year]} type="number" label="Year" />
+      </div>
+
+      <div>
+        <.input field={@form[:vin]} type="text" label="VIN" />
+      </div>
+
+      <div>
+        <.input field={@form[:chassis_number]} type="text" label="Chassis Number" />
+      </div>
+
+      <div>
+        <.input field={@form[:license_plate]} type="text" label="License Plate" />
+      </div>
+
+      <div>
+        <.input field={@form[:color]} type="text" label="Color" />
+      </div>
+
+      <div>
+        <.input field={@form[:mileage]} type="number" label="Mileage(km)" />
+      </div>
+
+      <div>
+        <.input field={@form[:hours]} type="number" label="Hours" />
+      </div>
+
+      <div>
+        <.input
+          field={@form[:status]}
+          type="select"
+          prompt=""
+          options={Fleetms.Enums.vehicle_statuses()}
+          label="Status"
+        />
+      </div>
+
+      <div>
+        <.input field={@form[:base_price]} type="number" label="Base Price" step="any" />
+      </div>
+    </div>
+    <div class="mb-4">
+      <span class="block mb-2 mt-6 md:text-lg lg:text-xl font-medium text-gray-900 dark:text-white">
+        Vehicle Photos
+      </span>
+      <div
+        class="grid grid-cols-3 gap-4 mb-4 sm:grid-cols-4"
+        id="vehicle-photos-list"
+        phx-update="ignore"
+      >
+        <%= if @vehicle do %>
+          <div :for={photo <- @vehicle.photos} x-data="{checked: false}">
+            <figure class="relative max-w-sm transition-all duration-300 cursor-pointer hover:grayscale-0">
+              <a href="#">
+                <img
+                  class="rounded-lg"
+                  x-bind:class="checked && 'filter grayscale'"
+                  src={Fleetms.VehiclePhoto.url({photo.filename, @vehicle})}
+                  alt=""
+                />
+              </a>
+              <figcaption class="absolute px-4 text-lg text-white bottom-2">
+                <input
+                  id={["photo_id_", photo.id]}
+                  name={[@form[:photos_to_delete_ids].name, "[]"]}
+                  type="checkbox"
+                  class="hidden"
+                  value={photo.id}
+                />
+                <div x-show="! checked">
+                  <label
+                    class="px-2 py-1 text-sm font-semibold bg-red-600 rounded-md hover:bg-red-700 cursor-pointer"
+                    for={["photo_id_", photo.id]}
+                    x-on:click="checked = ! checked"
+                  >
+                    <i class="fa-solid fa-trash" /> Delete
+                  </label>
+                </div>
+                <div x-show="checked">
+                  <label
+                    class="px-2 py-1 text-sm font-semibold bg-green-600 rounded-md hover:bg-green-700 cursor-pointer"
+                    for={["photo_id_", photo.id]}
+                    x-on:click="checked = ! checked"
+                  >
+                    <i class="fa-solid fa-trash-arrow-up" /> Undo Delete
+                  </label>
+                </div>
+              </figcaption>
+            </figure>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    <.alert :if={@disallow_photo_uploads} kind={:warning}>
+      <%= @upload_photo_disallow_msg %>
+    </.alert>
+    <div :if={not @disallow_photo_uploads}>
+      <.alert :for={err <- upload_errors(@uploads.vehicle_photos)} kind={:error}>
+        <%= error_to_string(err) %>
+      </.alert>
+    </div>
+    <div :if={not @disallow_photo_uploads} class="grid gap-6 mb-6 md:grid-cols-2">
+      <%= for {entry, _i} <- Enum.with_index(@uploads.vehicle_photos.entries) do %>
+        <div>
+          <.live_img_preview entry={entry} width="auto" height="200" />
+          <div class="my-2">
+            <.alert :for={err <- upload_errors(@uploads.vehicle_photos, entry)} kind={:error}>
+              <%= error_to_string(err) %>
+            </.alert>
+          </div>
+          <div class="my-2">
+            <.progress_bar progress={entry.progress} />
+          </div>
+          <div>
+            <.button
+              kind={:warning}
+              type="button"
+              phx-click="remove_photo"
+              phx-value-ref={entry.ref}
+              phx-target={@myself}
+            >
+              Remove
+            </.button>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <.upload_input
+      :if={not @disallow_photo_uploads}
+      upload={@uploads.vehicle_photos}
+      ref={@uploads.vehicle_photos.ref}
+    >
+      <:label>
+        <span class="font-semibold">Click to upload</span> or drag and drop
+      </:label>
+
+      <:description>
+        <span class="text-sm text-gray-500 dark:text-gray-400">
+          PNG, JPG, JPEG up to 2MB
+        </span>
+      </:description>
+    </.upload_input>
+
+    <div class="mb-4">
+      <span class="block mb-2 mt-6 md:text-lg lg:text-xl font-medium text-gray-900 dark:text-white">
+        Vehicle Documents
+      </span>
+
+      <div class="" id="vehicle-documents-list" phx-update="ignore">
+        <%= if @vehicle do %>
+          <%= for document <- @vehicle.documents do %>
+            <div x-data="{checked: false}">
+              <div class="flex items-center p-3 mb-3.5 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <div class="flex items-center justify-center w-10 h-10 mr-3 rounded-lg bg-primary-100 dark:bg-primary-900">
+                  <svg
+                    class="w-5 h-5 text-primary-600 lg:w-6 lg:h-6 dark:text-primary-300"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                  >
+                    <path
+                      clip-rule="evenodd"
+                      fill-rule="evenodd"
+                      d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625zM7.5 15a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 15zm.75 2.25a.75.75 0 000 1.5H12a.75.75 0 000-1.5H8.25z"
+                    >
+                    </path>
+                    <path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z">
+                    </path>
+                  </svg>
+                </div>
+                <div class="mr-4">
+                  <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                    <%= document.filename %>
+                  </p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    <%= document.file_type %>
+                  </p>
+                </div>
+                <div>
+                  <input
+                    id={["document_id_", document.id]}
+                    name={[@form[:documents_to_delete_ids].name, "[]"]}
+                    type="checkbox"
+                    class="hidden"
+                    value={document.id}
+                  />
+                  <div x-show="! checked" class="flex items-center ml-auto">
+                    <label for={["document_id_", document.id]} x-on:click="checked = ! checked">
+                      <div class="p-2 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="fa-solid fa-delete-left w-5 h-5 text-lg text-red-500 dark:text-red-400">
+                        </i>
+                        <span class="sr-only">Delete</span>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div x-show="checked" class="flex items-center ml-auto">
+                    <label for={["document_id_", document.id]} x-on:click="checked = ! checked">
+                      <div class="p-2 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="fa-solid fa-trash-arrow-up" /> Undo Delete
+                        <span class="sr-only">Undo Delete</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+    <.alert :if={@disallow_document_uploads} kind={:warning}>
+      <%= @upload_document_disallow_msg %>
+    </.alert>
+    <div :if={not @disallow_document_uploads}>
+      <.alert :for={err <- upload_errors(@uploads.vehicle_documents)} kind={:error}>
+        <%= error_to_string(err) %>
+      </.alert>
+    </div>
+    <div :if={not @disallow_document_uploads} class="grid gap-6 mb-6 md:grid-cols-2">
+      <div class="pt-4" id="documents-upload-entries" role="tabpanel">
+        <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+          <li
+            :for={{entry, _i} <- Enum.with_index(@uploads.vehicle_documents.entries)}
+            class="py-3 sm:py-4"
+          >
+            <div class="flex items-center p-3 mb-3.5 border border-gray-200 dark:border-gray-700 rounded-lg">
+              <div class="flex items-center justify-center w-10 h-10 mr-3 rounded-lg bg-primary-100 dark:bg-primary-900">
+                <svg
+                  class="w-5 h-5 text-primary-600 lg:w-6 lg:h-6 dark:text-primary-300"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    clip-rule="evenodd"
+                    fill-rule="evenodd"
+                    d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625zM7.5 15a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 15zm.75 2.25a.75.75 0 000 1.5H12a.75.75 0 000-1.5H8.25z"
+                  >
+                  </path>
+                  <path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z">
+                  </path>
+                </svg>
+              </div>
+              <div class="mr-4">
+                <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                  <%= entry.client_name %>
+                </p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  <%= entry.client_type %>, <%= (entry.client_size / 1000 / 1000)
+                  |> Float.round(3) %> MB
+                </p>
+              </div>
+              <div class="flex items-center ml-auto">
+                <button
+                  type="button"
+                  class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                  phx-click="remove_document"
+                  phx-value-ref={entry.ref}
+                  phx-target={@myself}
+                >
+                  <i class="fa-solid fa-delete-left w-5 h-5 text-lg text-red-500 dark:text-red-400">
+                  </i>
+                  <span class="sr-only">Delete</span>
+                </button>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <.upload_input
+      :if={not @disallow_document_uploads}
+      upload={@uploads.vehicle_documents}
+      ref={@uploads.vehicle_documents.ref}
+    >
+      <:label>
+        <span class="font-semibold">Click to upload</span> or drag and drop
+      </:label>
+
+      <:description>
+        <span class="text-sm text-gray-500 dark:text-gray-400">
+          PDF, DOCX, XLXS up to 8MB
+        </span>
+      </:description>
+    </.upload_input>
+    <:actions>
+      <.button phx-disable-with="Saving...">
+        Save Vehicle
+      </.button>
+    </:actions>
+
+    <:extra_block :if={@action == :edit}>
+      <div id="accordion-collapse-form" data-accordion="collapse">
+        <h2 id="accordion-collapse-form-heading-1">
+          <button
+            type="button"
+            class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-b-0 border-gray-200 rounded-t-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+            data-accordion-target="#accordion-collapse-form-body-1"
+            aria-expanded="false"
+            data-clone-attributes
+            aria-controls="accordion-collapse-form-body-1"
+          >
+            <span>Other Specifications</span>
+            <svg
+              data-accordion-icon
+              class="w-3 h-3 rotate-180 shrink-0"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 10 6"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5 5 1 1 5"
+              />
+            </svg>
+          </button>
+        </h2>
+        <div
+          id="accordion-collapse-form-body-1"
+          class="hidden"
+          data-clone-attributes
+          aria-labelledby="accordion-collapse-form-heading-1"
+        >
+          <.inputs_for :let={vehicle_other_spec_form} field={@form[:vehicle_other_spec]}>
+            <div class="text-lg text-gray-900 md:text-xl dark:text-white">
+              <h3 class="font-semibold mx-2 my-2">
+                Dimensions
+              </h3>
+            </div>
+            <div class="grid gap-4 mb-4 sm:grid-cols-2 md:mx-2">
+              <div>
+                <.input
+                  field={vehicle_other_spec_form[:width]}
+                  type="number"
+                  step="any"
+                  label="Width"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={vehicle_other_spec_form[:height]}
+                  type="number"
+                  step="any"
+                  label="Height"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={vehicle_other_spec_form[:length]}
+                  type="number"
+                  step="any"
+                  label="Length"
+                />
+              </div>
+              <div>
+                <.input
+                  field={vehicle_other_spec_form[:wheelbase]}
+                  type="number"
+                  step="any"
+                  label="Wheelbase"
+                />
+              </div>
+            </div>
+
+            <div class="text-lg text-gray-900 md:text-xl dark:text-white">
+              <h3 class="font-semibold mx-2 my-2">
+                Brakes
+              </h3>
+            </div>
+            <div class="grid gap-4 mb-4 sm:grid-cols-2 md:mx-2">
+              <div>
+                <.input
+                  field={vehicle_other_spec_form[:brake_system_type]}
+                  type="select"
+                  options={Fleetms.Enums.brake_system_types()}
+                  prompt=""
+                  label="Brake System Type"
+                />
+              </div>
+              <div>
+                <.input
+                  field={vehicle_other_spec_form[:front_brakes]}
+                  type="select"
+                  options={Fleetms.Enums.brake_types()}
+                  prompt=""
+                  label="Front Brakes Type"
+                />
+              </div>
+              <div>
+                <.input
+                  field={vehicle_other_spec_form[:rear_brakes]}
+                  type="select"
+                  options={Fleetms.Enums.brake_types()}
+                  prompt=""
+                  label="Rear Brakes Type"
+                />
+              </div>
+              <div>
+                <.input
+                  field={vehicle_other_spec_form[:assisting_system]}
+                  type="select"
+                  options={[:"ABS(Anti-lock braking system)", :Other]}
+                  prompt=""
+                  label="Assisting Systems"
+                />
+              </div>
+            </div>
+
+            <div class="text-lg text-gray-900 md:text-xl dark:text-white">
+              <h3 class="font-semibold mx-2 my-2">
+                Tires
+              </h3>
+            </div>
+            <div class="grid gap-4 mb-4 sm:grid-cols-2 md:mx-2">
+              <div>
+                <.input
+                  field={vehicle_other_spec_form[:front_tire_spec]}
+                  type="text"
+                  label="Front Tire Spec"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={vehicle_other_spec_form[:rear_tire_spec]}
+                  type="text"
+                  label="Rear Tire Spec"
+                />
+              </div>
+            </div>
+
+            <div class="text-lg text-gray-900 md:text-xl dark:text-white">
+              <h3 class="font-semibold mx-2 my-2">
+                Steering
+              </h3>
+            </div>
+            <div class="grid gap-4 mb-4 sm:grid-cols-2 md:mx-2">
+              <div>
+                <.input
+                  field={vehicle_other_spec_form[:steering_side]}
+                  type="select"
+                  options={Fleetms.Enums.steering_side()}
+                  prompt=""
+                  label="Steering Side"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={vehicle_other_spec_form[:steering_type]}
+                  type="select"
+                  options={Fleetms.Enums.steering_type()}
+                  prompt=""
+                  label="Steering Type"
+                />
+              </div>
+            </div>
+
+            <div class="text-lg text-gray-900 md:text-xl dark:text-white">
+              <h3 class="font-semibold mx-2 my-2">
+                Space, Volume and Weights
+              </h3>
+            </div>
+            <div class="grid gap-4 mb-4 sm:grid-cols-2 md:mx-2">
+              <div>
+                <.input
+                  field={vehicle_other_spec_form[:net_weight]}
+                  type="number"
+                  label="Net Weight"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={vehicle_other_spec_form[:gross_weight]}
+                  type="number"
+                  label="Gross Weight"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={vehicle_other_spec_form[:fuel_tank_capacity]}
+                  type="number"
+                  label="Fuel Tank Capacity"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={vehicle_other_spec_form[:max_payload]}
+                  type="number"
+                  label="Max Payload"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={vehicle_other_spec_form[:towing_capacity]}
+                  type="number"
+                  label="Towing Capacity"
+                />
+              </div>
+            </div>
+          </.inputs_for>
+        </div>
+        <h2 id="accordion-collapse-form-heading-2">
+          <button
+            type="button"
+            class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-b-0 border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+            data-accordion-target="#accordion-collapse-form-body-2"
+            data-clone-attributes
+            aria-expanded="false"
+            aria-controls="accordion-collapse-form-body-2"
+          >
+            <span>Engine Specifications</span>
+            <svg
+              data-accordion-icon
+              class="w-3 h-3 rotate-180 shrink-0"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 10 6"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5 5 1 1 5"
+              />
+            </svg>
+          </button>
+        </h2>
+        <div
+          id="accordion-collapse-form-body-2"
+          class="hidden"
+          data-clone-attributes
+          aria-labelledby="accordion-collapse-form-heading-2"
+        >
+          <div class="grid gap-4 mb-4 sm:grid-cols-2 md:mx-2">
+            <.inputs_for :let={engine_form} field={@form[:vehicle_engine_spec]}>
+              <div>
+                <.input field={engine_form[:manufacturer]} type="text" label="Manufacturer" />
+              </div>
+
+              <div>
+                <.input field={engine_form[:model]} type="text" label="Model" />
+              </div>
+
+              <div>
+                <.input field={engine_form[:serial_number]} type="text" label="Serial Number" />
+              </div>
+
+              <div>
+                <.input
+                  field={engine_form[:aspiration]}
+                  type="select"
+                  options={Fleetms.Enums.aspiration_types()}
+                  prompt=""
+                  label="Aspiration"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={engine_form[:displacement]}
+                  type="number"
+                  step="any"
+                  label="Displacement"
+                />
+              </div>
+
+              <div>
+                <.input field={engine_form[:cylinders]} type="number" label="Cylinders" />
+              </div>
+
+              <div>
+                <.input field={engine_form[:power]} type="number" label="Power" />
+              </div>
+
+              <div>
+                <.input field={engine_form[:torque]} type="number" label="Torque" />
+              </div>
+
+              <div>
+                <.input
+                  field={engine_form[:fuel_type]}
+                  type="select"
+                  options={Fleetms.Enums.fuel_types()}
+                  label="Fuel Type"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={engine_form[:fuel_specification]}
+                  type="text"
+                  label="Fuel Specification"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={engine_form[:fuel_delivery_type]}
+                  type="select"
+                  options={Fleetms.Enums.fuel_delivery_types()}
+                  prompt=""
+                  label="Fuel Delivery Type"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={engine_form[:config_type]}
+                  type="select"
+                  options={Fleetms.Enums.engine_config_types()}
+                  prompt=""
+                  label="Engine Configuration Type"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={engine_form[:valve_train_design]}
+                  type="select"
+                  options={Fleetms.Enums.valve_train_design_types()}
+                  prompt=""
+                  label="Valve Train Design"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={engine_form[:cooling_type]}
+                  type="select"
+                  options={Fleetms.Enums.cooling_system_types()}
+                  prompt=""
+                  label="Cooling System Type"
+                />
+              </div>
+
+              <div>
+                <.input field={engine_form[:oil_capacity]} type="number" label="Oil Capacity" />
+              </div>
+
+              <div>
+                <.input
+                  field={engine_form[:oil_specification]}
+                  type="text"
+                  label="Oil Specification"
+                />
+              </div>
+            </.inputs_for>
+          </div>
+        </div>
+        <h2 id="accordion-collapse-form-heading-3">
+          <button
+            type="button"
+            class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+            data-accordion-target="#accordion-collapse-form-body-3"
+            aria-expanded="false"
+            data-clone-attributes
+            aria-controls="accordion-collapse-form-body-3"
+          >
+            <span>Drivetrain Specifications</span>
+            <svg
+              data-accordion-icon
+              class="w-3 h-3 rotate-180 shrink-0"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 10 6"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5 5 1 1 5"
+              />
+            </svg>
+          </button>
+        </h2>
+        <div
+          id="accordion-collapse-form-body-3"
+          class="hidden"
+          data-clone-attributes
+          aria-labelledby="accordion-collapse-form-heading-3"
+        >
+          <div class="grid gap-4 mb-4 sm:grid-cols-2 md:mx-2">
+            <.inputs_for :let={drivetrain_spec_form} field={@form[:vehicle_drivetrain_spec]}>
+              <div>
+                <.input
+                  field={drivetrain_spec_form[:manufacturer]}
+                  type="text"
+                  label="Manufacturer"
+                />
+              </div>
+
+              <div>
+                <.input field={drivetrain_spec_form[:model]} type="text" label="Model" />
+              </div>
+
+              <div>
+                <.input
+                  field={drivetrain_spec_form[:serial_number]}
+                  type="text"
+                  label="Serial Number"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={drivetrain_spec_form[:transmission_type]}
+                  type="select"
+                  options={Fleetms.Enums.transmission_types()}
+                  prompt=""
+                  label="Transmission Type"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={drivetrain_spec_form[:number_of_gears]}
+                  type="number"
+                  label="Number of Gears"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={drivetrain_spec_form[:transmission_oil_capacity]}
+                  type="number"
+                  label="Oil Capacity"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={drivetrain_spec_form[:transmission_oil_specification]}
+                  type="text"
+                  label="Oil Specification"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={drivetrain_spec_form[:drive_type]}
+                  type="select"
+                  options={Fleetms.Enums.drive_types()}
+                  prompt=""
+                  label="Drive Type"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={drivetrain_spec_form[:axles]}
+                  type="number"
+                  label="Number of Axles"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={drivetrain_spec_form[:axle_configuration]}
+                  type="text"
+                  label="Axle Configurations"
+                />
+              </div>
+            </.inputs_for>
+          </div>
+        </div>
+
+        <h2 id="accordion-collapse-form-heading-4">
+          <button
+            type="button"
+            class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+            data-accordion-target="#accordion-collapse-form-body-4"
+            aria-expanded="false"
+            data-clone-attributes
+            aria-controls="accordion-collapse-form-body-4"
+          >
+            <span>Performance Specifications</span>
+            <svg
+              data-accordion-icon
+              class="w-3 h-3 rotate-180 shrink-0"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 10 6"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5 5 1 1 5"
+              />
+            </svg>
+          </button>
+        </h2>
+        <div
+          id="accordion-collapse-form-body-4"
+          class="hidden"
+          data-clone-attributes
+          aria-labelledby="accordion-collapse-form-heading-4"
+        >
+          <div class="grid gap-4 mb-4 sm:grid-cols-2 md:mx-2">
+            <.inputs_for :let={performance_spec_form} field={@form[:vehicle_performance_spec]}>
+              <div>
+                <.input
+                  field={performance_spec_form[:fuel_consumption_urban]}
+                  type="number"
+                  step="any"
+                  label="Fuel Consumption Urban(l/100km)"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={performance_spec_form[:fuel_consumption_extra_urban]}
+                  type="number"
+                  step="any"
+                  label="Fuel Consumption Extra Urban(l/100km)"
+                />
+              </div>
+              <div>
+                <.input
+                  field={performance_spec_form[:fuel_consumption_combined]}
+                  type="number"
+                  label="Fuel Combined(l/100km)"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={performance_spec_form[:co2_emission]}
+                  type="number"
+                  step="any"
+                  label="CO2 Emission(g/km)"
+                />
+              </div>
+
+              <div>
+                <.input
+                  field={performance_spec_form[:acceleration_0_to_100]}
+                  type="number"
+                  step="any"
+                  label="Acceleration 0 - 100km"
+                />
+              </div>
+              <div>
+                <.input
+                  field={performance_spec_form[:maximum_speed]}
+                  type="number"
+                  step="any"
+                  label="Maximum Speed(km)"
+                />
+              </div>
+              <div>
+                <.input
+                  field={performance_spec_form[:emission_standard]}
+                  type="text"
+                  label="Emission Standard"
+                />
+              </div>
+            </.inputs_for>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <.button phx-disable-with="Saving...">
+          Save
+        </.button>
+      </div>
+    </:extra_block>
+  </.simple_form>
+</div>

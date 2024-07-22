@@ -1,13 +1,8 @@
 defmodule FleetmsWeb.LayoutComponents do
-  @moduledoc """
-  This module contains components used in the layout of the application, for example `navbar`, `sidebar`, `public_navbar`, `footer`
-  """
   use Phoenix.Component
-  import FleetmsWeb.CoreComponents, only: [button: 1, icon: 1]
+  import FleetmsWeb.CoreComponents, only: [button: 1]
   use FleetmsWeb, :verified_routes
-
   alias Fleetms.Accounts.User
-  alias Fleetms.Vehicles.Vehicle
 
   @doc """
   A Navbar component for public pages
@@ -69,7 +64,7 @@ defmodule FleetmsWeb.LayoutComponents do
             </div>
 
             <%= if @current_user do %>
-              <.link navigate={~p"/users"}>
+              <.link navigate={~p"/dashboard"}>
                 <.button>
                   Dashboard
                 </.button>
@@ -225,7 +220,7 @@ defmodule FleetmsWeb.LayoutComponents do
     """
   end
 
-  attr :current_user, :map, required: true
+  attr :current_user, :map, required: false
 
   def navbar(assigns) do
     ~H"""
@@ -372,42 +367,7 @@ defmodule FleetmsWeb.LayoutComponents do
               <div class="block py-2 px-4 text-base font-medium text-center text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 Notifications
               </div>
-              <div>
-                <a
-                  href="#"
-                  class="flex py-3 px-4 border-b hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600"
-                >
-                  <div class="flex-shrink-0">
-                    <img
-                      class="w-11 h-11 rounded-full"
-                      src="http://localhost:1313/images/users/bonnie-green.png"
-                      alt="Jese image"
-                    />
-                    <div class="flex absolute justify-center items-center ml-6 -mt-5 w-5 h-5 rounded-full border border-white bg-primary-700 dark:border-gray-700">
-                      <svg
-                        class="w-3 h-3 text-white"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M8.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l2-2a1 1 0 00-1.414-1.414L11 7.586V3a1 1 0 10-2 0v4.586l-.293-.293z">
-                        </path>
-                        <path d="M3 5a2 2 0 012-2h1a1 1 0 010 2H5v7h2l1 2h4l1-2h2V5h-1a1 1 0 110-2h1a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5z">
-                        </path>
-                      </svg>
-                    </div>
-                  </div>
-                  <div class="pl-3 w-full">
-                    <div class="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400">
-                      New message from <span class="font-semibold text-gray-900 dark:text-white">Bonnie Green</span>: "Hey, what's up? All set
-                      for the presentation?"
-                    </div>
-                    <div class="text-xs font-medium text-primary-700 dark:text-primary-400">
-                      a few moments ago
-                    </div>
-                  </div>
-                </a>
-              </div>
+
               <a
                 href="#"
                 class="block py-2 text-base font-normal text-center text-gray-900 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:hover:underline"
@@ -546,6 +506,7 @@ defmodule FleetmsWeb.LayoutComponents do
     """
   end
 
+  attr :active_link, :any, required: true
   attr :current_user, :map, required: true
 
   def sidebar(assigns) do
@@ -589,57 +550,472 @@ defmodule FleetmsWeb.LayoutComponents do
                   </div>
                 </form>
               </li>
-              <li :for={sidebar_item <- sidebar_links(@current_user)} :if={sidebar_item.show_link?}>
+              <li>
                 <.link
-                  navigate={sidebar_item.link}
-                  class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700"
+                  navigate={~p"/dashboard"}
+                  class={[
+                    "flex items-center px-2 text-base font-normal rounded-lg transition duration-75 group",
+                    @active_link != :dashboard &&
+                      "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                    @active_link == :dashboard &&
+                      "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                  ]}
                 >
-                  <.icon name={sidebar_item.icon_name} class="ml-1 h-6 w-6" />
+                  <i class="fa-solid fa-chart-pie w-6 h-8 text-xl text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white">
+                  </i>
+                  <span class="ml-3" sidebar-toggle-item>Dashboard</span>
+                </.link>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  class={[
+                    "flex items-center px-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group",
+                    @active_link not in [:vehicles, :vehicle_assignments] &&
+                      "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                    @active_link in [:vehicles, :vehicle_assignments] &&
+                      "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                  ]}
+                  aria-controls="dropdown-vehicles-link"
+                  data-collapse-toggle="dropdown-vehicles-link"
+                >
+                  <i class="fa-solid fa-truck w-6 h-8 pt-1 text-xl text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white">
+                  </i>
+                  <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item>
+                    Vehicles
+                  </span>
+                  <i class="fa-solid fa-angle-down w-6" sidebar-toggle-item></i>
+                </button>
 
-                  <span class="ml-3" sidebar-toggle-item><%= sidebar_item.title %></span>
+                <ul
+                  id="dropdown-vehicles-link"
+                  class={[
+                    @active_link not in [:vehicles, :vehicle_assignments, :vehicle_general_reminders] &&
+                      "hidden",
+                    "py-2 space-y-2 "
+                  ]}
+                >
+                  <li>
+                    <.link
+                      navigate={~p"/vehicles"}
+                      class={[
+                        "flex items-center p-2 pl-11 text-base font-normal rounded-lg transition duration-75 group",
+                        @active_link != :vehicles &&
+                          "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                        @active_link == :vehicles &&
+                          "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                      ]}
+                    >
+                      Vehicles
+                    </.link>
+                  </li>
+                  <li>
+                    <.link
+                      navigate={~p"/vehicle_assignments"}
+                      class={[
+                        "flex items-center p-2 pl-11 text-base font-normal rounded-lg transition duration-75 group",
+                        @active_link != :vehicle_assignments &&
+                          "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                        @active_link == :vehicle_assignments &&
+                          "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                      ]}
+                    >
+                      Assignments
+                    </.link>
+                  </li>
+                  <li>
+                    <.link
+                      navigate={~p"/vehicle_general_reminders"}
+                      class={[
+                        "flex items-center p-2 pl-11 text-base font-normal rounded-lg transition duration-75 group",
+                        @active_link != :vehicle_general_reminders &&
+                          "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                        @active_link == :vehicle_general_reminders &&
+                          "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                      ]}
+                    >
+                      Reminders
+                    </.link>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  class={[
+                    "flex items-center px-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group",
+                    @active_link not in [:inspection_submissions, :inspection_forms] &&
+                      "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                    @active_link in [:inspection_submissions, :inspection_forms] &&
+                      "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                  ]}
+                  aria-controls="dropdown-inspections-link"
+                  data-collapse-toggle="dropdown-inspections-link"
+                >
+                  <i class="fa-solid fa-list-check w-6 h-8 pt-1 text-xl text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white">
+                  </i>
+                  <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item>
+                    Inspections
+                  </span>
+                  <i class="fa-solid fa-angle-down w-6"></i>
+                </button>
+                <ul
+                  id="dropdown-inspections-link"
+                  class={[
+                    @active_link not in [:inspection_submissions, :inspection_forms] && "hidden",
+                    "py-2 space-y-2 "
+                  ]}
+                >
+                  <li>
+                    <.link
+                      navigate={~p"/inspection_forms"}
+                      class={[
+                        "flex items-center p-2 pl-11 text-base font-normal rounded-lg transition duration-75 group",
+                        @active_link != :inspection_forms &&
+                          "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                        @active_link == :inspection_forms &&
+                          "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                      ]}
+                    >
+                      Forms
+                    </.link>
+                  </li>
+                  <li>
+                    <.link
+                      navigate={~p"/inspections"}
+                      class={[
+                        "flex items-center p-2 pl-11 text-base font-normal rounded-lg transition duration-75 group",
+                        @active_link != :inspection_submissions &&
+                          "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                        @active_link == :inspection_submissions &&
+                          "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                      ]}
+                    >
+                      Submissions
+                    </.link>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <.link
+                  navigate={~p"/issues"}
+                  class={[
+                    "flex items-center px-2 text-base font-normal rounded-lg transition duration-75 group",
+                    @active_link != :issues &&
+                      "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                    @active_link == :issues &&
+                      "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                  ]}
+                >
+                  <i class="fa-solid fa-circle-exclamation w-6 h-8 pt-1 text-xl text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white">
+                  </i>
+                  <span class="ml-3" sidebar-toggle-item>Issues</span>
+                </.link>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  class={[
+                    "flex items-center px-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group",
+                    @active_link not in [
+                      :service_tasks,
+                      :service_groups,
+                      :service_reminders,
+                      :work_orders
+                    ] &&
+                      "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                    @active_link in [
+                      :service_tasks,
+                      :service_groups,
+                      :service_reminders,
+                      :work_orders
+                    ] && "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                  ]}
+                  aria-controls="dropdown-service-links"
+                  data-collapse-toggle="dropdown-service-links"
+                >
+                  <i class="fa-solid fa-screwdriver-wrench w-6 h-8 pt-1 text-xl text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white">
+                  </i>
+
+                  <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item>
+                    Service
+                  </span>
+                  <i class="fa-solid fa-angle-down w-6" sidebar-toggle-item></i>
+                </button>
+                <ul
+                  id="dropdown-service-links"
+                  class={[
+                    @active_link not in [
+                      :service_reminders,
+                      :service_groups,
+                      :service_tasks,
+                      :work_orders
+                    ] && "hidden",
+                    "py-2 space-y-2 "
+                  ]}
+                >
+                  <li>
+                    <.link
+                      navigate={~p"/service_tasks"}
+                      class={[
+                        "flex items-center p-2 pl-11 text-base font-normal rounded-lg transition duration-75 group",
+                        @active_link != :service_tasks &&
+                          "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                        @active_link == :service_tasks &&
+                          "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                      ]}
+                    >
+                      Service Tasks
+                    </.link>
+                  </li>
+                  <li>
+                    <.link
+                      navigate={~p"/service_groups"}
+                      class={[
+                        "flex items-center p-2 pl-11 text-base font-normal rounded-lg transition duration-75 group",
+                        @active_link != :service_groups &&
+                          "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                        @active_link == :service_groups &&
+                          "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                      ]}
+                    >
+                      Service Groups
+                    </.link>
+                  </li>
+                  <li>
+                    <.link
+                      navigate={~p"/service_reminders"}
+                      class={[
+                        "flex items-center p-2 pl-11 text-base font-normal rounded-lg transition duration-75 group",
+                        @active_link != :service_reminders &&
+                          "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                        @active_link == :service_reminders &&
+                          "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                      ]}
+                    >
+                      Service Reminders
+                    </.link>
+                  </li>
+                  <li>
+                    <.link
+                      navigate={~p"/work_orders"}
+                      class={[
+                        "flex items-center p-2 pl-11 text-base font-normal rounded-lg transition duration-75 group",
+                        @active_link != :work_orders &&
+                          "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                        @active_link == :work_orders &&
+                          "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                      ]}
+                    >
+                      Work Orders
+                    </.link>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  class={[
+                    "flex items-center px-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group",
+                    @active_link not in [:users_list] &&
+                      "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                    @active_link in [:users_list] &&
+                      "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                  ]}
+                  aria-controls="dropdown-users"
+                  data-collapse-toggle="dropdown-users"
+                >
+                  <i class="fa-solid fa-users w-6 h-8 pt-1 text-xl text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white">
+                  </i>
+                  <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item>
+                    Users
+                  </span>
+
+                  <i class="fa-solid fa-angle-down w-6" sidebar-toggle-item></i>
+                </button>
+                <ul
+                  :if={Ash.can?({User, :list}, @current_user)}
+                  id="dropdown-users"
+                  class={[@active_link != :users_list && "hidden", "py-2 space-y-2"]}
+                >
+                  <li>
+                    <.link
+                      navigate={~p"/users"}
+                      class={[
+                        "flex items-center p-2 pl-11 text-base font-normal rounded-lg transition duration-75 group",
+                        @active_link != :users_list &&
+                          "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                        @active_link == :users_list &&
+                          "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                      ]}
+                    >
+                      Users list
+                    </.link>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  class={[
+                    "flex items-center px-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group",
+                    @active_link not in [:parts, :inventory_locations] &&
+                      "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                    @active_link in [:parts, :inventory_locations] &&
+                      "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                  ]}
+                  aria-controls="dropdown-inventory-link"
+                  data-collapse-toggle="dropdown-inventory-link"
+                >
+                  <i class="fa-solid fa-warehouse w-6 h-8 pt-1 text-xl text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white">
+                  </i>
+                  <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item>
+                    Inventory
+                  </span>
+                  <i class="fa-solid fa-angle-down w-6" sidebar-toggle-item></i>
+                </button>
+                <ul
+                  id="dropdown-inventory-link"
+                  class={[
+                    @active_link not in [:parts, :inventory_locations] && "hidden",
+                    "py-2 space-y-2 "
+                  ]}
+                >
+                  <li>
+                    <.link
+                      navigate={~p"/parts"}
+                      class={[
+                        "flex items-center p-2 pl-11 text-base font-normal rounded-lg transition duration-75 group",
+                        @active_link != :parts &&
+                          "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                        @active_link == :parts &&
+                          "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                      ]}
+                    >
+                      Parts
+                    </.link>
+                  </li>
+                  <li>
+                    <.link
+                      navigate={~p"/inventory_locations"}
+                      class={[
+                        "flex items-center p-2 pl-11 text-base font-normal rounded-lg transition duration-75 group",
+                        @active_link != :inventory_locations &&
+                          "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                        @active_link == :inventory_locations &&
+                          "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                      ]}
+                    >
+                      Inventory Locations
+                    </.link>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <.link
+                  navigate={~p"/fuel_histories"}
+                  class={[
+                    "flex items-center px-2 text-base font-normal rounded-lg transition duration-75 group",
+                    @active_link != :fuel_histories &&
+                      "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                    @active_link == :fuel_histories &&
+                      "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                  ]}
+                >
+                  <i class="fa-solid fa-gas-pump w-6 h-8 pt-1 text-xl text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white">
+                  </i>
+                  <span class="ml-3" sidebar-toggle-item>Fuel Tracking</span>
+                </.link>
+              </li>
+              <li>
+                <.link
+                  navigate={~p"/reports"}
+                  class={[
+                    "flex items-center px-2 text-base font-normal rounded-lg transition duration-75 group",
+                    @active_link != :reports &&
+                      "text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-gray-700",
+                    @active_link == :reports &&
+                      "text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-gray-700"
+                  ]}
+                >
+                  <i class="fa-solid fa-chart-area w-6 h-8 pt-1 text-xl text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white">
+                  </i>
+                  <span class="ml-3" sidebar-toggle-item>Reports</span>
                 </.link>
               </li>
             </ul>
-            <div class="pt-2 space-y-2">
-              <a
-                href="https://flowbite.com/docs/components/alerts/"
-                target="_blank"
-                class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700"
-              >
-                <svg
-                  class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z">
-                  </path>
-                </svg>
-                <span class="ml-3" sidebar-toggle-item>Components</span>
-              </a>
-            </div>
+          </div>
+        </div>
+        <div
+          class="hidden absolute bottom-0 left-0 justify-center p-4 space-x-4 w-full lg:flex"
+          sidebar-bottom-menu
+        >
+          <div
+            id="tooltip-settings"
+            role="tooltip"
+            class="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip dark:bg-gray-700"
+          >
+            Settings page
+            <div class="tooltip-arrow" data-popper-arrow></div>
           </div>
         </div>
       </div>
     </aside>
+
+    <div class="hidden fixed inset-0 z-10 bg-gray-900/50 dark:bg-gray-900/90" id="sidebarBackdrop">
+    </div>
     """
   end
 
-  defp sidebar_links(actor) do
-    [
-      %{link: ~p"/dashboard", title: "Dashboard", icon_name: "hero-chart-pie", show_link?: true},
-      %{
-        link: ~p"/users",
-        title: "Users",
-        icon_name: "hero-users",
-        show_link?: Ash.can?({User, :list}, actor)
-      },
-      %{
-        link: ~p"/vehicles",
-        title: "Vehicles",
-        icon_name: "hero-truck",
-        show_link?: Ash.can?({Vehicle, :list}, actor)
-      }
-    ]
+  def footer(assigns) do
+    ~H"""
+    <footer class="p-4 my-6 mx-4 bg-white rounded-lg shadow md:flex md:items-center md:justify-between md:p-6 xl:p-8 dark:bg-gray-800">
+      <ul class="flex flex-wrap items-center mb-6 space-y-1 md:mb-0">
+        <li>
+          <a
+            href="#"
+            class="mr-4 text-sm font-normal text-gray-500 hover:underline md:mr-6 dark:text-gray-400"
+          >
+            Terms
+            and conditions
+          </a>
+        </li>
+        <li>
+          <a
+            href="#"
+            class="mr-4 text-sm font-normal text-gray-500 hover:underline md:mr-6 dark:text-gray-400"
+          >
+            Privacy
+            Policy
+          </a>
+        </li>
+        <li>
+          <a
+            href="#"
+            class="mr-4 text-sm font-normal text-gray-500 hover:underline md:mr-6 dark:text-gray-400"
+          >
+            Licensing
+          </a>
+        </li>
+        <li>
+          <a
+            href="#"
+            class="mr-4 text-sm font-normal text-gray-500 hover:underline md:mr-6 dark:text-gray-400"
+          >
+            Cookie
+            Policy
+          </a>
+        </li>
+        <li>
+          <a href="#" class="text-sm font-normal text-gray-500 hover:underline dark:text-gray-400">
+            Contact
+          </a>
+        </li>
+      </ul>
+    </footer>
+    <p class="my-10 text-sm text-center text-gray-500">
+      &copy; 2019-2022 <a href="https://flowbite.com/" class="hover:underline" target="_blank">Fleetms</a>. All rights reserved.
+    </p>
+    """
   end
 end

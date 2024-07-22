@@ -1,9 +1,13 @@
 # Fleetms
 
+## NOTE
+This project is a work in progress, see [Projects](https://github.com/users/jmnda-dev/projects/15/views/1) 
 To start your Phoenix server:
 
   * Run `mix setup` to install and setup dependencies
   * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+
+To reset database and seed sample data, run `mix seed`
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 

@@ -1,0 +1,276 @@
+<nav class="p-4 lg:mt-1.5 flex" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <.link
+        navigate={~p"/"}
+        class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
+      >
+        <svg
+          class="w-3 h-3 mr-2.5"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
+        </svg>
+        Home
+      </.link>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg
+          class="w-3 h-3 text-gray-400 mx-1"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 6 10"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m1 9 4-4-4-4"
+          />
+        </svg>
+        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">
+          Report Downloads
+        </span>
+      </div>
+    </li>
+  </ol>
+</nav>
+
+<div class="mx-2">
+  <div class="text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
+    <ul class="flex flex-wrap -mb-px">
+      <li class="me-2">
+        <.tab
+          navigate={~p"/reports"}
+          id="summary-tab"
+          icon_class="fa-solid fa-chart-gantt mr-2"
+          label="Summary"
+        />
+      </li>
+      <li class="me-2">
+        <.tab
+          navigate={~p"/reports/downloads"}
+          id="downloads-tab"
+          active={true}
+          icon_class="fa-solid fa-download mr-2"
+          label="Downloads"
+        />
+      </li>
+    </ul>
+  </div>
+  <!-- Start block -->
+  <section class="bg-gray-50 dark:bg-gray-900">
+    <div class="mx-auto max-w-screen-2xl">
+      <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <tr>
+                <th scope="col" class="p-4">Download</th>
+                <th scope="col" class="p-4">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <th
+                  scope="row"
+                  class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  <div class="flex items-center mr-3">
+                    <i class="fa-solid fa-truck mr-3" /> Vehicles
+                  </div>
+                </th>
+                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                  <div class="flex items-center space-x-4">
+                    <.button
+                      type="button"
+                      phx-click={JS.push("download", value: %{download_for: "vehicles"})}
+                    >
+                      <i class="fa-solid fa-download" /> Download
+                    </.button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <th
+                  scope="row"
+                  class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  <div class="flex items-center mr-3">
+                    <i class="fa-solid fa-timeline mr-3" /> Vehicle Assignments
+                  </div>
+                </th>
+                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                  <div class="flex items-center space-x-4">
+                    <.button type="button" kind={:warning}>
+                      <i class="fa-solid fa-download" /> Not Implemented yet
+                    </.button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <th
+                  scope="row"
+                  class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  <div class="flex items-center mr-3">
+                    <i class="fa-solid fa-list-check mr-3" /> Inspection Submissions
+                  </div>
+                </th>
+                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                  <div class="flex items-center space-x-4">
+                    <.button type="button" kind={:warning}>
+                      <i class="fa-solid fa-download" /> Not Implemented yet
+                    </.button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <th
+                  scope="row"
+                  class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  <div class="flex items-center mr-3">
+                    <i class="fa-solid fa-exclamation-circle mr-3" /> Issues
+                  </div>
+                </th>
+                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                  <div class="flex items-center space-x-4">
+                    <.button type="button" kind={:warning}>
+                      <i class="fa-solid fa-download" /> Not Implemented yet
+                    </.button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <th
+                  scope="row"
+                  class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  <div class="flex items-center mr-3">
+                    <i class="fa-solid fa-wrench mr-3" /> Service Tasks
+                  </div>
+                </th>
+                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                  <div class="flex items-center space-x-4">
+                    <.button type="button" kind={:warning}>
+                      <i class="fa-solid fa-download" /> Not Implemented yet
+                    </.button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <th
+                  scope="row"
+                  class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  <div class="flex items-center mr-3">
+                    <i class="fa-solid fa-car mr-3" /> Service Groups
+                  </div>
+                </th>
+                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                  <div class="flex items-center space-x-4">
+                    <.button type="button" kind={:warning}>
+                      <i class="fa-solid fa-download" /> Not Implemented yet
+                    </.button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <th
+                  scope="row"
+                  class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  <div class="flex items-center mr-3">
+                    <i class="fa-solid fa-bell mr-3" /> Service Reminders
+                  </div>
+                </th>
+                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                  <div class="flex items-center space-x-4">
+                    <.button type="button" kind={:warning}>
+                      <i class="fa-solid fa-download" /> Not Implemented yet
+                    </.button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <th
+                  scope="row"
+                  class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  <div class="flex items-center mr-3">
+                    <i class="fa-solid fa-file-lines mr-3" /> Work Orders
+                  </div>
+                </th>
+                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                  <div class="flex items-center space-x-4">
+                    <.button type="button" kind={:warning}>
+                      <i class="fa-solid fa-download" /> Not Implemented yet
+                    </.button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <th
+                  scope="row"
+                  class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  <div class="flex items-center mr-3">
+                    <i class="fa-solid fa-boxes-stacked mr-3" /> Parts
+                  </div>
+                </th>
+                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                  <div class="flex items-center space-x-4">
+                    <.button type="button" kind={:warning}>
+                      <i class="fa-solid fa-download" /> Not Implemented yet
+                    </.button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <th
+                  scope="row"
+                  class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  <div class="flex items-center mr-3">
+                    <i class="fa-solid fa-warehouse mr-3" /> Inventory Locations
+                  </div>
+                </th>
+                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                  <div class="flex items-center space-x-4">
+                    <.button type="button" kind={:warning}>
+                      <i class="fa-solid fa-download" /> Not Implemented yet
+                    </.button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <th
+                  scope="row"
+                  class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  <div class="flex items-center mr-3">
+                    <i class="fa-solid fa-gas-pump mr-3" /> Fuel Histories
+                  </div>
+                </th>
+                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                  <div class="flex items-center space-x-4">
+                    <.button type="button" kind={:warning}>
+                      <i class="fa-solid fa-download" /> Not Implemented yet
+                    </.button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

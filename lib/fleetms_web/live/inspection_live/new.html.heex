@@ -1,0 +1,275 @@
+<nav class="p-4 lg:mt-1.5 flex" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a
+        href="#"
+        class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
+      >
+        <svg
+          class="w-3 h-3 mr-2.5"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
+        </svg>
+        Home
+      </a>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg
+          class="w-3 h-3 text-gray-400 mx-1"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 6 10"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m1 9 4-4-4-4"
+          />
+        </svg>
+        <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2 dark:text-gray-400">
+          Inspection Submissions
+        </span>
+      </div>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg
+          class="w-3 h-3 text-gray-400 mx-1"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 6 10"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m1 9 4-4-4-4"
+          />
+        </svg>
+        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">
+          Perform Inspection
+        </span>
+      </div>
+    </li>
+  </ol>
+</nav>
+
+<div class="mx-2">
+  <div class="flex items-center">
+    <span class="text-xl md:text-3xl text-gray-900 dark:text-white">
+      <i class="fa-solid fa-list-check mr-2"></i>
+    </span>
+    <div>
+      <h3 class="text-xl font-bold text-gray-900 md:text-3xl dark:text-white">
+        Perform Inspection
+      </h3>
+    </div>
+  </div>
+
+  <div class="shadow-lg bg-white dark:bg-gray-800 mt-4 p-4 rounded-md">
+    <.simple_form
+      for={@form}
+      id="inspection-submission-form"
+      phx-submit="save"
+      phx-change="validate"
+    >
+      <div class="grid gap-4 mb-4 sm:grid-cols-2">
+        <.input
+          field={@form[:inspection_form_id]}
+          type="select"
+          phx-change="inspection_form_selected"
+          prompt="Select Inspection Form"
+          options={@inspection_forms}
+          label="Inspection Form"
+        />
+        <.input
+          field={@form[:vehicle_id]}
+          type="select"
+          prompt="Select Vehicle"
+          options={@vehicles}
+          label="Vehicle"
+        />
+      </div>
+
+      <div :if={@form[:radio_input_values].value}>
+        <.inputs_for :let={pass_fail_form} field={@form[:radio_input_values]}>
+          <fieldset class="grid gap-4 mb-4 sm:grid-cols-2 border-2 border-gray-300 dark:border-gray-600 rounded-md p-4">
+            <h5 class="text-xl text-gray-800 dark:text-white">
+              <%= get_form_value(pass_fail_form, :name) %>
+            </h5>
+
+            <div class="hidden">
+              <.input field={pass_fail_form[:slug]} type="text" />
+              <.input field={pass_fail_form[:name]} type="text" />
+              <.input field={pass_fail_form[:pass_label]} type="text" />
+              <.input field={pass_fail_form[:fail_label]} type="text" />
+              <.input field={pass_fail_form[:help_text]} type="text" />
+              <.input field={pass_fail_form[:allow_na]} type="checkbox" />
+              <.input field={pass_fail_form[:required]} type="checkbox" />
+              <.input field={pass_fail_form[:comment_required_on_fail]} type="checkbox" />
+              <.input field={pass_fail_form[:comment_required_on_pass]} type="checkbox" />
+            </div>
+            <div class="inline-flex gap-4">
+              <.input
+                id={"#{pass_fail_form.name}-pass"}
+                field={pass_fail_form[:status]}
+                type="radio"
+                value={:Pass}
+                label={get_form_value(pass_fail_form, :pass_label)}
+                checked={:Pass == get_form_value(pass_fail_form, :status)}
+              />
+              <.input
+                id={"#{pass_fail_form.name}-fail"}
+                field={pass_fail_form[:status]}
+                type="radio"
+                value={:Fail}
+                label={get_form_value(pass_fail_form, :fail_label)}
+                checked={:Fail == get_form_value(pass_fail_form, :status)}
+              />
+              <div :if={get_form_value(pass_fail_form, :allow_na)}>
+                <.input
+                  id={"#{pass_fail_form.name}-na"}
+                  field={pass_fail_form[:status]}
+                  type="radio"
+                  value={:"Not-Applicable"}
+                  label="Not Applicable"
+                  checked={:"Not-Applicable" == get_form_value(pass_fail_form, :status)}
+                />
+              </div>
+              <div :if={maybe_show_comment_form(pass_fail_form)} class="col-12">
+                <.input field={pass_fail_form[:comments]} type="textarea" label="Comments" />
+              </div>
+            </div>
+          </fieldset>
+        </.inputs_for>
+      </div>
+
+      <div :if={@form[:dropdown_input_values].value}>
+        <.inputs_for :let={dropdown_form} field={@form[:dropdown_input_values]}>
+          <div class="hidden">
+            <.input field={dropdown_form[:slug]} type="text" />
+            <.input field={dropdown_form[:name]} type="text" />
+            <.input field={dropdown_form[:help_text]} type="text" />
+            <.input
+              field={dropdown_form[:status]}
+              type="select"
+              options={[:Pass, :Fail]}
+              value={get_form_value(dropdown_form, :status)}
+            />
+            <.input
+              field={dropdown_form[:fail_options]}
+              type="select"
+              options={get_dropdown_fail_options(dropdown_form)}
+              value={get_dropdown_fail_options(dropdown_form)}
+              multiple
+            />
+            <.input
+              field={dropdown_form[:options]}
+              type="select"
+              options={get_dropdown_options(dropdown_form)}
+              value={get_dropdown_options(dropdown_form)}
+              multiple
+            />
+            <.input field={dropdown_form[:required]} type="checkbox" />
+            <.input field={dropdown_form[:comment_required_on_fail]} type="checkbox" />
+            <.input field={dropdown_form[:comment_required_on_pass]} type="checkbox" />
+          </div>
+          <fieldset class="grid gap-4 mb-4 sm:grid-cols-2 border-2 border-gray-300 dark:border-gray-600 rounded-md p-4">
+            <h5 class="text-xl text-gray-800 dark:text-white">
+              <%= get_form_value(dropdown_form, :name) %>
+            </h5>
+            <.input
+              field={dropdown_form[:selected_option]}
+              type="select"
+              prompt="Select"
+              options={get_dropdown_options(dropdown_form)}
+              phx-debounce="500"
+            />
+
+            <div :if={maybe_show_comment_form(dropdown_form)}>
+              <.input field={dropdown_form[:comments]} type="textarea" label="Comments" />
+            </div>
+          </fieldset>
+        </.inputs_for>
+      </div>
+
+      <div :if={@form[:number_input_values].value}>
+        <.inputs_for :let={number_input_form} field={@form[:number_input_values]}>
+          <div class="hidden">
+            <.input field={number_input_form[:slug]} type="text" />
+            <.input field={number_input_form[:name]} type="text" />
+            <.input field={number_input_form[:help_text]} type="text" />
+            <.input field={number_input_form[:pass_range_min]} type="number" />
+            <.input field={number_input_form[:pass_range_max]} type="number" />
+            <.input
+              field={number_input_form[:status]}
+              type="select"
+              options={[:Pass, :Fail]}
+              value={get_form_value(number_input_form, :status)}
+            />
+            <.input field={number_input_form[:comment_required_on_fail]} type="checkbox" />
+            <.input field={number_input_form[:comment_required_on_pass]} type="checkbox" />
+          </div>
+          <fieldset class="grid gap-4 mb-4 sm:grid-cols-2 border-2 border-gray-300 dark:border-gray-600 rounded-md p-4">
+            <h5 class="text-xl text-gray-800 dark:text-white">
+              <%= get_form_value(number_input_form, :name) %>
+            </h5>
+            <.input field={number_input_form[:value]} type="number" phx-debounce="500" />
+
+            <div :if={maybe_show_comment_form(number_input_form, hide_if_nil: true)}>
+              <.input field={number_input_form[:comments]} type="textarea" label="Comments" />
+            </div>
+          </fieldset>
+        </.inputs_for>
+      </div>
+
+      <div :if={@form[:signature_input_values].value}>
+        <.inputs_for :let={signature_form} field={@form[:signature_input_values]}>
+          <div class="border border-light-subtle rounded p-4">
+            <fieldset class="grid gap-4 mb-4 sm:grid-cols-2 border-2 border-gray-300 dark:border-gray-600 rounded-md p-4">
+              <h5 class="text-xl text-gray-800 dark:text-white">
+                Signature
+              </h5>
+
+              <div class="hidden">
+                <.input field={signature_form[:required]} type="checkbox" />
+                <.input field={signature_form[:label]} type="text" />
+                <.input field={signature_form[:encoded_image]} type="text" />
+              </div>
+              <div class="inline-flex">
+                <.input
+                  field={signature_form[:name]}
+                  type="text"
+                  label={get_form_value(signature_form, :label)}
+                />
+
+                <canvas
+                  id="signature"
+                  phx-update="ignore"
+                  data-input-target={signature_form[:encoded_image].id}
+                  phx-hook="signaturePad"
+                >
+                </canvas>
+              </div>
+            </fieldset>
+          </div>
+        </.inputs_for>
+      </div>
+      <:actions>
+        <.button phx-disable-with="Saving...">
+          <i class="fa-solid fa-floppy-disk me-1"></i>Submit Inspection
+        </.button>
+      </:actions>
+    </.simple_form>
+  </div>
+</div>

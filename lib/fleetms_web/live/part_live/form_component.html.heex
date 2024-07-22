@@ -1,0 +1,196 @@
+<div>
+  <.header><%= @title %></.header>
+
+  <.simple_form
+    for={@form}
+    id="part-form"
+    phx-target={@myself}
+    phx-change="validate"
+    phx-submit="save"
+  >
+    <div class="grid gap-4 mb-4 sm:grid-cols-2">
+      <.input field={@form[:name]} type="text" label="Name" />
+
+      <.input field={@form[:part_number]} type="text" label="Part Number" />
+
+      <.input field={@form[:oem_part_number]} type="text" label="OEM Part Number" />
+
+      <.input field={@form[:description]} type="textarea" label="Description" />
+
+      <.input field={@form[:unit_cost]} type="text" step="any" label="Unit Cost" />
+      <.input
+        field={@form[:unit_measurement]}
+        type="select"
+        prompt=""
+        options={@part_unit_measurements}
+        label="Unit Measurement"
+      />
+
+      <.input field={@form[:quantity_threshold]} type="text" label="Quantity Threshold" />
+      <.input
+        field={@form[:part_manufacturer_id]}
+        type="select"
+        prompt=""
+        options={@part_manufacturers}
+        label="Part Manufacturer"
+      />
+      <.input
+        field={@form[:part_category_id]}
+        type="select"
+        prompt=""
+        options={@part_categories}
+        label="Part Category"
+      />
+      <%!-- TODO: Add input for Part locations(warehouses) and quantity at location
+      TODO: Add input for adding Vendors to parts and vendor part prices
+      TODO: Add upload for Part photos and documents --%>
+    </div>
+    <div class="mb-4">
+      <span class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Part Photos
+      </span>
+      <div
+        class="grid grid-cols-3 gap-4 mb-4 sm:grid-cols-4"
+        id="part-photos-list"
+        phx-update="ignore"
+      >
+        <%= if @part do %>
+          <div :for={photo <- @part.part_photos} x-data="{checked: false}">
+            <figure class="relative max-w-sm transition-all duration-300 cursor-pointer hover:grayscale-0">
+              <a href="#">
+                <img
+                  class="rounded-lg"
+                  x-bind:class="checked && 'filter grayscale'"
+                  src={Fleetms.PartPhoto.url({photo.filename, @part})}
+                  alt=""
+                />
+              </a>
+              <figcaption class="absolute px-4 text-lg text-white bottom-2">
+                <input
+                  id={["photo_id_", photo.id]}
+                  name={[@form[:photos_to_delete_ids].name, "[]"]}
+                  type="checkbox"
+                  class="hidden"
+                  value={photo.id}
+                />
+                <div x-show="! checked">
+                  <label
+                    class="px-2 py-1 text-sm font-semibold bg-red-600 rounded-md hover:bg-red-700 cursor-pointer"
+                    for={["photo_id_", photo.id]}
+                    x-on:click="checked = ! checked"
+                  >
+                    <i class="fa-solid fa-trash" /> Delete
+                  </label>
+                </div>
+                <div x-show="checked">
+                  <label
+                    class="px-2 py-1 text-sm font-semibold bg-green-600 rounded-md hover:bg-green-700 cursor-pointer"
+                    for={["photo_id_", photo.id]}
+                    x-on:click="checked = ! checked"
+                  >
+                    <i class="fa-solid fa-trash-arrow-up" /> Undo Delete
+                  </label>
+                </div>
+              </figcaption>
+            </figure>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    <.alert :if={@disallow_uploads} kind={:warning}>
+      <%= @upload_disallow_msg %>
+    </.alert>
+    <div :if={not @disallow_uploads}>
+      <.alert :for={err <- upload_errors(@uploads.part_photos)} kind={:error}>
+        <%= error_to_string(err) %>
+      </.alert>
+    </div>
+    <div :if={not @disallow_uploads} class="grid gap-6 mb-6 md:grid-cols-2">
+      <%= for {entry, _i} <- Enum.with_index(@uploads.part_photos.entries) do %>
+        <div>
+          <.live_img_preview entry={entry} width="auto" height="200" />
+          <div class="my-2">
+            <.alert :for={err <- upload_errors(@uploads.part_photos, entry)} kind={:error}>
+              <%= error_to_string(err) %>
+            </.alert>
+          </div>
+          <div class="my-2">
+            <.progress_bar progress={entry.progress} />
+          </div>
+          <div>
+            <.button
+              kind={:warning}
+              type="button"
+              phx-click="remove_photo"
+              phx-value-ref={entry.ref}
+              phx-target={@myself}
+            >
+              Remove
+            </.button>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <.upload_input
+      :if={not @disallow_uploads}
+      upload={@uploads.part_photos}
+      ref={@uploads.part_photos.ref}
+    >
+      <:label>
+        <span class="font-semibold">Click to upload</span> or drag and drop
+      </:label>
+
+      <:description>
+        <span class="text-sm text-gray-500 dark:text-gray-400">
+          PNG, JPG, JPEG up to 2MB
+        </span>
+      </:description>
+    </.upload_input>
+
+    <div class="my-2">
+      <.input field={@form[:track_inventory]} type="checkbox" label="Track Inventory" />
+    </div>
+    <.inputs_for :let={part_inventory_locations_form} field={@form[:part_inventory_locations]}>
+      <div class="grid gap-4 mb-4 sm:grid-cols-3">
+        <.input
+          field={part_inventory_locations_form[:inventory_location_id]}
+          type="select"
+          prompt=""
+          options={@inventory_locations}
+          label="Inventory Location"
+        />
+
+        <.input field={part_inventory_locations_form[:quantity]} type="number" label="Quantity" />
+        <div class="w-3/5 py-6 flex">
+          <.button
+            size={:xs}
+            kind={:danger}
+            type="button"
+            phx-click="remove_form"
+            phx-value-path={part_inventory_locations_form.name}
+            phx-target={@myself}
+          >
+            <i class="fa-solid fa-trash" />
+          </.button>
+        </div>
+      </div>
+    </.inputs_for>
+    <div class="mt-1">
+      <.button
+        size={:xs}
+        type="button"
+        phx-click="add_form"
+        phx-value-path={@form[:part_inventory_locations].name}
+        phx-target={@myself}
+      >
+        <i class="fa-solid fa-plus" /> Add Inventory Location
+      </.button>
+    </div>
+    <:actions>
+      <.button phx-disable-with="Saving...">
+        <i class="fa-solid fa-floppy-disk me-1"></i>Save Part
+      </.button>
+    </:actions>
+  </.simple_form>
+</div>

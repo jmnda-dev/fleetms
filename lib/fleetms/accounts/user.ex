@@ -13,6 +13,9 @@ defmodule Fleetms.Accounts.User do
   alias Fleetms.Accounts.{Organization, Token, UserProfile}
   alias Fleetms.Accounts.User.Policies.{IsAdmin, IsFleetManager, IsTechnician}
 
+  @default_listing_limit 20
+  @default_sorting_params %{sort_by: :created_at, sort_order: :desc}
+  @default_paginate_params %{page: 1, per_page: @default_listing_limit}
   @password_regex ~r/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$\-_+])[A-Za-z\d!@#$\-_+]+$/
   @invalid_password_msg "Invalid password format. Password should be a combination of lowercase and uppercase letters, numbers, and at least one of these characters: @#$-_+"
 
@@ -53,15 +56,17 @@ defmodule Fleetms.Accounts.User do
       sensitive? true
     end
 
-    attribute :status, :atom do
-      allow_nil? false
-      default :active
-      writable? false
-      constraints one_of: Fleetms.Enums.user_statuses()
-    end
-
     attribute :roles, {:array, :atom} do
       allow_nil? false
+      public? true
+    end
+
+    attribute :status, :atom do
+      allow_nil? false
+      public? true
+      default :Active
+      writable? false
+      constraints one_of: Fleetms.Enums.user_statuses()
     end
 
     create_timestamp :created_at
@@ -85,6 +90,10 @@ defmodule Fleetms.Accounts.User do
       authorize_if always()
     end
 
+    policy action_type(:action) do
+      authorize_if always()
+    end
+
     policy action(:list) do
       authorize_if IsFleetManager
       authorize_if IsTechnician
@@ -99,8 +108,80 @@ defmodule Fleetms.Accounts.User do
   actions do
     defaults [:destroy]
 
+    action :validate_sorting_params, :map do
+      description "Validates the Sorting params from the URL e.g /?sort_by=name&sort_order=desc"
+      argument :url_params, :map, allow_nil?: false
+
+      run fn input, _context ->
+        params =
+          %{
+            sort_order: Map.get(input.arguments.url_params, "sort_order", "desc"),
+            sort_by: Map.get(input.arguments.url_params, "sort_by", "updated_at")
+          }
+
+        types = %{
+          sort_order:
+            Ecto.ParameterizedType.init(Ecto.Enum, values: [asc: "Ascending", desc: "Descending"]),
+          sort_by:
+            Ecto.ParameterizedType.init(Ecto.Enum,
+              values: [
+                created_at: "Date Created",
+                updated_at: "Date Updated",
+                first_name: "First Name",
+                last_name: "Last Name",
+                role: "Role",
+                status: "Status"
+              ]
+            )
+        }
+
+        data = %{}
+
+        {data, types}
+        |> Ecto.Changeset.cast(params, Map.keys(types))
+        |> Ecto.Changeset.apply_action(:create)
+        |> case do
+          {:ok, sort_params} ->
+            {:ok, sort_params}
+
+          {:error, changeset} ->
+            {:ok, @default_sorting_params}
+        end
+      end
+    end
+
+    action :validate_pagination_params, :map do
+      description "Validates the Pagination params from the URL e.g /?page=1&per_page=10"
+      argument :url_params, :map, allow_nil?: false
+
+      run fn input, _context ->
+        params =
+          %{
+            page: Map.get(input.arguments.url_params, "page", 1),
+            per_page: Map.get(input.arguments.url_params, "per_page", @default_listing_limit)
+          }
+
+        types = %{
+          page: :integer,
+          per_page: :integer
+        }
+
+        data = %{}
+
+        {data, types}
+        |> Ecto.Changeset.cast(params, Map.keys(types))
+        |> Ecto.Changeset.apply_action(:create)
+        |> case do
+          {:ok, paginate_params} ->
+            {:ok, paginate_params}
+
+          {:error, _changeset} ->
+            {:ok, @default_paginate_params}
+        end
+      end
+    end
+
     create :register_with_password do
-      allow_nil_input [:hashed_password]
       accept [:email]
 
       argument :password, :string do
@@ -134,7 +215,6 @@ defmodule Fleetms.Accounts.User do
     end
 
     create :create_organization_user do
-      allow_nil_input [:hashed_password]
       accept [:email, :roles]
 
       argument :password, :string do
@@ -165,15 +245,9 @@ defmodule Fleetms.Accounts.User do
       change manage_relationship(:organization_id, :organization, type: :append_and_remove)
       change manage_relationship(:user_profile, type: :direct_control)
 
-      change after_action(fn _changeset, created_user, _context ->
+      change after_action(fn changeset, created_user, _context ->
                {:ok, Ash.load!(created_user, :full_name)}
              end)
-    end
-
-    read :list do
-      primary? true
-
-      prepare build(load: [:full_name])
     end
 
     read :get_by_id do
@@ -186,7 +260,6 @@ defmodule Fleetms.Accounts.User do
     update :update do
       primary? true
       require_atomic? false
-      allow_nil_input [:hashed_password]
       accept [:email, :roles]
 
       argument :user_status, :atom do
@@ -216,6 +289,77 @@ defmodule Fleetms.Accounts.User do
       change AshAuthentication.Strategy.Password.HashPasswordChange
       change set_attribute(:status, arg(:user_status))
     end
+
+    read :read, primary?: true
+
+    read :get_all do
+      prepare build(load: [:organization, user_profile: [:full_name]])
+    end
+
+    read :list do
+      pagination offset?: true, default_limit: 50, countable: true
+
+      argument :paginate_sort_opts, :map, default: @default_sorting_params
+      argument :search_query, :string, default: ""
+      argument :advanced_filter_params, :map, default: %{}
+
+      prepare build(load: [:full_name])
+
+      prepare fn query, _context ->
+        %{sort_order: sort_order, sort_by: sort_by} =
+          query.arguments.paginate_sort_opts
+
+        search_query = Ash.Query.get_argument(query, :search_query)
+        advanced_filter_params = Ash.Query.get_argument(query, :advanced_filter_params)
+
+        query =
+          Enum.reduce(advanced_filter_params, query, fn
+            {_, nil}, accumulated_query ->
+              accumulated_query
+
+            {_, []}, accumulated_query ->
+              accumulated_query
+
+            {_, "All"}, accumulated_query ->
+              accumulated_query
+
+            {_, :All}, accumulated_query ->
+              accumulated_query
+
+            {:roles, roles}, accumulated_query ->
+              Ash.Query.filter(
+                accumulated_query,
+                expr(role in ^roles)
+              )
+
+            {:status, statuses}, accumulated_query ->
+              Ash.Query.filter(
+                accumulated_query,
+                expr(status in ^statuses)
+              )
+          end)
+          |> Ash.Query.load([
+            :user_profile
+          ])
+          |> Ash.Query.sort([{sort_by, sort_order}])
+
+        if search_query == "" or is_nil(search_query) do
+          query
+        else
+          Ash.Query.filter(
+            query,
+            expr(
+              trigram_similarity(first_name, ^search_query) > 0.1 or
+                trigram_similarity(last_name, ^search_query) > 0.1 or
+                trigram_similarity(user_profile.middle_name, ^search_query) > 0.3 or
+                trigram_similarity(email, ^search_query) > 0.3 or
+                trigram_similarity(role, ^search_query) > 0.3 or
+                trigram_similarity(user_profile.mobile, ^search_query) > 0.3
+            )
+          )
+        end
+      end
+    end
   end
 
   identities do
@@ -226,6 +370,11 @@ defmodule Fleetms.Accounts.User do
     identity :unique_username, [:username] do
       eager_check? true
     end
+  end
+
+  code_interface do
+    define :validate_sorting_params, action: :validate_sorting_params, args: [:url_params]
+    define :validate_pagination_params, action: :validate_pagination_params, args: [:url_params]
   end
 
   preparations do

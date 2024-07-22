@@ -1,31 +1,17 @@
 defmodule FleetmsWeb.AuthController do
-  @moduledoc """
-  The AuthController module.
-  """
   use FleetmsWeb, :controller
   use AshAuthentication.Phoenix.Controller
 
   def success(conn, _activity, user, _token) do
     return_to = get_session(conn, :return_to) || ~p"/"
+    user = Ash.load!(user, :organization)
 
     conn
     |> delete_session(:return_to)
     |> store_in_session(user)
+    |> put_session(:tenant, Ash.ToTenant.to_tenant(user.organization, user.organization))
     |> assign(:current_user, user)
     |> redirect(to: return_to)
-  end
-
-  def failure(
-        conn,
-        {:password, :register} = _activity,
-        _reason
-      ) do
-    conn
-    |> put_flash(
-      :error,
-      "An error occured while creating an account"
-    )
-    |> redirect(to: ~p"/sign-up")
   end
 
   def failure(
@@ -38,7 +24,7 @@ defmodule FleetmsWeb.AuthController do
       :error,
       "Email or password is incorrect"
     )
-    |> redirect(to: ~p"/sign-in")
+    |> redirect(to: "/sign-in")
   end
 
   def sign_out(conn, _params) do

@@ -17,7 +17,7 @@ defmodule FleetmsWeb do
   those modules here.
   """
 
-  def static_paths, do: ~w(assets fonts images favicon.ico robots.txt)
+  def static_paths, do: ~w(assets fonts webfonts images uploads favicon.ico robots.txt)
 
   def router do
     quote do
@@ -68,7 +68,7 @@ defmodule FleetmsWeb do
 
   def html do
     quote do
-      use Phoenix.Component
+      use Phoenix.Component, global_prefixes: ~w(data-)
 
       # Import convenience functions from controllers
       import Phoenix.Controller,
@@ -88,7 +88,6 @@ defmodule FleetmsWeb do
       import FleetmsWeb.LayoutComponents
       import FleetmsWeb.LiveHelpers
       import FleetmsWeb.Gettext
-
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
 
@@ -107,7 +106,7 @@ defmodule FleetmsWeb do
   end
 
   @doc """
-  When used, dispatch to the appropriate controller/live_view/etc.
+  When used, dispatch to the appropriate controller/view/etc.
   """
   defmacro __using__(which) when is_atom(which) do
     apply(__MODULE__, which, [])
