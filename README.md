@@ -1,7 +1,9 @@
 # Fleetms
 
 ## NOTE
-This project is a work in progress, see [Projects](https://github.com/users/jmnda-dev/projects/15/views/1) 
+This project is a work in progress, see [Projects](https://github.com/users/jmnda-dev/projects/15/views/1)
+
+
 To start your Phoenix server:
 
   * Run `mix setup` to install and setup dependencies
