@@ -1,8 +1,4 @@
 defmodule Fleetms.Vehicles.VehicleMake do
-  @moduledoc """
-  A VehicleMake resource
-  """
-
   use Ash.Resource,
     domain: Fleetms.Vehicles,
     data_layer: AshPostgres.DataLayer
@@ -13,13 +9,7 @@ defmodule Fleetms.Vehicles.VehicleMake do
     attribute :name, :string do
       allow_nil? false
       public? true
-      constraints min_length: 1, max_length: 100
-    end
-
-    attribute :details, :string do
-      allow_nil? true
-      public? true
-      constraints min_length: 1, max_length: 500
+      constraints min_length: 1, max_length: 50
     end
 
     create_timestamp :created_at
@@ -36,11 +26,18 @@ defmodule Fleetms.Vehicles.VehicleMake do
     create :create do
       primary? true
       accept :*
-
       upsert? true
       upsert_fields [:name]
       upsert_identity :unique_name
     end
+
+    read :get_all
+  end
+
+  code_interface do
+
+
+    define :get_all, action: :get_all
   end
 
   identities do

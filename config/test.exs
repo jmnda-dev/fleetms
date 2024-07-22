@@ -11,18 +11,21 @@ config :fleetms, Fleetms.Repo,
   hostname: "localhost",
   database: "fleetms_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
-  pool_size: System.schedulers_online() * 2
+  pool_size: 10
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
 config :fleetms, FleetmsWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
-  secret_key_base: "mwDGuzv3L5ZtPO5NDh3Ik/1E+7zQ0pcJwAbHR/w+gAMNe3eqz/JDcLe1WYzP03Rz",
+  secret_key_base: "2V1MyKV1eozeEv9cHZ+bnQQ0pGqk5hKj8Qxe+1I270n78bMpce9xelxfsF/uVHlX",
   server: false
 
 # In test we don't send emails.
 config :fleetms, Fleetms.Mailer, adapter: Swoosh.Adapters.Test
-config :fleetms, :token_signing_secret, "mwDGuzv3L5ZtPO5NDh3Ik"
+
+config :fleetms,
+       :token_signing_secret,
+       "SDFOULbu+UdvREQlC3RiEejAVLkv/XDGfLKARryJeP50LokewrrrsKmqxU7btPpo"
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
@@ -32,10 +35,5 @@ config :logger, level: :warning
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
-
-config :phoenix_live_view,
-  # Enable helpful, but potentially expensive runtime checks
-  enable_expensive_runtime_checks: true
-
 config :bcrypt_elixir, log_rounds: 1
 config :ash, :disable_async?, true

@@ -43,11 +43,11 @@ defmodule FleetmsWeb.UserLive.ListTest do
         |> log_in_user(admin_user)
         |> live(~p"/users")
 
-      assert html =~ "All users"
+      assert html =~ "All Users"
       assert html =~ admin_user.full_name
     end
 
-    test "User with `fleet_manager`, `technician`, or `driver` role cannot add user", %{
+    test "User with `fleet_manager`, `technician`, or `driver` role cannot Add User", %{
       conn: conn,
       admin_user: admin_user
     } do
@@ -62,16 +62,20 @@ defmodule FleetmsWeb.UserLive.ListTest do
         |> log_in_user(user)
         |> live(~p"/users")
 
-      assert html =~ "All users"
+      render_async(user_list_live)
+
+      assert html =~ "All Users"
       assert html =~ admin_user.full_name
       assert html =~ user.full_name
-      refute has_element?(user_list_live, "button", "Add user")
+      refute has_element?(user_list_live, "button", "Add User")
 
-      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Unauthorized action", fn ->
-        conn
-        |> log_in_user(user)
-        |> live(~p"/users/new")
-      end
+      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+                   "You are not authorized to perform this action",
+                   fn ->
+                     conn
+                     |> log_in_user(user)
+                     |> live(~p"/users/new")
+                   end
     end
 
     test "User with `fleet_manager`, `technician`, or `driver` roles cannot update user", %{
@@ -89,16 +93,20 @@ defmodule FleetmsWeb.UserLive.ListTest do
         |> log_in_user(user)
         |> live(~p"/users")
 
-      assert html =~ "All users"
+      render_async(user_list_live)
+
+      assert html =~ "All Users"
       assert html =~ admin_user.full_name
       assert html =~ user.full_name
-      refute has_element?(user_list_live, ~s{[href="/users/#{admin_user.id}/edit"]}, "Edit user")
+      refute has_element?(user_list_live, ~s{[href="/users/#{admin_user.id}/edit"]}, "Edit User")
 
-      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Unauthorized action", fn ->
-        conn
-        |> log_in_user(user)
-        |> live(~p"/users/#{user}/edit")
-      end
+      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+                   "You are not authorized to perform this action",
+                   fn ->
+                     conn
+                     |> log_in_user(user)
+                     |> live(~p"/users/#{user}/edit")
+                   end
     end
 
     test "User with `viewer` role cannot view users list, add or update a user", %{
@@ -111,33 +119,41 @@ defmodule FleetmsWeb.UserLive.ListTest do
           roles: [:viewer]
         })
 
-      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Unauthorized action", fn ->
-        conn
-        |> log_in_user(user)
-        |> live(~p"/users")
-      end
+      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+                   "You are not authorized to perform this action",
+                   fn ->
+                     conn
+                     |> log_in_user(user)
+                     |> live(~p"/users")
+                   end
 
-      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Unauthorized action", fn ->
-        conn
-        |> log_in_user(user)
-        |> live(~p"/users/new")
-      end
+      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+                   "You are not authorized to perform this action",
+                   fn ->
+                     conn
+                     |> log_in_user(user)
+                     |> live(~p"/users/new")
+                   end
 
-      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError, "Unauthorized action", fn ->
-        conn
-        |> log_in_user(user)
-        |> live(~p"/users/#{user}/edit")
-      end
+      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+                   "You are not authorized to perform this action",
+                   fn ->
+                     conn
+                     |> log_in_user(user)
+                     |> live(~p"/users/#{user}/edit")
+                   end
     end
 
-    test "creates a new user", %{conn: conn, admin_user: admin_user} do
+    test "creates a Add User ", %{conn: conn, admin_user: admin_user} do
       {:ok, user_list_live, _html} =
         conn
         |> log_in_user(admin_user)
         |> live(~p"/users")
 
-      assert user_list_live |> element("a", "Add user") |> render_click() =~
-               "New User"
+      render_async(user_list_live)
+
+      assert user_list_live |> element("a", "Add User") |> render_click() =~
+               "Add User"
 
       assert_patch(user_list_live, ~p"/users/new")
 
@@ -175,8 +191,10 @@ defmodule FleetmsWeb.UserLive.ListTest do
         |> log_in_user(admin_user)
         |> live(~p"/users")
 
+      render_async(user_list_live)
+
       assert user_list_live
-             |> element(~s{[href="/users/#{admin_user.id}/edit"]}, "Edit user")
+             |> element(~s{[href="/users/#{admin_user.id}/edit"]}, "Edit User")
              |> render_click() =~
                "Edit User"
 
@@ -217,8 +235,10 @@ defmodule FleetmsWeb.UserLive.ListTest do
         |> log_in_user(admin_user)
         |> live(~p"/users")
 
+      render_async(user_list_live)
+
       assert user_list_live
-             |> element(~s{[href="/users/#{admin_user.id}/edit"]}, "Edit user")
+             |> element(~s{[href="/users/#{admin_user.id}/edit"]}, "Edit User")
              |> render_click() =~
                "Edit User"
 

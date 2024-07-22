@@ -1,0 +1,317 @@
+[
+    {
+        "name": "Engine Oil Change"
+    },
+    {
+        "name": "Transmission Oil Change"
+    },
+    {
+        "name": "Tire Rotation"
+    },
+    {
+        "name": "Brake Pad Replacement"
+    },
+    {
+        "name": "Spark Plug Replacement"
+    },
+    {
+        "name": "Air Filter Replacement"
+    },
+    {
+        "name": "Battery Check"
+    },
+    {
+        "name": "Coolant Flush"
+    },
+    {
+        "name": "Wheel Alignment"
+    },
+    {
+        "name": "Fuel Filter Replacement"
+    },
+    {
+        "name": "Timing Belt Replacement"
+    },
+    {
+        "name": "Alternator Inspection"
+    },
+    {
+        "name": "Suspension Inspection"
+    },
+    {
+        "name": "Exhaust System Check"
+    },
+    {
+        "name": "Power Steering Fluid Flush"
+    },
+    {
+        "name": "Radiator Inspection"
+    },
+    {
+        "name": "Tire Balancing"
+    },
+    {
+        "name": "Engine Diagnostic"
+    },
+    {
+        "name": "Wiper Blade Replacement"
+    },
+    {
+        "name": "Headlight Alignment"
+    },
+    {
+        "name": "AC System Service"
+    },
+    {
+        "name": "Cabin Air Filter Replacement"
+    },
+    {
+        "name": "Wheel Bearing Inspection"
+    },
+    {
+        "name": "Drive Belt Replacement"
+    },
+    {
+        "name": "Oxygen Sensor Replacement"
+    },
+    {
+        "name": "Fuel Injector Cleaning"
+    },
+    {
+        "name": "Emission System Inspection"
+    },
+    {
+        "name": "Serpentine Belt Replacement"
+    },
+    {
+        "name": "Starter Motor Check"
+    },
+    {
+        "name": "Catalytic Converter Inspection"
+    },
+    {
+        "name": "Brake Fluid Replacement"
+    },
+    {
+        "name": "Steering Gearbox Inspection"
+    },
+    {
+        "name": "Wheel Hub Assembly Check"
+    },
+    {
+        "name": "Exhaust Manifold Inspection"
+    },
+    {
+        "name": "PCV Valve Replacement"
+    },
+    {
+        "name": "Throttle Body Cleaning"
+    },
+    {
+        "name": "Crankshaft Position Sensor Replacement"
+    },
+    {
+        "name": "Engine Mount Inspection"
+    },
+    {
+        "name": "Ignition Coil Replacement"
+    },
+    {
+        "name": "Drive Shaft Inspection"
+    },
+    {
+        "name": "Axle Shaft Inspection"
+    },
+    {
+        "name": "EGR Valve Cleaning"
+    },
+    {
+        "name": "Camshaft Position Sensor Replacement"
+    },
+    {
+        "name": "Intake Manifold Gasket Replacement"
+    },
+    {
+        "name": "Suspension Bushing Replacement"
+    },
+    {
+        "name": "Shock Absorber Inspection"
+    },
+    {
+        "name": "Ball Joint Replacement"
+    },
+    {
+        "name": "Wheel Speed Sensor Replacement"
+    },
+    {
+        "name": "Steering Rack Replacement"
+    },
+    {
+        "name": "Engine Control Module (ECM) Replacement"
+    },
+    {
+        "name": "Mass Airflow Sensor Replacement"
+    },
+    {
+        "name": "Thermostat Replacement"
+    },
+    {
+        "name": "Radiator Fan Replacement"
+    },
+    {
+        "name": "Clutch Master Cylinder Replacement"
+    },
+    {
+        "name": "Clutch Slave Cylinder Replacement"
+    },
+    {
+        "name": "Drive Belt Tensioner Replacement"
+    },
+    {
+        "name": "Ignition Control Module Replacement"
+    },
+    {
+        "name": "Fuel Pump Replacement"
+    },
+    {
+        "name": "Wheel Bearing Replacement"
+    },
+    {
+        "name": "Fuel Pressure Regulator Replacement"
+    },
+    {
+        "name": "Cabin Air Filter Inspection"
+    },
+    {
+        "name": "Axle Seal Replacement"
+    },
+    {
+        "name": "Transfer Case Fluid Replacement"
+    },
+    {
+        "name": "Differential Fluid Replacement"
+    },
+    {
+        "name": "Drive Belt Inspection"
+    },
+    {
+        "name": "Wheel Bearing Lubrication"
+    },
+    {
+        "name": "Valve Cover Gasket Replacement"
+    },
+    {
+        "name": "Throttle Position Sensor Replacement"
+    },
+    {
+        "name": "Starter Motor Replacement"
+    },
+    {
+        "name": "Transmission Mount Replacement"
+    },
+    {
+        "name": "Fuel Filter Inspection"
+    },
+    {
+        "name": "Battery Replacement"
+    },
+    {
+        "name": "Fuel Injector Replacement"
+    },
+    {
+        "name": "EGR Valve Replacement"
+    },
+    {
+        "name": "Camshaft Position Sensor Inspection"
+    },
+    {
+        "name": "Ignition Coil Inspection"
+    },
+    {
+        "name": "Power Steering Fluid Replacement"
+    },
+    {
+        "name": "Serpentine Belt Inspection"
+    },
+    {
+        "name": "Suspension Bushing Inspection"
+    },
+    {
+        "name": "Shock Absorber Replacement"
+    },
+    {
+        "name": "Ball Joint Inspection"
+    },
+    {
+        "name": "Wheel Speed Sensor Inspection"
+    },
+    {
+        "name": "Steering Rack Inspection"
+    },
+    {
+        "name": "Engine Control Module (ECM) Inspection"
+    },
+    {
+        "name": "Mass Airflow Sensor Inspection"
+    },
+    {
+        "name": "Thermostat Inspection"
+    },
+    {
+        "name": "Radiator Fan Inspection"
+    },
+    {
+        "name": "Clutch Master Cylinder Inspection"
+    },
+    {
+        "name": "Clutch Slave Cylinder Inspection"
+    },
+    {
+        "name": "Drive Belt Tensioner Inspection"
+    },
+    {
+        "name": "Ignition Control Module Inspection"
+    },
+    {
+        "name": "Fuel Pump Inspection"
+    },
+    {
+        "name": "Wheel Bearing Greasing"
+    },
+    {
+        "name": "Fuel Pressure Regulator Inspection"
+    },
+    {
+        "name": "Axle Seal Inspection"
+    },
+    {
+        "name": "Transfer Case Fluid Inspection"
+    },
+    {
+        "name": "Differential Fluid Inspection"
+    },
+    {
+        "name": "Valve Cover Gasket Inspection"
+    },
+    {
+        "name": "Throttle Position Sensor Inspection"
+    },
+    {
+        "name": "Starter Motor Inspection"
+    },
+    {
+        "name": "Transmission Mount Inspection"
+    },
+    {
+        "name": "Battery Inspection"
+    },
+    {
+        "name": "Fuel Injector Inspection"
+    },
+    {
+        "name": "EGR Valve Inspection"
+    },
+    {
+        "name": "Power Steering Fluid Inspection"
+    }
+]

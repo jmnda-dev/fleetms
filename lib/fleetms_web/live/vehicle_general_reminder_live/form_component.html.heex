@@ -1,0 +1,84 @@
+<div>
+  <.header>
+    <%= @title %>
+  </.header>
+  <.simple_form
+    for={@form}
+    id="vehicle_general_reminder-form"
+    phx-target={@myself}
+    phx-change="validate"
+    phx-submit="save"
+  >
+    <div class="grid gap-4 mb-4 sm:grid-cols-2">
+      <div id="vehicle-input" phx-update="ignore">
+        <.input
+          field={@form[:vehicle_id]}
+          type="select"
+          options={@vehicles}
+          prompt=""
+          label="Vehicle"
+          phx-hook="select2JS"
+          style="width: 100%;"
+          data-placeholder="Select Vehicle"
+          required
+        />
+      </div>
+
+      <.inputs_for :let={reminder_purpose_form} field={@form[:vehicle_reminder_purpose]}>
+        <div id="reminder_purpose-input" phx-update="ignore">
+          <.input
+            field={reminder_purpose_form[:name]}
+            type="select"
+            label="Reminder For"
+            options={@vehicle_reminder_purposes}
+            prompt=""
+            phx-target={@myself}
+            phx-hook="select2JS"
+            style="width: 100%;"
+            data-placeholder="Select reminder purpose"
+          />
+        </div>
+      </.inputs_for>
+      <div>
+        <.input field={@form[:due_date]} type="date" label="Due Date" required />
+      </div>
+      <div>
+        <.input field={@form[:time_interval]} type="number" label="Time Interval (optional)" />
+      </div>
+      <div>
+        <.input
+          field={@form[:time_interval_unit]}
+          type="select"
+          prompt=""
+          options={Fleetms.Enums.time_units()}
+          label="Time Interval Unit (optional)"
+        />
+      </div>
+      <div>
+        <.input
+          field={@form[:due_date_threshold]}
+          type="number"
+          label="Due Date Threshold (optional)"
+        />
+      </div>
+      <div>
+        <.input
+          field={@form[:due_date_threshold_unit]}
+          type="select"
+          prompt=""
+          options={Fleetms.Enums.time_units()}
+          label="Due Date Threshold Unit (optional)"
+        />
+      </div>
+      <div>
+        <.input field={@form[:description]} type="textarea" label="Description" />
+      </div>
+    </div>
+
+    <:actions>
+      <.button phx-disable-with="Saving...">
+        Save Reminder
+      </.button>
+    </:actions>
+  </.simple_form>
+</div>

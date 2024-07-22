@@ -51,7 +51,7 @@ defmodule Fleetms.AccountsFixtures do
       |> Ash.Changeset.set_context(%{private: %{ash_authentication?: true}})
       |> Ash.create()
 
-    Ash.load!(user, :full_name)
+    Ash.load!(user, [:full_name, :organization])
   end
 
   def org_user_fixture(attrs \\ %{}) do
@@ -75,5 +75,10 @@ defmodule Fleetms.AccountsFixtures do
       |> Ash.create()
 
     organization
+  end
+
+  def setup_organization_and_user do
+    initial_user = initial_user_fixture()
+    %{user: initial_user, tenant: initial_user.organization}
   end
 end

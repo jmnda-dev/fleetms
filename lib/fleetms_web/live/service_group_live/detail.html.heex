@@ -1,0 +1,294 @@
+<nav class="p-4 lg:mt-1.5 flex" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a
+        href="#"
+        class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
+      >
+        <svg
+          class="w-3 h-3 mr-2.5"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
+        </svg>
+        Home
+      </a>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg
+          class="w-3 h-3 text-gray-400 mx-1"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 6 10"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m1 9 4-4-4-4"
+          />
+        </svg>
+        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">
+          Service Groups
+        </span>
+      </div>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg
+          class="w-3 h-3 text-gray-400 mx-1"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 6 10"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m1 9 4-4-4-4"
+          />
+        </svg>
+        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">
+          <%= @service_group.name %>
+        </span>
+      </div>
+    </li>
+  </ol>
+</nav>
+
+<div class="mx-2">
+  <div class="border-b border-gray-200 shadow-md rounded-md bg-white dark:bg-gray-800 dark:border-gray-700">
+    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400 py-2">
+      <li class="mr-2">
+        <.tab
+          id="service_group_details_tab"
+          active={@live_action in [:detail, :edit]}
+          patch={~p"/service_groups/#{@service_group}"}
+          label="Details"
+          icon_class="fa-regular fa-rectangle-list w-6"
+        />
+      </li>
+      <li class="mr-2">
+        <.tab
+          id="service_group_schedules-tab"
+          active={@live_action == :service_group_schedules}
+          patch={~p"/service_groups/#{@service_group}/service_group_schedules"}
+          label="Reminder Schedules"
+          icon_class="fa-regular fa-eye w-6"
+        />
+      </li>
+      <li class="mr-2">
+        <.tab
+          id="vehicles_tab"
+          active={@live_action == :vehicles}
+          patch={~p"/service_groups/#{@service_group}/vehicles"}
+          label="Vehicles"
+          icon_class="fa-regular fa-calendar-days w-6"
+        />
+      </li>
+    </ul>
+
+    <div :if={@live_action in [:detail, :edit]} class="p-4">
+      <div class="flex justify-between mb-4 rounded-t sm:mb-5">
+        <div class="flex items-center shadow-sm rounded-md bg-white dark:bg-gray-800 p-2">
+          <img
+            class="w-14 h-14 mr-2 rounded-md sm:mr-4"
+            src={image_src(@service_group.thumbnail_url)}
+            alt={@service_group.name}
+          />
+          <div>
+            <h3 class="text-lg font-bold text-gray-900 md:text-xl dark:text-white">
+              <%= @service_group.name %> - Service Group
+            </h3>
+          </div>
+        </div>
+        <div
+          :if={
+Ash.can?(
+              {Fleetms.Service.ServiceGroup, :update},
+              @current_user
+            )
+          }
+          class="mt-3"
+        >
+          <.link navigate={~p"/service_groups/#{@service_group}/detail/edit"}>
+            <.button type="button" class="btn-sm mb-0">
+              <i class="fa-solid fa-pen-to-square text-sm" aria-hidden="true"></i> Edit
+            </.button>
+          </.link>
+        </div>
+      </div>
+
+      <.list>
+        <:item title="Description"><%= @service_group.description %></:item>:w
+      </.list>
+    </div>
+    <div :if={@live_action == :service_group_schedules} class="p-4">
+      <div
+        :if={
+Ash.can?(
+            {Fleetms.Service.ServiceGroupSchedule, :create},
+            @current_user
+          )
+        }
+        class="text-end"
+      >
+        <.link navigate={
+          ~p"/service_groups/#{@service_group}/service_group_schedules/add_service_group_schedule"
+        }>
+          <.button type="button" class="btn-sm mb-0">
+            <i class="fa-solid fa-plus text-sm" aria-hidden="true"></i> Add Schedule
+          </.button>
+        </.link>
+      </div>
+      <.table_2 id="service_group_schedules-table" rows={@streams.service_group_schedules}>
+        <:col :let={{_id, service_group_schedule}} label="Interval">
+          <%= cond do %>
+            <% service_group_schedule.mileage_interval && service_group_schedule.time_interval -> %>
+              Every <%= service_group_schedule.mileage_interval %>km or <%= service_group_schedule.time_interval %> <%= service_group_schedule.time_interval_unit %>
+            <% service_group_schedule.mileage_interval -> %>
+              Every <%= service_group_schedule.mileage_interval %>km
+            <% service_group_schedule.time_interval -> %>
+              Every <%= service_group_schedule.time_interval %> <%= service_group_schedule.time_interval_unit %>
+            <% true -> %>
+              --
+          <% end %>
+        </:col>
+
+        <:col :let={{_id, service_group_schedule}} label="Service Tasks">
+          <ul class="max-w-md space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
+            <li :for={service_task <- service_group_schedule.service_tasks}>
+              <%= service_task.name %>
+            </li>
+          </ul>
+        </:col>
+        <:action :let={{id, service_group_schedule}}>
+          <button
+            id={"#{id}-dropdown-button"}
+            data-dropdown-toggle={"#{id}-dropdown"}
+            class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
+            type="button"
+          >
+            <svg
+              class="w-5 h-5"
+              aria-hidden="true"
+              fill="currentColor"
+              viewbox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+            </svg>
+          </button>
+          <div
+            id={"#{id}-dropdown"}
+            class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
+          >
+            <ul
+              class="py-1 text-sm text-gray-700 dark:text-gray-200"
+              aria-labelledby={"#{id}-dropdown-button"}
+            >
+              <li :if={
+                Ash.can?(
+                  {Fleetms.Service.ServiceGroupSchedule, :update},
+                  @current_user
+                )
+              }>
+                <.link
+                  patch={
+                    ~p"/service_groups/#{@service_group}/service_group_schedules/#{service_group_schedule}/edit"
+                  }
+                  class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                >
+                  Edit
+                </.link>
+              </li>
+            </ul>
+            <div
+              :if={
+                Ash.can?(
+                  {Fleetms.Service.ServiceGroupSchedule, :destroy},
+                  @current_user
+                )
+              }
+              class="py-1"
+            >
+              <.link
+                phx-click={JS.push("delete_schedule", value: %{id: service_group_schedule.id})}
+                data-confirm="Are you sure?"
+                class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+              >
+                Delete
+              </.link>
+            </div>
+          </div>
+        </:action>
+      </.table_2>
+    </div>
+    <div :if={@live_action == :vehicles} class="p-4">
+      <.table_2
+        id="service_group_vehicles"
+        rows={@streams.vehicles}
+        row_click={fn {_id, vehicle} -> JS.navigate(~p"/vehicles/#{vehicle}") end}
+      >
+        <:col :let={{_id, vehicle}}>
+          <img
+            src={Fleetms.VehiclePhoto.url({vehicle.photo, vehicle}, :thumb)}
+            class="h-8 w-auto mr-3 rounded-md"
+            alt={vehicle.name}
+          />
+          <%= vehicle.full_name %>
+        </:col>
+      </.table_2>
+    </div>
+  </div>
+</div>
+
+<.modal
+  :if={@live_action == :edit}
+  id="service_group-modal"
+  show
+  phx_click_away={false}
+  phx_window_keydown={false}
+  on_cancel={JS.navigate(~p"/service_groups/#{@service_group}")}
+>
+  <.live_component
+    module={FleetmsWeb.ServiceGroupLive.FormComponent}
+    id={@service_group.id}
+    title={@page_title}
+    action={@live_action}
+    service_group={@service_group}
+    current_user={@current_user}
+    tenant={@tenant}
+    notify_parent={false}
+    patch={~p"/service_groups/#{@service_group}"}
+  />
+</.modal>
+
+<.modal
+  :if={@live_action in [:add_service_group_schedule, :edit_service_group_schedule]}
+  id="service_group_schedule-modal"
+  show
+  phx_click_away={false}
+  phx_window_keydown={false}
+  on_cancel={JS.navigate(~p"/service_groups/#{@service_group}/service_group_schedules")}
+>
+  <.live_component
+    module={FleetmsWeb.ServiceGroupLive.ScheduleFormComponent}
+    id={@service_group.id}
+    title={@page_title}
+    action={@live_action}
+    service_group={@service_group}
+    current_user={@current_user}
+    tenant={@tenant}
+    service_group_schedule={@service_group_schedule}
+    patch={~p"/service_groups/#{@service_group}/service_group_schedules"}
+  />
+</.modal>

@@ -1,0 +1,26 @@
+<div>
+  <.header><%= @title %></.header>
+
+  <.simple_form
+    for={@form}
+    id="inventory-location-form"
+    phx-target={@myself}
+    phx-change="validate"
+    phx-submit="save"
+  >
+    <div class="grid">
+      <div class="col-span-1">
+        <.input field={@form[:name]} type="text" label="Name" />
+      </div>
+      <div class="col-span-1">
+        <.input field={@form[:description]} type="textarea" label="Description" />
+      </div>
+    </div>
+
+    <:actions>
+      <.button phx-disable-with="Saving...">
+        <i class="fa-solid fa-floppy-disk me-1"></i>Save Inventory Location
+      </.button>
+    </:actions>
+  </.simple_form>
+</div>

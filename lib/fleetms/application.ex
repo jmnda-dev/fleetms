@@ -7,18 +7,24 @@ defmodule Fleetms.Application do
 
   @impl true
   def start(_type, _args) do
+    :logger.add_handler(:my_sentry_handler, Sentry.LoggerHandler, %{
+        config: %{metadata: [:file, :line]}
+      })
+
     children = [
+      # Start the Telemetry supervisor
       FleetmsWeb.Telemetry,
+      # Start the Ecto repository
       Fleetms.Repo,
-      {DNSCluster, query: Application.get_env(:fleetms, :dns_cluster_query) || :ignore},
+      # Start the PubSub system
       {Phoenix.PubSub, name: Fleetms.PubSub},
-      # Start the Finch HTTP client for sending emails
+      # Start Finch
       {Finch, name: Fleetms.Finch},
-      {AshAuthentication.Supervisor, otp_app: :fleetms},
+      # Start the Endpoint (http/https)
+      FleetmsWeb.Endpoint,
       # Start a worker by calling: Fleetms.Worker.start_link(arg)
-      # {Fleetms.Worker, arg},
-      # Start to serve requests, typically the last entry
-      FleetmsWeb.Endpoint
+      # {Fleetms.Worker, arg}
+      {AshAuthentication.Supervisor, otp_app: :fleetms}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -1,0 +1,163 @@
+{
+  "attributes": [
+    {
+      "default": "fragment(\"gen_random_uuid()\")",
+      "size": null,
+      "type": "uuid",
+      "source": "id",
+      "references": null,
+      "allow_nil?": false,
+      "primary_key?": true,
+      "generated?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "decimal",
+      "source": "fuel_consumption_urban",
+      "references": null,
+      "allow_nil?": true,
+      "primary_key?": false,
+      "generated?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "decimal",
+      "source": "fuel_consumption_extra_urban",
+      "references": null,
+      "allow_nil?": true,
+      "primary_key?": false,
+      "generated?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "decimal",
+      "source": "fuel_consumption_combined",
+      "references": null,
+      "allow_nil?": true,
+      "primary_key?": false,
+      "generated?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "decimal",
+      "source": "co2_emission",
+      "references": null,
+      "allow_nil?": true,
+      "primary_key?": false,
+      "generated?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "decimal",
+      "source": "acceleration_0_to_100",
+      "references": null,
+      "allow_nil?": true,
+      "primary_key?": false,
+      "generated?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "decimal",
+      "source": "maximum_speed",
+      "references": null,
+      "allow_nil?": true,
+      "primary_key?": false,
+      "generated?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "text",
+      "source": "emission_standard",
+      "references": null,
+      "allow_nil?": true,
+      "primary_key?": false,
+      "generated?": false
+    },
+    {
+      "default": "fragment(\"(now() AT TIME ZONE 'utc')\")",
+      "size": null,
+      "type": "utc_datetime_usec",
+      "source": "created_at",
+      "references": null,
+      "allow_nil?": false,
+      "primary_key?": false,
+      "generated?": false
+    },
+    {
+      "default": "fragment(\"(now() AT TIME ZONE 'utc')\")",
+      "size": null,
+      "type": "utc_datetime_usec",
+      "source": "updated_at",
+      "references": null,
+      "allow_nil?": false,
+      "primary_key?": false,
+      "generated?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "uuid",
+      "source": "vehicle_id",
+      "references": {
+        "name": "vehicle_performance_specs_vehicle_id_fkey",
+        "table": "vehicles",
+        "multitenancy": {
+          "global": false,
+          "strategy": "context",
+          "attribute": null
+        },
+        "primary_key?": true,
+        "schema": "public",
+        "destination_attribute": "id",
+        "on_delete": "delete",
+        "on_update": null,
+        "deferrable": false,
+        "match_with": null,
+        "match_type": null,
+        "index?": false,
+        "destination_attribute_default": null,
+        "destination_attribute_generated": null
+      },
+      "allow_nil?": false,
+      "primary_key?": false,
+      "generated?": false
+    }
+  ],
+  "table": "vehicle_performance_specs",
+  "hash": "9765662C09BF0CB9ECC1770DB9AC9718F651EC3EF4A17E57470148A1D849D934",
+  "repo": "Elixir.Fleetms.Repo",
+  "identities": [
+    {
+      "name": "unique_vehicle_id",
+      "keys": [
+        {
+          "type": "atom",
+          "value": "vehicle_id"
+        }
+      ],
+      "where": null,
+      "base_filter": null,
+      "all_tenants?": false,
+      "nils_distinct?": true,
+      "index_name": "vehicle_performance_specs_unique_vehicle_id_index"
+    }
+  ],
+  "multitenancy": {
+    "global": false,
+    "strategy": "context",
+    "attribute": null
+  },
+  "schema": null,
+  "check_constraints": [],
+  "custom_indexes": [],
+  "base_filter": null,
+  "custom_statements": [],
+  "has_create_action": true
+}

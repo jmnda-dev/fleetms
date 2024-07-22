@@ -1,0 +1,774 @@
+<nav class="p-4 lg:mt-1.5 flex" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a
+        href="#"
+        class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
+      >
+        <svg
+          class="w-3 h-3 mr-2.5"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
+        </svg>
+        Home
+      </a>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg
+          class="w-3 h-3 text-gray-400 mx-1"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 6 10"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m1 9 4-4-4-4"
+          />
+        </svg>
+        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">
+          Vehicles Assignments
+        </span>
+      </div>
+    </li>
+  </ol>
+</nav>
+
+<section class="bg-gray-50 dark:bg-gray-900 py-3 sm:py-5">
+  <div class="mx-auto max-w-screen-2xl px-4 lg:px-2">
+    <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg">
+      <div class="border-b dark:border-gray-700 mx-4">
+        <div class="flex items-center justify-between space-x-4 pt-3">
+          <div class="flex-1 flex items-center space-x-3">
+            <h5 class="dark:text-white font-semibold">All vehicles Assignments</h5>
+          </div>
+        </div>
+        <div class="flex flex-col-reverse md:flex-row items-center justify-between md:space-x-4 py-3">
+          <div class="w-full lg:w-2/3 flex flex-col space-y-3 md:space-y-0 md:flex-row md:items-center">
+            <form phx-submit="search" class="w-full md:max-w-sm flex-1 md:mr-4">
+              <label
+                for="vehicle_search_search_query"
+                class="text-sm font-medium text-gray-900 sr-only dark:text-white"
+              >
+                Search
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <svg
+                    aria-hidden="true"
+                    class="w-4 h-4 text-gray-500 dark:text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewbox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type="search"
+                  id="vehicle_assignment_search_query"
+                  name="vehicle_assignment_search[search_query]"
+                  class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  phx-debounce="700"
+                  value={@search_params.search_query}
+                  placeholder="Search vehicle..."
+                />
+                <button
+                  type="submit"
+                  class="text-white absolute right-0 bottom-0 top-0 bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-r-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                >
+                  Search
+                </button>
+              </div>
+            </form>
+            <.link patch={
+              ~p"/vehicle_assignments/filter_form?#{Map.merge(@paginate_sort_opts, @search_params) |> Map.merge(@filter_form_data)}"
+            }>
+              <button
+                id="filterDropdownButton"
+                type="button"
+                class="flex items-center justify-center w-full px-4 py-2 mr-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg md:w-auto focus:outline-none hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  class="w-4 h-4 mr-2 text-gray-400"
+                  viewbox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
+                  />
+                </svg>
+                Filter
+              </button>
+            </.link>
+            <form class="flex items-center space-x-4">
+              <div>
+                <button
+                  id="per-page-select-dropdownButton"
+                  data-dropdown-toggle="per-page-select-dropdown"
+                  class="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                  type="button"
+                >
+                  Per Page
+                  <svg
+                    class="-mr-1 ml-1.5 w-5 h-5"
+                    fill="currentColor"
+                    viewbox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                  >
+                    <path
+                      clip-rule="evenodd"
+                      fill-rule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                    />
+                  </svg>
+                </button>
+                <div
+                  id="per-page-select-dropdown"
+                  class="z-10 hidden w-48 p-3 bg-white rounded-lg shadow dark:bg-gray-700"
+                >
+                  <div>
+                    <h6 class="mb-3 text-sm font-medium text-gray-900 dark:text-white">
+                      Number of items per page
+                    </h6>
+                    <ul class="space-y-2 text-sm" aria-labelledby="per-page-select-dropdownButton">
+                      <li :for={number <- get_items_per_page_opts()} class="flex items-center">
+                        <input
+                          id={[number, "_items_per_page"]}
+                          name="paginate_sort_opts[per_page]"
+                          type="radio"
+                          value={number}
+                          checked={number == Integer.to_string(@paginate_sort_opts.per_page)}
+                          class="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                          phx-change="items_per_page_changed"
+                        />
+                        <label
+                          for={[number, "_items_per_page"]}
+                          class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
+                        >
+                          <%= number %>
+                        </label>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <button
+                  id="sort-order-select-dropdownButton"
+                  data-dropdown-toggle="sort-order-select-dropdown"
+                  class="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                  type="button"
+                >
+                  Sort Order
+                  <svg
+                    class="-mr-1 ml-1.5 w-5 h-5"
+                    fill="currentColor"
+                    viewbox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                  >
+                    <path
+                      clip-rule="evenodd"
+                      fill-rule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                    />
+                  </svg>
+                </button>
+                <div
+                  id="sort-order-select-dropdown"
+                  class="z-10 hidden w-48 p-3 bg-white rounded-lg shadow dark:bg-gray-700"
+                >
+                  <div>
+                    <h6 class="mb-3 text-sm font-medium text-gray-900 dark:text-white">
+                      Vehicle Assignments Sort Order
+                    </h6>
+                    <ul
+                      class="space-y-2 text-sm"
+                      aria-labelledby="sort-order-select-dropdownButton"
+                    >
+                      <li :for={{value, label} <- get_sort_order_opts()} class="flex items-center">
+                        <input
+                          id={"#{value}_sort_order"}
+                          name="paginate_sort_opts[sort_order]"
+                          type="radio"
+                          value={value}
+                          checked={value == @paginate_sort_opts.sort_order}
+                          class="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                          phx-change="sort_order_changed"
+                        />
+                        <label
+                          for={"#{value}_sort_order"}
+                          class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
+                        >
+                          <%= label %>
+                        </label>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <button
+                  id="sort-by-select-dropdownButton"
+                  data-dropdown-toggle="sort-by-select-dropdown"
+                  class="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                  type="button"
+                >
+                  Sort By
+                  <svg
+                    class="-mr-1 ml-1.5 w-5 h-5"
+                    fill="currentColor"
+                    viewbox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                  >
+                    <path
+                      clip-rule="evenodd"
+                      fill-rule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                    />
+                  </svg>
+                </button>
+                <div
+                  id="sort-by-select-dropdown"
+                  class="z-10 hidden w-48 p-3 bg-white rounded-lg shadow dark:bg-gray-700"
+                >
+                  <div>
+                    <h6 class="mb-3 text-sm font-medium text-gray-900 dark:text-white">
+                      Sort Vehicle Assignments by
+                    </h6>
+                    <ul class="space-y-2 text-sm" aria-labelledby="sort-by-select-dropdownButton">
+                      <li :for={{value, label} <- get_sort_by_opts()} class="flex items-center">
+                        <input
+                          id={"#{value}_sort_by"}
+                          name="paginate_sort_opts[sort_by]"
+                          type="radio"
+                          value={value}
+                          checked={value == @paginate_sort_opts.sort_by}
+                          class="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                          phx-change="sort_by_changed"
+                        />
+                        <label
+                          for={"#{value}_sort_by"}
+                          class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
+                        >
+                          <%= label %>
+                        </label>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div
+            :if={
+              Ash.can?({Fleetms.Vehicles.Vehicle, :create}, @current_user)
+            }
+            class="w-full md:w-auto flex flex-col md:flex-row mb-3 md:mb-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0"
+          >
+            <.link navigate={~p"/vehicle_assignments/new"}>
+              <button
+                type="button"
+                class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
+              >
+                <svg
+                  class="h-3.5 w-3.5 mr-2"
+                  fill="currentColor"
+                  viewbox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    clip-rule="evenodd"
+                    fill-rule="evenodd"
+                    d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                  />
+                </svg>
+                Add Vehicle Assignment
+              </button>
+            </.link>
+          </div>
+        </div>
+      </div>
+
+      <div :if={@loading} class="flex justify-center">
+        <.spinner class="text-center" />
+      </div>
+
+      <.table_2
+        :if={not @loading}
+        id="vehicles"
+        rows={@streams.vehicle_assignments}
+        row_click={
+          fn {_id, vehicle_assignment} ->
+            JS.dispatch("click", to: "#vehicle_assignment-detail-drawer-button")
+            |> JS.push("load_vehicle_assignment_detail", value: %{id: vehicle_assignment.id})
+          end
+        }
+      >
+        <:col :let={{_id, vehicle_assignment}} label="Assigned To">
+          <div class="flex items-center">
+            <img
+              src={
+                Fleetms.UserProfilePhoto.url(
+                  vehicle_assignment.assignee.user_profile.profile_photo,
+                  vehicle_assignment.assignee.user_profile
+                )
+              }
+              alt={@current_user.full_name}
+              class="w-auto h-8 mr-3 rounded-full"
+            />
+            <%= @current_user.full_name %>
+          </div>
+        </:col>
+
+        <:col :let={{_id, vehicle_assignment}} label="Vehicle">
+          <div class="flex items-center">
+            <img
+              src={
+                Fleetms.VehiclePhoto.url(
+                  {vehicle_assignment.vehicle.photo, vehicle_assignment.vehicle},
+                  :thumb
+                )
+              }
+              class="h-8 w-auto mr-3 rounded-md"
+              alt={vehicle_assignment.vehicle.full_name}
+            />
+            <%= vehicle_assignment.vehicle.full_name %>
+          </div>
+        </:col>
+
+        <:col :let={{_id, vehicle_assignment}} label="Status">
+          <%= cond do %>
+            <% vehicle_assignment.status == "Upcoming" -> %>
+              <.badge kind={:info} label={vehicle_assignment.status} />
+            <% vehicle_assignment.status == "In-progress" -> %>
+              <.badge kind={:warning} label={vehicle_assignment.status} />
+            <% vehicle_assignment.status == "Past" -> %>
+              <.badge kind={:success} label={vehicle_assignment.status} />
+          <% end %>
+        </:col>
+
+        <:col :let={{id, vehicle_assignment}} label="Start Date">
+          <span id={"#{id}-start_datetime-column"} phx-hook="LocalTime" data-exclude-time="true">
+            <%= vehicle_assignment.start_datetime %>
+          </span>
+        </:col>
+        <:col :let={{id, vehicle_assignment}} label="End Date">
+          <span id={"#{id}-end_datetime-column"} phx-hook="LocalTime" data-exclude-time="true">
+            <%= vehicle_assignment.end_datetime %>
+          </span>
+        </:col>
+
+        <:col :let={{_id, vehicle_assignment}} label="Start Mileage">
+          <%= vehicle_assignment.start_mileage %>
+        </:col>
+        <:col :let={{_id, vehicle_assignment}} label="End Mileage">
+          <%= vehicle_assignment.end_mileage %>
+        </:col>
+
+        <:action :let={{id, vehicle_assignment}}>
+          <button
+            id={"#{id}-dropdown-button"}
+            data-dropdown-toggle={"#{id}-dropdown"}
+            class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
+            type="button"
+          >
+            <svg
+              class="w-5 h-5"
+              aria-hidden="true"
+              fill="currentColor"
+              viewbox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+            </svg>
+          </button>
+          <div
+            id={"#{id}-dropdown"}
+            class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
+          >
+            <ul
+              class="py-1 text-sm text-gray-700 dark:text-gray-200"
+              aria-labelledby={"#{id}-dropdown-button"}
+            >
+              <li>
+                <.link
+                  navigate={~p"/vehicle_assignments/#{vehicle_assignment}"}
+                  class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                >
+                  Details
+                </.link>
+              </li>
+              <li :if={
+                Ash.can?(
+                  {Fleetms.Vehicles.VehicleAssignment, :update},
+                  @current_user
+                )
+              }>
+                <.link
+                  patch={~p"/vehicle_assignments/#{vehicle_assignment}/edit"}
+                  class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                >
+                  Edit
+                </.link>
+              </li>
+            </ul>
+            <div
+              :if={
+                Ash.can?(
+                  {Fleetms.Vehicles.VehicleAssignment, :destroy},
+                  @current_user
+                )
+              }
+              class="py-1"
+            >
+              <.link
+                phx-click={JS.push("delete", value: %{id: vehicle_assignment.id})}
+                data-confirm="Are you sure?"
+                class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+              >
+                Delete
+              </.link>
+            </div>
+          </div>
+        </:action>
+      </.table_2>
+    </div>
+  </div>
+</section>
+
+<section class="flex items-center bg-gray-50 dark:bg-gray-900">
+  <div class="w-full max-w-screen-xl px-4 mx-auto lg:px-12">
+    <!-- Start coding here -->
+    <div class="relative overflow-hidden bg-white rounded-b-lg shadow-md dark:bg-gray-800">
+      <nav
+        class="flex flex-col items-start justify-between p-4 space-y-3 md:flex-row md:items-center md:space-y-0"
+        aria-label="Table navigation"
+      >
+        <ul class="inline-flex items-stretch -space-x-px">
+          <li :if={@paginate_sort_opts.page > 1}>
+            <.link
+              patch={
+                ~p"/vehicle_assignments?#{%{@paginate_sort_opts | page: @paginate_sort_opts.page - 1}}"
+              }
+              class="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+            >
+              <span class="sr-only">Previous</span>
+              <svg
+                class="w-5 h-5"
+                aria-hidden="true"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                  clip-rule="evenodd"
+                >
+                </path>
+              </svg>
+            </.link>
+          </li>
+          <%= for i <- (@paginate_sort_opts.page - 2)..(@paginate_sort_opts.page + 2), i > 0 and i <= @total_pages do %>
+            <li>
+              <.link
+                patch={~p"/vehicle_assignments?#{%{@paginate_sort_opts | page: i}}"}
+                aria-current={i == @paginate_sort_opts.page && "page"}
+                class={[
+                  "flex items-center justify-center px-3 py-2 text-sm leading-tight",
+                  i == @paginate_sort_opts.page &&
+                    "z-10 border text-primary-600 bg-primary-50 border-primary-300 hover:bg-primary-100 hover:text-primary-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white disabled cursor-not-allowed decoration-transparent",
+                  i != @paginate_sort_opts.page &&
+                    "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                ]}
+              >
+                <%= i %>
+              </.link>
+            </li>
+          <% end %>
+          <li :if={@has_more?}>
+            <.link
+              patch={
+                ~p"/vehicle_assignments?#{%{@paginate_sort_opts | page: @paginate_sort_opts.page + 1}}"
+              }
+              class="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+            >
+              <span class="sr-only">Next</span>
+              <svg
+                class="w-5 h-5"
+                aria-hidden="true"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clip-rule="evenodd"
+                >
+                </path>
+              </svg>
+            </.link>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</section>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="vehicle-modal"
+  show
+  max_width="max-w-5xl"
+  on_cancel={JS.navigate(~p"/vehicle_assignments")}
+>
+  <.live_component
+    module={FleetmsWeb.VehicleAssignmentLive.FormComponent}
+    id="vehicle_assignment-form-component"
+    title={@page_title}
+    action={@live_action}
+    vehicle_assignment={@vehicle_assignment}
+    current_user={@current_user}
+    tenant={@tenant}
+    patch={~p"/vehicle_assignments"}
+  />
+</.modal>
+
+<.modal
+  :if={@live_action == :filter_form}
+  id="filter-form-modal"
+  show
+  max_width="max-w-5xl"
+  phx_click_away={false}
+  on_cancel={
+    JS.navigate(
+      ~p"/vehicle_assignments?#{Map.merge(@paginate_sort_opts, @search_params) |> Map.merge(@filter_form_data)}"
+    )
+  }
+>
+  <.live_component
+    module={FleetmsWeb.VehicleAssignmentLive.FilterFormComponent}
+    id="filter-form-component"
+    title={@page_title}
+    action={@live_action}
+    paginate_sort_opts={@paginate_sort_opts}
+    search_params={@search_params}
+    filter_form_data={@filter_form_data}
+    current_user={@current_user}
+    tenant={@tenant}
+  />
+</.modal>
+<!-- drawer init and toggle -->
+<div class="text-center hidden">
+  <button
+    type="button"
+    id="vehicle_assignment-detail-drawer-button"
+    phx-hook="DrawerHook"
+    data-drawer-target="vehicle_assignment-detail-drawer"
+    data-drawer-placement="right"
+    aria-controls="vehicle_assignment-detail-drawer"
+  >
+    Show right drawer
+  </button>
+</div>
+<div
+  id="vehicle_assignment-detail-drawer"
+  class="fixed top-0 right-0 z-40 h-screen p-4 overflow-y-auto transition-transform translate-x-full bg-white w-4/5 md:w-3/5 lg:w-2/5 dark:bg-gray-800"
+  tabindex="-1"
+  aria-labelledby="drawer-right-label"
+  data-clone-attributes=""
+>
+  <.link navigate={
+    not is_nil(@vehicle_assignment) && ~p"/vehicles/#{@vehicle_assignment.vehicle}"
+  }>
+    <h5
+      :if={not is_nil(@vehicle_assignment)}
+      id="drawer-right-label"
+      class="inline-flex items-center mb-4 text-base font-semibold text-gray-700 dark:text-gray-200"
+    >
+      <img
+        src={
+          Fleetms.VehiclePhoto.url(
+            {@vehicle_assignment.vehicle.photo, @vehicle_assignment.vehicle},
+            :thumb
+          )
+        }
+        class="h-12 w-auto mr-3 rounded-md"
+        alt={@vehicle_assignment.vehicle.full_name}
+      />
+      <%= @vehicle_assignment.vehicle.full_name %> Vehicle Assignment
+    </h5>
+  </.link>
+  <button
+    type="button"
+    aria-controls="vehicle_assignment-detail-drawer"
+    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white"
+  >
+    <svg
+      class="w-3 h-3"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 14 14"
+    >
+      <path
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+      />
+    </svg>
+    <span class="sr-only">Close menu</span>
+  </button>
+
+  <section class="bg-white dark:bg-gray-900">
+    <div class="py-8 mx-auto max-w-6xl">
+      <div
+        :if={@live_action == :index and is_nil(@vehicle_assignment)}
+        role="status"
+        class="max-w-sm animate-pulse"
+      >
+        <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+        <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
+        <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
+        <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
+        <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5"></div>
+        <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+        <span class="sr-only">Loading...</span>
+      </div>
+      <div :if={@live_action == :index and not is_nil(@vehicle_assignment)} class="">
+        <div class="flex items-center space-x-4">
+          <img
+            class="mb-4 w-16 h-16 rounded-full sm:w-20 sm:h-20"
+            src={
+              Fleetms.UserProfilePhoto.url(
+                {@vehicle_assignment.assignee.user_profile.profile_photo,
+                 @vehicle_assignment.assignee.user_profile}
+              )
+            }
+            alt={"#{@vehicle_assignment.assignee.user_profile.first_name} #{@vehicle_assignment.assignee.user_profile.last_name}"}
+          />
+          <div>
+            <h2 class="flex items-center mb-2 text-xl font-bold leading-none text-gray-900 sm:text-2xl dark:text-white">
+              <%= @vehicle_assignment.assignee.user_profile.first_name %> <%= @vehicle_assignment.assignee.user_profile.last_name %>
+            </h2>
+            <.badge :for={role <- @vehicle_assignment.assignee.roles} label={role} />
+          </div>
+        </div>
+        <div>
+          <dl class="-my-4 divide-y divide-gray-200 dark:divide-gray-600">
+            <div class="flex gap-4 py-4 text-sm leading-6 sm:gap-8">
+              <dt class="w-1/4 font-semibold flex-none text-gray-900 dark:text-white">
+                Status
+              </dt>
+              <dd class="text-gray-600 dark:text-gray-300">
+                <%= cond do %>
+                  <% @vehicle_assignment.status == "Upcoming" -> %>
+                    <.badge kind={:info} label={@vehicle_assignment.status} />
+                  <% @vehicle_assignment.status == "In-progress" -> %>
+                    <.badge kind={:warning} label={@vehicle_assignment.status} />
+                  <% @vehicle_assignment.status == "Past" -> %>
+                    <.badge kind={:success} label={@vehicle_assignment.status} />
+                <% end %>
+              </dd>
+            </div>
+
+            <div class="flex gap-4 py-4 text-sm leading-6 sm:gap-8">
+              <dt class="w-1/4 font-semibold flex-none text-gray-900 dark:text-white">
+                Start Date
+              </dt>
+              <dd
+                id="start_datetime-item"
+                phx-hook="LocalTime"
+                data-exclude-time="true"
+                class="text-gray-600 dark:text-gray-300"
+              >
+                <%= @vehicle_assignment.start_datetime %>
+              </dd>
+            </div>
+            <div class="flex gap-4 py-4 text-sm leading-6 sm:gap-8">
+              <dt class="w-1/4 font-semibold flex-none text-gray-900 dark:text-white">
+                End Date
+              </dt>
+              <dd
+                id="end_datetime-item"
+                phx-hook="LocalTime"
+                data-exclude-time="true"
+                class="text-gray-600 dark:text-gray-300"
+              >
+                <%= @vehicle_assignment.end_datetime %>
+              </dd>
+            </div>
+            <div class="flex gap-4 py-4 text-sm leading-6 sm:gap-8">
+              <dt class="w-1/4 font-semibold flex-none text-gray-900 dark:text-white">
+                Duration
+              </dt>
+              <dd class="text-gray-600 dark:text-gray-300">
+                <.badge
+                  kind={:info}
+                  label={
+                    Fleetms.Utils.DateTimeHelper.humanize_duration(
+                      @vehicle_assignment.start_datetime,
+                      @vehicle_assignment.end_datetime
+                    )
+                  }
+                />
+              </dd>
+            </div>
+            <div class="flex gap-4 py-4 text-sm leading-6 sm:gap-8">
+              <dt class="w-1/4 font-semibold flex-none text-gray-900 dark:text-white">
+                Start Mileage
+              </dt>
+              <dd class="text-gray-600 dark:text-gray-300">
+                <%= @vehicle_assignment.start_mileage %>
+              </dd>
+            </div>
+            <div class="flex gap-4 py-4 text-sm leading-6 sm:gap-8">
+              <dt class="w-1/4 font-semibold flex-none text-gray-900 dark:text-white">
+                End Mileage
+              </dt>
+              <dd class="text-gray-600 dark:text-gray-300">
+                <%= @vehicle_assignment.end_mileage %>
+              </dd>
+            </div>
+            <div class="flex gap-4 py-4 text-sm leading-6 sm:gap-8">
+              <dt class="w-1/4 font-semibold flex-none text-gray-900 dark:text-white">
+                Comments
+              </dt>
+              <dd class="text-gray-600 dark:text-gray-300">
+                <%= @vehicle_assignment.comments %>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

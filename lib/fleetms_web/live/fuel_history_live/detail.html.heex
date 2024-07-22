@@ -1,0 +1,196 @@
+<nav class="p-4 lg:mt-1.5 flex" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <.link
+        navigate={~p"/"}
+        class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
+      >
+        <svg
+          class="w-3 h-3 mr-2.5"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
+        </svg>
+        Home
+      </.link>
+    </li>
+    <li aria-current="page">
+      <.link navigate={~p"/fuel_histories"}>
+        <div class="flex items-center">
+          <svg
+            class="w-3 h-3 text-gray-400 mx-1"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 6 10"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 9 4-4-4-4"
+            />
+          </svg>
+          <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2 dark:text-gray-400">
+            Fuel History
+          </span>
+        </div>
+      </.link>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg
+          class="w-3 h-3 text-gray-400 mx-1"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 6 10"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m1 9 4-4-4-4"
+          />
+        </svg>
+        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">
+          <%= @fuel_history.vehicle.full_name %> Refuel Entry
+        </span>
+      </div>
+    </li>
+  </ol>
+</nav>
+
+<div class="mx-2">
+  <div class="flex justify-between mb-4 rounded-t sm:mb-5">
+    <div class="flex items-center shadow-sm rounded-md bg-white dark:bg-gray-800 p-2">
+      <img
+        class="w-14 h-14 mr-2 rounded-md sm:mr-4"
+        src={
+          Fleetms.VehiclePhoto.url({@fuel_history.vehicle.photo, @fuel_history.vehicle}, :thumb)
+        }
+        alt={@fuel_history.vehicle.full_name}
+      />
+      <div>
+        <h3 class="text-lg font-bold text-gray-900 md:text-xl dark:text-white">
+          <%= @fuel_history.vehicle.full_name %> Fuel History
+        </h3>
+        <p class="text-base font-light text-gray-500 dark:text-gray-400">
+          Refueled By:
+          <.badge
+            :if={not is_nil(@fuel_history.refueled_by)}
+            label={@fuel_history.refueled_by.user_profile.full_name}
+          />
+        </p>
+      </div>
+    </div>
+    <div :if={
+      Ash.can?(
+        {@fuel_history, :update},
+        @current_user
+      )
+    }>
+      <.link navigate={~p"/fuel_histories/#{@fuel_history}/detail/edit"}>
+        <.button type="button" class="btn-sm mb-0">
+          <i class="fa-solid fa-pen-to-square text-sm" aria-hidden="true"></i> Edit
+        </.button>
+      </.link>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-2">
+    <div class="bg-white dark:bg-gray-800 shadow-md rounded-md p-4">
+      <h4 class="text-lg md:text-2xl text-gray-900 dark:text-white pb-2">
+        Details
+      </h4>
+
+      <.list>
+        <:item title="Odometer Reading">
+          <.badge kind={:primary} label={@fuel_history.odometer_reading} />km
+        </:item>
+
+        <:item title="Date and Time of Refuel">
+          <time id="refuel-datetime" class="invisible" phx-hook="LocalTime">
+            <%= @fuel_history.refuel_datetime %>
+          </time>
+        </:item>
+        <:item title="Refuel Quantity(Litres)">
+          <%= @fuel_history.refuel_quantity %>
+        </:item>
+        <:item title="Refuel Cost">
+          <%= @fuel_history.refuel_cost %>
+        </:item>
+        <:item title="Refuel Location">
+          <%= @fuel_history.refuel_location %>
+        </:item>
+        <:item title="Fuel Type">
+          <%= @fuel_history.fuel_type %>
+        </:item>
+        <:item title="Payment Method">
+          <%= @fuel_history.payment_method %>
+        </:item>
+        <:item title="Notes">
+          <%= @fuel_history.notes %>
+        </:item>
+      </.list>
+    </div>
+    <div class="shadow-md rounded-md bg-white dark:bg-gray-800 p-4">
+      <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+        <li class="mr-2">
+          <.tab id="photos-tab" active={true} label="Photos" />
+        </li>
+        <li class="mr-2">
+          <.tab href="#" id="documents-tab" active={false} label="Documents" />
+        </li>
+      </ul>
+
+      <div class="grid gap-4 mt-2">
+        <div
+          :if={
+            not is_nil(@fuel_history.fuel_history_photos) and
+              @fuel_history.fuel_history_photos != []
+          }
+          class="grid grid-cols-5 gap-4 pswp-gallery"
+          id="fuel_history-photos-gallery"
+          phx-hook="photoswipeHook"
+        >
+          <a
+            :for={photo <- @fuel_history.fuel_history_photos}
+            href={Fleetms.FuelHistoryPhoto.url({photo.filename, @fuel_history}, :original)}
+            data-pswp-width="2500"
+            data-pswp-height="1666"
+          >
+            <img
+              class="h-auto max-w-full rounded-lg"
+              src={Fleetms.FuelHistoryPhoto.url({photo.filename, @fuel_history}, :thumb)}
+              alt=""
+            />
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<.modal
+  :if={@live_action == :edit}
+  id="fuel_history-modal"
+  show
+  on_cancel={JS.navigate(~p"/fuel_histories/#{@fuel_history}")}
+>
+  <.live_component
+    module={FleetmsWeb.FuelHistoryLive.FormComponent}
+    id={@fuel_history.id}
+    title={@page_title}
+    action={@live_action}
+    fuel_history={@fuel_history}
+    current_user={@current_user}
+    tenant={@tenant}
+    patch={~p"/fuel_histories/#{@fuel_history}"}
+  />
+</.modal>

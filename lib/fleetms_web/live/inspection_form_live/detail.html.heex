@@ -1,0 +1,591 @@
+<nav class="p-4 lg:mt-1.5 flex" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a
+        href="#"
+        class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
+      >
+        <svg
+          class="w-3 h-3 mr-2.5"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
+        </svg>
+        Home
+      </a>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg
+          class="w-3 h-3 text-gray-400 mx-1"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 6 10"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m1 9 4-4-4-4"
+          />
+        </svg>
+        <.link navigate={~p"/inspection_forms/#{@inspection_form}"}>
+          <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2 dark:text-gray-400">
+            Inspection Forms
+          </span>
+        </.link>
+      </div>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg
+          class="w-3 h-3 text-gray-400 mx-1"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 6 10"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m1 9 4-4-4-4"
+          />
+        </svg>
+        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">
+          <%= @inspection_form.title %>
+        </span>
+      </div>
+    </li>
+  </ol>
+</nav>
+
+<div class="mx-2">
+  <div class="flex justify-between mb-4 rounded-t sm:mb-5">
+    <div>
+      <h3 class="text-lg font-bold text-gray-900 md:text-xl dark:text-white">
+        <%= @inspection_form.title %> Inspection Form
+      </h3>
+      <p class="text-base font-light text-gray-500 dark:text-gray-400">
+        <%= render_value(@inspection_form.labels) %>
+      </p>
+    </div>
+  </div>
+
+  <div class="border-b border-gray-200 dark:border-gray-700">
+    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400">
+      <li class="mr-2">
+        <.tab
+          id="form_details_tab"
+          active={@live_action == :detail}
+          patch={~p"/inspection_forms/#{@inspection_form}"}
+          label="Form Details"
+          icon_class="fa-regular fa-rectangle-list w-6"
+        />
+      </li>
+      <li class="mr-2">
+        <.tab
+          id="form_details_tab"
+          active={@live_action == :preview}
+          patch={~p"/inspection_forms/#{@inspection_form}"}
+          label="Preview Form"
+          icon_class="fa-regular fa-eye w-6"
+        />
+      </li>
+      <li class="mr-2">
+        <.tab
+          id="form_details_tab"
+          active={@live_action == :schedule}
+          patch={~p"/inspection_forms/#{@inspection_form}"}
+          label="Schedules"
+          icon_class="fa-regular fa-calendar-days w-6"
+        />
+      </li>
+    </ul>
+  </div>
+  <%= if Ash.can?({Fleetms.Inspection.InspectionForm, :update}, @current_user) do %>
+    <.simple_form for={@form} id="inspection-form-form" phx-change="validate" phx-submit="save">
+      <div class="py-2 px-2">
+        <.input field={@form[:title]} type="text" label="Title" />
+        <div class="mt-2">
+          <.button phx-loading="Saving ...">
+            Save
+          </.button>
+        </div>
+      </div>
+
+      <div class="container py-2 px-2">
+        <fieldset class="border-2 border-gray-300 dark:border-gray-600 px-2 rounded-md py-3 mb-2">
+          <h3 class="text-xl md:text-2xl text-gray-800 dark:text-gray-100 font-semibold">
+            Pass/Fail Inputs
+          </h3>
+          <div
+            id="pass-fail-inputs-accordion"
+            data-accordion="collapse"
+            data-clone-attributes=""
+            data-active-classes="bg-primary-100 dark:bg-gray-800 text-primary-500 dark:text-white"
+          >
+            <.inputs_for :let={radio_input_form} field={@form[:radio_inputs]}>
+              <h2 id={["accordion-heading-", radio_input_form.id]}>
+                <button
+                  type="button"
+                  class={[
+                    "flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-b-0 border-gray-200 focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-800 dark:border-gray-700 dark:text-gray-400 hover:bg-blue-100 dark:hover:bg-gray-800",
+                    radio_input_form.params["_persistent_id"] == "0" && "rounded-t-xl"
+                  ]}
+                  data-accordion-target={["#accordion-body-", radio_input_form.id]}
+                  aria-expanded="false"
+                  data-clone-attributes=""
+                  aria-controls={["accordion-body-", radio_input_form.id]}
+                >
+                  <span>
+                    <%= case AshPhoenix.Form.value(radio_input_form, :name) do %>
+                      <% nil -> %>
+                        New Pass/Fail Field
+                      <% value -> %>
+                        <%= value %>
+                    <% end %>
+                  </span>
+                  <svg
+                    data-accordion-icon
+                    class="w-3 h-3 rotate-180 shrink-0"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 10 6"
+                  >
+                    <path
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5 5 1 1 5"
+                    />
+                  </svg>
+                </button>
+              </h2>
+              <div
+                id={["accordion-body-", radio_input_form.id]}
+                class="hidden p-4"
+                data-clone-attributes=""
+                aria-labelledby={["accordion-heading-", radio_input_form.id]}
+              >
+                <div class="grid gap-4 mb-4 sm:grid-cols-2">
+                  <.input field={radio_input_form[:name]} type="text" label="Name" />
+                  <.input
+                    field={radio_input_form[:pass_label]}
+                    type="text"
+                    label="Pass label"
+                  />
+                  <.input
+                    field={radio_input_form[:fail_label]}
+                    type="text"
+                    label="Fail label"
+                  />
+                  <.input
+                    field={radio_input_form[:help_text]}
+                    type="textarea"
+                    label="Help text"
+                  />
+                </div>
+                <div class="grid gap-4 mb-4 sm:grid-cols-2">
+                  <.input
+                    field={radio_input_form[:allow_na]}
+                    type="checkbox"
+                    label="Allow Not Applicable (N/A)"
+                  />
+                  <.input
+                    field={radio_input_form[:comment_required_on_pass]}
+                    type="checkbox"
+                    label="Comment or photo required on pass"
+                  />
+                  <.input
+                    field={radio_input_form[:comment_required_on_fail]}
+                    type="checkbox"
+                    label="Comment or photo required on fail"
+                  />
+                  <.button
+                    kind={:danger}
+                    type="button"
+                    phx-click="remove_form"
+                    phx-value-path={radio_input_form.name}
+                  >
+                    Delete
+                  </.button>
+                </div>
+              </div>
+            </.inputs_for>
+          </div>
+
+          <div class="py-2">
+            <.button
+              type="button"
+              phx-click="add_form"
+              phx-value-path={@form[:radio_inputs].name}
+            >
+              Add Pass/Fail Field
+            </.button>
+          </div>
+        </fieldset>
+
+        <fieldset class="border-2 border-gray-300 dark:border-gray-600 px-2 rounded-md py-3 mb-2">
+          <h3 class="text-xl md:text-2xl text-gray-800 dark:text-gray-100 font-semibold">
+            Dropdown Inputs
+          </h3>
+          <div
+            id="dropdown-inputs-accordion"
+            data-accordion="collapse"
+            data-clone-attributes=""
+            data-active-classes="bg-primary-100 dark:bg-gray-800 text-primary-500 dark:text-white"
+          >
+            <.inputs_for :let={dropdown_input_form} field={@form[:dropdown_inputs]}>
+              <h2 id={["accordion-heading-", dropdown_input_form.id]}>
+                <button
+                  type="button"
+                  class={[
+                    "flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-b-0 border-gray-200 focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-800 dark:border-gray-700 dark:text-gray-400 hover:bg-blue-100 dark:hover:bg-gray-800",
+                    dropdown_input_form.params["_persistent_id"] == "0" && "rounded-t-xl"
+                  ]}
+                  data-accordion-target={["#accordion-body-", dropdown_input_form.id]}
+                  aria-expanded="false"
+                  data-clone-attributes=""
+                  aria-controls={["accordion-body-", dropdown_input_form.id]}
+                >
+                  <span>
+                    <%= case AshPhoenix.Form.value(dropdown_input_form, :name) do %>
+                      <% nil -> %>
+                        New Dropdown Field
+                      <% value -> %>
+                        <%= value %>
+                    <% end %>
+                  </span>
+                  <svg
+                    data-accordion-icon
+                    class="w-3 h-3 rotate-180 shrink-0"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 10 6"
+                  >
+                    <path
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5 5 1 1 5"
+                    />
+                  </svg>
+                </button>
+              </h2>
+              <div
+                id={["accordion-body-", dropdown_input_form.id]}
+                class="hidden p-4"
+                data-clone-attributes=""
+                aria-labelledby={["accordion-heading-", dropdown_input_form.id]}
+              >
+                <div class="grid gap-4 mb-4 sm:grid-cols-2">
+                  <.input field={dropdown_input_form[:name]} type="text" label="Name" />
+                  <.input
+                    field={dropdown_input_form[:help_text]}
+                    type="textarea"
+                    label="Help text"
+                  />
+
+                  <.input
+                    field={dropdown_input_form[:comment_required_on_pass]}
+                    type="checkbox"
+                    label="Comment or photo required on pass"
+                  />
+                  <.input
+                    field={dropdown_input_form[:comment_required_on_fail]}
+                    type="checkbox"
+                    label="Comment or photo required on fail"
+                  />
+                  <div class="mt-1">
+                    <.button
+                      kind={:danger}
+                      type="button"
+                      phx-click="remove_form"
+                      phx-value-path={dropdown_input_form.name}
+                    >
+                      Delete
+                    </.button>
+                  </div>
+                </div>
+                <div class="">
+                  <h5 class="mb-1 text-gray-900 dark:text-gray-100">Options</h5>
+                  <.inputs_for :let={option} field={dropdown_input_form[:options]}>
+                    <div class="grid gap-4 mb-4 sm:grid-cols-2">
+                      <div>
+                        <.input field={option[:label]} type="text" />
+                      </div>
+                      <div>
+                        <.input
+                          field={option[:fail_if_selected]}
+                          type="checkbox"
+                          label="Consider Failed if Selected"
+                        />
+                      </div>
+                      <div>
+                        <.button
+                          kind={:danger}
+                          type="button"
+                          phx-click="remove_form"
+                          class="btn-sm mt-1"
+                          phx-value-path={option.name}
+                        >
+                          Delete
+                        </.button>
+                      </div>
+                    </div>
+                  </.inputs_for>
+                </div>
+                <.button
+                  type="button"
+                  phx-click="add_form"
+                  class="btn-sm mt-1"
+                  phx-value-path={dropdown_input_form[:options].name}
+                >
+                  Add Option
+                </.button>
+              </div>
+            </.inputs_for>
+          </div>
+
+          <div class="py-2">
+            <.button
+              type="button"
+              phx-click="add_form"
+              phx-value-path={@form[:dropdown_inputs].name}
+            >
+              Add Dropdown Input Field
+            </.button>
+          </div>
+        </fieldset>
+
+        <fieldset class="border-2 border-gray-300 dark:border-gray-600 px-2 rounded-md py-3 mb-2">
+          <h3 class="text-xl md:text-2xl text-gray-800 dark:text-gray-100 font-semibold">
+            Number Inputs
+          </h3>
+          <div
+            id="number-inputs-accordion"
+            data-accordion="collapse"
+            data-clone-attributes=""
+            data-active-classes="bg-primary-100 dark:bg-gray-800 text-primary-500 dark:text-white"
+          >
+            <.inputs_for :let={number_input_form} field={@form[:number_inputs]}>
+              <h2 id={["accordion-heading-", number_input_form.id]}>
+                <button
+                  type="button"
+                  class={[
+                    "flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-b-0 border-gray-200 focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-800 dark:border-gray-700 dark:text-gray-400 hover:bg-blue-100 dark:hover:bg-gray-800",
+                    number_input_form.params["_persistent_id"] == "0" && "rounded-t-xl"
+                  ]}
+                  data-accordion-target={["#accordion-body-", number_input_form.id]}
+                  aria-expanded="false"
+                  data-clone-attributes=""
+                  aria-controls={["accordion-body-", number_input_form.id]}
+                >
+                  <span>
+                    <%= case AshPhoenix.Form.value(number_input_form, :name) do %>
+                      <% nil -> %>
+                        New Number Field
+                      <% value -> %>
+                        <%= value %>
+                    <% end %>
+                  </span>
+                  <svg
+                    data-accordion-icon
+                    class="w-3 h-3 rotate-180 shrink-0"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 10 6"
+                  >
+                    <path
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5 5 1 1 5"
+                    />
+                  </svg>
+                </button>
+              </h2>
+              <div
+                id={["accordion-body-", number_input_form.id]}
+                class="hidden p-4"
+                data-clone-attributes=""
+                aria-labelledby={["accordion-heading-", number_input_form.id]}
+              >
+                <div class="grid gap-4 mb-4 sm:grid-cols-2">
+                  <.input field={number_input_form[:name]} type="text" label="Name" />
+                  <.input field={number_input_form[:help_text]} type="textarea" label="Help text" />
+                  <.input
+                    field={number_input_form[:comment_required_on_pass]}
+                    type="checkbox"
+                    label="Comment or photo required on pass"
+                  />
+                  <.input
+                    field={number_input_form[:comment_required_on_fail]}
+                    type="checkbox"
+                    label="Comment or photo required on fail"
+                  />
+                  <div class="mt-1">
+                    <.button
+                      kind={:danger}
+                      type="button"
+                      phx-click="remove_form"
+                      phx-value-path={number_input_form.name}
+                    >
+                      Delete
+                    </.button>
+                  </div>
+                </div>
+                <div class="grid gap-4 mb-4 sm:grid-cols-2">
+                  <.input
+                    field={number_input_form[:pass_range_min]}
+                    type="number"
+                    step="any"
+                    label="Pass Range Minimun"
+                  />
+                  <.input
+                    field={number_input_form[:pass_range_max]}
+                    type="number"
+                    label="Pass Range Maximum"
+                  />
+                </div>
+              </div>
+            </.inputs_for>
+          </div>
+
+          <div class="py-2">
+            <.button
+              type="button"
+              phx-click="add_form"
+              phx-value-path={@form[:number_inputs].name}
+            >
+              Add Number Input Field
+            </.button>
+          </div>
+        </fieldset>
+
+        <fieldset class="border-2 border-gray-300 dark:border-gray-600 px-2 rounded-md py-3 mb-2">
+          <h3 class="text-xl md:text-2xl text-gray-800 dark:text-gray-100 font-semibold">
+            Signature Input
+          </h3>
+          <div
+            id="signature-inputs-accordion"
+            data-accordion="collapse"
+            data-clone-attributes=""
+            data-active-classes="bg-primary-100 dark:bg-gray-800 text-primary-500 dark:text-white"
+          >
+            <.inputs_for :let={signature_input_form} field={@form[:signature_inputs]}>
+              <h2 id={["accordion-heading-", signature_input_form.id]}>
+                <button
+                  type="button"
+                  class={[
+                    "flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-b-0 border-gray-200 focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-800 dark:border-gray-700 dark:text-gray-400 hover:bg-blue-100 dark:hover:bg-gray-800",
+                    signature_input_form.params["_persistent_id"] == "0" && "rounded-t-xl"
+                  ]}
+                  data-accordion-target={["#accordion-body-", signature_input_form.id]}
+                  aria-expanded="false"
+                  data-clone-attributes=""
+                  aria-controls={["accordion-body-", signature_input_form.id]}
+                >
+                  <span>
+                    <%= case AshPhoenix.Form.value(signature_input_form, :name) do %>
+                      <% nil -> %>
+                        New Signature Field
+                      <% value -> %>
+                        <%= value %>
+                    <% end %>
+                  </span>
+                  <svg
+                    data-accordion-icon
+                    class="w-3 h-3 rotate-180 shrink-0"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 10 6"
+                  >
+                    <path
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5 5 1 1 5"
+                    />
+                  </svg>
+                </button>
+              </h2>
+              <div
+                id={["accordion-body-", signature_input_form.id]}
+                class="hidden p-4"
+                data-clone-attributes=""
+                aria-labelledby={["accordion-heading-", signature_input_form.id]}
+              >
+                <div class="grid gap-4 mb-4 sm:grid-cols-2">
+                  <.input field={signature_input_form[:name]} type="text" label="Name" />
+                  <.input
+                    field={signature_input_form[:help_text]}
+                    type="textarea"
+                    label="Help text"
+                  />
+                  <div class="mt-1">
+                    <.button
+                      kind={:danger}
+                      type="button"
+                      phx-click="remove_form"
+                      phx-value-path={signature_input_form.name}
+                    >
+                      Delete
+                    </.button>
+                  </div>
+                </div>
+                <div class="grid gap-4 mb-4 sm:grid-cols-2">
+                  <.button
+                    kind={:danger}
+                    type="button"
+                    phx-click="remove_form"
+                    phx-value-path={signature_input_form.name}
+                  >
+                    Delete
+                  </.button>
+                </div>
+              </div>
+            </.inputs_for>
+          </div>
+
+          <div class="py-2">
+            <.button
+              type="button"
+              phx-click="add_form"
+              phx-value-path={@form[:signature_inputs].name}
+            >
+              Add Signature Field
+            </.button>
+          </div>
+        </fieldset>
+
+        <.button phx-loading="Saving ...">
+          Save
+        </.button>
+      </div>
+    </.simple_form>
+  <% else %>
+    <div class="w-full md:w-3/5">
+      <.alert kind={:error}>
+        <h3 class="text-xl ">
+          You are not authorized to update Inspection Forms
+        </h3>
+      </.alert>
+    </div>
+  <% end %>
+</div>

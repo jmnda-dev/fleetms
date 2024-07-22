@@ -1,16 +1,19 @@
 <.flash_group flash={@flash} />
 <.navbar current_user={@current_user} />
-
-<div class="flex pt-16 overflow-hidden bg-gray-50 dark:bg-gray-900">
-  <.sidebar current_user={@current_user} />
-  <div class="hidden fixed inset-0 z-10 bg-gray-900/50 dark:bg-gray-900/90" id="sidebarBackdrop">
-  </div>
+<div
+  class="flex overflow-hidden pt-16 bg-gray-50 dark:bg-gray-900"
+  phx-hook="dispatchPhxLoadingStopEvent"
+  id="outer-container"
+>
+  <.sidebar active_link={@active_link} current_user={@current_user} />
   <div
     id="main-content"
-    class="relative w-full h-full overflow-y-auto bg-gray-50 lg:ml-64 dark:bg-gray-900"
+    class="overflow-y-auto relative w-full h-full bg-gray-50 lg:ml-64 dark:bg-gray-900"
   >
     <main>
       <%= @inner_content %>
+
+      <.footer />
     </main>
   </div>
 </div>

@@ -1,0 +1,715 @@
+<nav class="p-4 lg:mt-1.5 flex" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <.link
+        navigate={~p"/"}
+        class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
+      >
+        <svg
+          class="w-3 h-3 mr-2.5"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
+        </svg>
+        Home
+      </.link>
+    </li>
+    <li aria-current="page">
+      <.link navigate={~p"/vehicles"}>
+        <div class="flex items-center">
+          <svg
+            class="w-3 h-3 text-gray-400 mx-1"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 6 10"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 9 4-4-4-4"
+            />
+          </svg>
+          <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2 dark:text-gray-400">
+            Vehicles
+          </span>
+        </div>
+      </.link>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg
+          class="w-3 h-3 text-gray-400 mx-1"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 6 10"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m1 9 4-4-4-4"
+          />
+        </svg>
+        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">
+          <%= @vehicle.full_name %>
+        </span>
+      </div>
+    </li>
+  </ol>
+</nav>
+
+<section class="mx-2">
+  <div class="flex justify-between mb-4 rounded-t sm:mb-5">
+    <div class="flex items-center shadow-sm rounded-md bg-white dark:bg-gray-800 p-2">
+      <img
+        class="w-14 h-14 mr-2 rounded-md sm:mr-4"
+        src={Fleetms.VehiclePhoto.url({@vehicle.photo, @vehicle}, :thumb)}
+        alt={@vehicle.full_name}
+      />
+      <div>
+        <h3 class="text-lg font-bold text-gray-900 md:text-xl dark:text-white">
+          <%= @vehicle.full_name %>
+        </h3>
+        <p class="text-base font-light text-gray-500 dark:text-gray-400">
+          Status: <.badge label={@vehicle.status} />
+        </p>
+      </div>
+    </div>
+    <div>
+      <.link
+        :if={Ash.can?({@vehicle, :update}, @current_user)}
+        navigate={~p"/vehicles/#{@vehicle}/detail/edit"}
+      >
+        <.button type="button" class="btn-sm mb-0">
+          <i class="fa-solid fa-pen-to-square text-sm" aria-hidden="true"></i> Edit
+        </.button>
+      </.link>
+
+      <.button
+        :if={Ash.can?({@vehicle, :update}, @current_user)}
+        type="button"
+        class="btn-sm mb-0"
+        kind={:info}
+      >
+        <i class="fa-solid fa-pen-to-square text-sm" aria-hidden="true"></i> Update Status
+      </.button>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-2">
+    <div class="bg-white dark:bg-gray-800 shadow-md rounded-md p-4">
+      <.list>
+        <:item title="Status">
+          <.badge kind={:info} label={@vehicle.status} />
+        </:item>
+
+        <:item title="Mileage">
+          <%= @vehicle.mileage %>km
+        </:item>
+        <:item title="License Plate">
+          <%= @vehicle.license_plate %>
+        </:item>
+        <:item title="
+            Vehicle Category"><%= @vehicle.category %></:item>
+        <:item title="Purchase Price">
+          <%= @vehicle.purchase_price %>
+        </:item>
+        <:item title="Purchase Date">
+          <%= @vehicle.purchase_date %>
+        </:item>
+      </.list>
+    </div>
+    <div class="shadow-md rounded-md bg-white dark:bg-gray-800 p-4">
+      <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
+        <ul
+          class="flex flex-wrap -mb-px text-sm font-medium text-center"
+          id="default-tab"
+          data-tabs-toggle="#default-tab-content"
+          role="tablist"
+        >
+          <li class="me-2" role="presentation">
+            <button
+              class="inline-block p-4 border-b-2 rounded-t-lg"
+              id="photos-tab"
+              data-clone-attributes=""
+              data-tabs-target="#photos-tab-content"
+              type="button"
+              role="tab"
+              aria-controls="photos-tab-content"
+              aria-selected="false"
+            >
+              Photos
+            </button>
+          </li>
+          <li class="me-2" role="presentation">
+            <button
+              class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
+              id="documents-tab"
+              data-clone-attributes=""
+              data-tabs-target="#documents-tab-content"
+              type="button"
+              role="tab"
+              aria-controls="documents-tab-content"
+              aria-selected="false"
+            >
+              Documents
+            </button>
+          </li>
+        </ul>
+      </div>
+      <div id="default-tab-content">
+        <div
+          class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
+          data-clone-attributes=""
+          id="photos-tab-content"
+          role="tabpanel"
+          aria-labelledby="photos-tab"
+        >
+          <div class="grid gap-4 mt-2">
+            <div
+              :if={not is_nil(@vehicle.photos) and @vehicle.photos != []}
+              class="grid grid-cols-5 gap-4 pswp-gallery"
+              id="vehicle-photos-gallery"
+              phx-hook="photoswipeHook"
+            >
+              <a
+                :for={photo <- @vehicle.photos}
+                href={Fleetms.VehiclePhoto.url({photo.filename, @vehicle}, :original)}
+                data-pswp-width="2500"
+                data-pswp-height="1666"
+              >
+                <img
+                  class="h-auto max-w-full rounded-lg"
+                  src={Fleetms.VehiclePhoto.url({photo.filename, @vehicle}, :thumb)}
+                  alt=""
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+        <div
+          class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
+          data-clone-attributes=""
+          id="documents-tab-content"
+          role="tabpanel"
+          aria-labelledby="documents-tab"
+        >
+          <div
+            :for={document <- @vehicle.documents}
+            :if={not is_nil(@vehicle.documents) and @vehicle.documents != []}
+            class="flex items-center p-3 mb-3.5 border border-gray-200 dark:border-gray-700 rounded-lg"
+          >
+            <div class="flex items-center justify-center w-10 h-10 mr-3 rounded-lg bg-primary-100 dark:bg-primary-900">
+              <svg
+                class="w-5 h-5 text-primary-600 lg:w-6 lg:h-6 dark:text-primary-300"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  clip-rule="evenodd"
+                  fill-rule="evenodd"
+                  d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625zM7.5 15a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 15zm.75 2.25a.75.75 0 000 1.5H12a.75.75 0 000-1.5H8.25z"
+                >
+                </path>
+                <path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z">
+                </path>
+              </svg>
+            </div>
+            <div class="mr-4">
+              <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                <%= document.filename %>
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                <%= document.file_type %>, 2.3 MB
+              </p>
+            </div>
+            <div class="flex items-center ml-auto">
+              <button type="button" class="p-2 rounded hover:bg-gray-100">
+                <svg
+                  class="w-5 h-5 text-gray-500 dark:text-gray-400"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    clip-rule="evenodd"
+                    fill-rule="evenodd"
+                    d="M12 2.25a.75.75 0 01.75.75v11.69l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06l3.22 3.22V3a.75.75 0 01.75-.75zm-9 13.5a.75.75 0 01.75.75v2.25a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5V16.5a.75.75 0 011.5 0v2.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V16.5a.75.75 0 01.75-.75z"
+                  >
+                  </path>
+                </svg>
+                <span class="sr-only">Download</span>
+              </button>
+              <button type="button" class="p-2 rounded hover:bg-gray-100">
+                <svg
+                  class="w-5 h-5 text-gray-500 dark:text-gray-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z">
+                  </path>
+                </svg>
+                <span class="sr-only">Actions</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="bg-white dark:bg-gray-900 mx-2">
+  <div class="px-3 mt-2 bg-white dark:bg-gray-800 shadow-md rounded-md">
+    <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
+      <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400">
+        <li class="mr-2">
+          <.tab
+            active={@live_action == :detail}
+            patch={~p"/vehicles/#{@vehicle}"}
+            id="full-vehicle-details-tab"
+            label="Full Details"
+            icon_class="fa-solid fa-list-check mr-1 text-md"
+          />
+        </li>
+        <li class="mr-2">
+          <.tab
+            patch={~p"/vehicles/#{@vehicle}/detail/issues"}
+            active={@live_action == :vehicle_issues}
+            id="vehicle-issues-tab"
+            label="Issues"
+            icon_class="fa-solid fa-circle-exclamation mr-1"
+          />
+        </li>
+        <li class="mr-2">
+          <.tab
+            patch={~p"/vehicles/#{@vehicle}/detail/service_reminders"}
+            active={@live_action == :vehicle_service_reminders}
+            id="vehicle-service_reminders-tab"
+            label="Service Reminders"
+            icon_class="fa-solid fa-bell mr-1"
+          />
+        </li>
+        <li class="mr-2">
+          <.tab
+            patch={~p"/vehicles/#{@vehicle}/detail/work_orders"}
+            active={@live_action == :vehicle_work_orders}
+            id="vehicle-work_orders-tab"
+            label="Work Orders"
+            icon_class="fa-solid fa-file-circle-check mr-1"
+          />
+        </li>
+        <li class="mr-2">
+          <.tab
+            patch={~p"/vehicles/#{@vehicle}/detail/fuel_histories"}
+            active={@live_action == :vehicle_fuel_histories}
+            id="vehicle-fuel_histories-tab"
+            label="Fuel History"
+            icon_class="fa-solid fa-gas-pump mr-1"
+          />
+        </li>
+      </ul>
+    </div>
+    <div id="default2-tab-content">
+      <div :if={@live_action == :detail} role="tabpanel" aria-labelledby="details-tab">
+        <div id="accordion-collapse" data-accordion="collapse">
+          <h2 id="accordion-collapse-heading-1">
+            <button
+              type="button"
+              class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-b-0 border-gray-200 rounded-t-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+              data-accordion-target="#accordion-collapse-body-1"
+              aria-expanded="true"
+              aria-controls="accordion-collapse-body-1"
+            >
+              <span>General Information</span>
+              <svg
+                data-accordion-icon
+                class="w-3 h-3 rotate-180 shrink-0"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 10 6"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5 5 1 1 5"
+                />
+              </svg>
+            </button>
+          </h2>
+          <div
+            id="accordion-collapse-body-1"
+            class="hidden"
+            aria-labelledby="accordion-collapse-heading-1"
+          >
+            <div class="p-5 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+              <.list>
+                <:item title="Make">
+                  <%= @vehicle.vehicle_make %>
+                </:item>
+                <:item title="Model">
+                  <%= @vehicle.model %>
+                </:item>
+                <:item title="Model Code">
+                  <%= @vehicle.model_code %>
+                </:item>
+                <:item title="Year">
+                  <%= @vehicle.year %>
+                </:item>
+                <:item title="Category">
+                  <%= @vehicle.type %>
+                </:item>
+                <:item title="Vehicle Type">
+                  <%= @vehicle.type %>
+                </:item>
+                <:item title="Body Style">
+                  <%= @vehicle.body_style %>
+                </:item>
+                <:item title="License Plate">
+                  <%= @vehicle.license_plate %>
+                </:item>
+                <:item title="VIN">
+                  <%= @vehicle.vin %>
+                </:item>
+                <:item title="Chassis Number">
+                  <%= @vehicle.chassis_number %>
+                </:item>
+                <:item title="Color">
+                  <%= @vehicle.color %>
+                </:item>
+                <:item title="Base Price">
+                  <%= @vehicle.base_price %>
+                </:item>
+                <:item title="Purchase Price">
+                  <%= @vehicle.purchase_price %>
+                </:item>
+                <:item title="Purchase Date">
+                  <%= @vehicle.purchase_date %>
+                </:item>
+              </.list>
+
+              <div class="text-lg text-center text-gray-900 md:text-xl dark:text-white my-3">
+                <h3 class="font-semibold">
+                  Dimensions
+                </h3>
+              </div>
+              <.list>
+                <:item title="Length">
+                  <%= @vehicle.vehicle_other_spec.length %>
+                </:item>
+                <:item title="Width">
+                  <%= @vehicle.vehicle_other_spec.width %>
+                </:item>
+                <:item title="Height">
+                  <%= @vehicle.vehicle_other_spec.height %>
+                </:item>
+                <:item title="Wheelbase">
+                  <%= @vehicle.vehicle_other_spec.wheelbase %>
+                </:item>
+              </.list>
+
+              <div class="text-lg text-center text-gray-900 md:text-xl dark:text-white my-3">
+                <h3 class="font-semibold">
+                  Brakes
+                </h3>
+              </div>
+              <.list>
+                <:item title="Brake System Type">
+                  <%= @vehicle.vehicle_other_spec.brake_system_type %>
+                </:item>
+                <:item title="Front Brakes Type">
+                  <%= @vehicle.vehicle_other_spec.front_brakes %>
+                </:item>
+                <:item title="Rear Brakes Type">
+                  <%= @vehicle.vehicle_other_spec.rear_brakes %>
+                </:item>
+                <:item title="Assisting System">
+                  <%= @vehicle.vehicle_other_spec.assisting_system %>
+                </:item>
+              </.list>
+              <div class="text-lg text-center text-gray-900 md:text-xl dark:text-white my-3">
+                <h3 class="font-semibold">
+                  Tires
+                </h3>
+              </div>
+              <.list>
+                <:item title="Front Tire Spec">
+                  <%= @vehicle.vehicle_other_spec.front_tire_spec %>
+                </:item>
+                <:item title="Rear Tire Spec">
+                  <%= @vehicle.vehicle_other_spec.rear_tire_spec %>
+                </:item>
+              </.list>
+              <div class="text-lg text-center text-gray-900 md:text-xl dark:text-white my-3">
+                <h3 class="font-semibold">
+                  Steering
+                </h3>
+              </div>
+              <.list>
+                <:item title="Steering Side">
+                  <%= @vehicle.vehicle_other_spec.steering_side %>
+                </:item>
+                <:item title="Steering Type">
+                  <%= @vehicle.vehicle_other_spec.steering_type %>
+                </:item>
+              </.list>
+              <div class="text-lg text-center text-gray-900 md:text-xl dark:text-white my-3">
+                <h3 class="font-semibold">
+                  Space, Volume and Weights
+                </h3>
+              </div>
+              <.list>
+                <:item title="Fuel Tank Capacity(Liters)">
+                  <%= @vehicle.vehicle_other_spec.fuel_tank_capacity %>
+                </:item>
+                <:item title="Gross Weight(KG)">
+                  <%= @vehicle.vehicle_other_spec.gross_weight %>
+                </:item>
+                <:item title="Net Weight(KG)">
+                  <%= @vehicle.vehicle_other_spec.net_weight %>
+                </:item>
+                <:item title="Towing Capacity(KG)">
+                  <%= @vehicle.vehicle_other_spec.towing_capacity %>
+                </:item>
+                <:item title="Max Payload(KG)">
+                  <%= @vehicle.vehicle_other_spec.max_payload %>
+                </:item>
+              </.list>
+            </div>
+          </div>
+          <h2 id="accordion-collapse-heading-2">
+            <button
+              type="button"
+              class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-b-0 border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+              data-accordion-target="#accordion-collapse-body-2"
+              aria-expanded="false"
+              aria-controls="accordion-collapse-body-2"
+            >
+              <span>Engine Specifications</span>
+              <svg
+                data-accordion-icon
+                class="w-3 h-3 rotate-180 shrink-0"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 10 6"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5 5 1 1 5"
+                />
+              </svg>
+            </button>
+          </h2>
+          <div
+            id="accordion-collapse-body-2"
+            class="hidden"
+            aria-labelledby="accordion-collapse-heading-2"
+          >
+            <div class="p-5 border border-b-0 border-gray-200 dark:border-gray-700">
+              <.list>
+                <:item title="Manufacturer">
+                  <%= @vehicle.vehicle_engine_spec.manufacturer %>
+                </:item>
+                <:item title="Model">
+                  <%= @vehicle.vehicle_engine_spec.model %>
+                </:item>
+                <:item title="Serial Number">
+                  <%= @vehicle.vehicle_engine_spec.serial_number %>
+                </:item>
+                <:item title="Aspiration">
+                  <%= @vehicle.vehicle_engine_spec.aspiration %>
+                </:item>
+                <:item title="Displacement">
+                  <%= @vehicle.vehicle_engine_spec.displacement %>
+                </:item>
+                <:item title="Number of Cylinders">
+                  <%= @vehicle.vehicle_engine_spec.cylinders %>
+                </:item>
+                <:item title="Power">
+                  <%= @vehicle.vehicle_engine_spec.power %>
+                </:item>
+                <:item title="Torque">
+                  <%= @vehicle.vehicle_engine_spec.torque %>
+                </:item>
+                <:item title="Fuel Type">
+                  <%= @vehicle.vehicle_engine_spec.fuel_type %>
+                </:item>
+                <:item title="Fuel Delivery">
+                  <%= @vehicle.vehicle_engine_spec.fuel_delivery_type %>
+                </:item>
+                <:item title="Engine Configuration">
+                  <%= @vehicle.vehicle_engine_spec.config_type %>
+                </:item>
+                <:item title="Valve Train Design">
+                  <%= @vehicle.vehicle_engine_spec.valve_train_design %>
+                </:item>
+                <:item title="Cooling Type">
+                  <%= @vehicle.vehicle_engine_spec.cooling_type %>
+                </:item>
+                <:item title="Oil Capacity">
+                  <%= @vehicle.vehicle_engine_spec.oil_capacity %>
+                </:item>
+                <:item title="Oil Specifications">
+                  <%= @vehicle.vehicle_engine_spec.oil_specification %>
+                </:item>
+              </.list>
+            </div>
+          </div>
+          <h2 id="accordion-collapse-heading-3">
+            <button
+              type="button"
+              class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+              data-accordion-target="#accordion-collapse-body-3"
+              aria-expanded="false"
+              aria-controls="accordion-collapse-body-3"
+            >
+              <span>Drivetrain Specifications </span>
+              <svg
+                data-accordion-icon
+                class="w-3 h-3 rotate-180 shrink-0"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 10 6"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5 5 1 1 5"
+                />
+              </svg>
+            </button>
+          </h2>
+          <div
+            id="accordion-collapse-body-3"
+            class="hidden"
+            aria-labelledby="accordion-collapse-heading-3"
+          >
+            <div class="p-5 border border-t-0 border-gray-200 dark:border-gray-700">
+              <.list>
+                <:item title="Manufacturer">
+                  <%= @vehicle.vehicle_drivetrain_spec.manufacturer %>
+                </:item>
+                <:item title="Model">
+                  <%= @vehicle.vehicle_drivetrain_spec.model %>
+                </:item>
+                <:item title="Serial Number">
+                  <%= @vehicle.vehicle_drivetrain_spec.serial_number %>
+                </:item>
+                <:item title="Transmission Type">
+                  <%= @vehicle.vehicle_drivetrain_spec.transmission_type %>
+                </:item>
+                <:item title="Number of Gears">
+                  <%= @vehicle.vehicle_drivetrain_spec.number_of_gears %>
+                </:item>
+                <:item title="Transmission Oil Capacity">
+                  <%= @vehicle.vehicle_drivetrain_spec.transmission_oil_capacity %>
+                </:item>
+                <:item title="Tramission Oil Specification">
+                  <%= @vehicle.vehicle_drivetrain_spec.transmission_oil_specification %>
+                </:item>
+                <:item title="Drive Type">
+                  <%= @vehicle.vehicle_drivetrain_spec.drive_type %>
+                </:item>
+                <:item title="Axles">
+                  <%= @vehicle.vehicle_drivetrain_spec.axles %>
+                </:item>
+                <:item title="Axle Configuration">
+                  <%= @vehicle.vehicle_drivetrain_spec.axle_configuration %>
+                </:item>
+              </.list>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div :if={@live_action == :vehicle_issues} role="tabpanel" aria-labelledby="issues-tab">
+        <.live_component
+          module={FleetmsWeb.VehicleLive.VehicleIssueListComponent}
+          id="vehicle-issues-live-component"
+          vehicle={@vehicle}
+          current_user={@current_user}
+          tenant={@tenant}
+        />
+      </div>
+      <div
+        :if={@live_action == :vehicle_service_reminders}
+        role="tabpanel"
+        aria-labelledby="service_reminders-tab"
+      >
+        <.live_component
+          module={FleetmsWeb.VehicleLive.VehicleServiceReminderListComponent}
+          id="vehicle-service_reminders-live-component"
+          vehicle={@vehicle}
+          current_user={@current_user}
+          tenant={@tenant}
+        />
+      </div>
+      <div
+        :if={@live_action == :vehicle_work_orders}
+        role="tabpanel"
+        aria-labelledby="work_orders-tab"
+      >
+        <.live_component
+          module={FleetmsWeb.VehicleLive.VehicleWorkOrderListComponent}
+          id="vehicle-work_orders-live-component"
+          vehicle={@vehicle}
+          current_user={@current_user}
+          tenant={@tenant}
+        />
+      </div>
+      <div
+        :if={@live_action == :vehicle_fuel_histories}
+        role="tabpanel"
+        aria-labelledby="fuel_histories-tab"
+      >
+        <.live_component
+          module={FleetmsWeb.VehicleLive.VehicleFuelHistoryListComponent}
+          id="vehicle-fuel_history-live-component"
+          vehicle={@vehicle}
+          current_user={@current_user}
+          tenant={@tenant}
+        />
+      </div>
+    </div>
+  </div>
+</section>
+
+<.modal
+  :if={@live_action == :edit}
+  id="vehicle-modal"
+  show
+  max_width="max-w-6xl"
+  on_cancel={JS.navigate(~p"/vehicles/#{@vehicle}")}
+>
+  <.live_component
+    module={FleetmsWeb.VehicleLive.FormComponent}
+    id="vehicle-form-component"
+    title={@page_title}
+    action={@live_action}
+    vehicle={@vehicle}
+    current_user={@current_user}
+    tenant={@tenant}
+    patch={~p"/vehicles/#{@vehicle}"}
+  />
+</.modal>

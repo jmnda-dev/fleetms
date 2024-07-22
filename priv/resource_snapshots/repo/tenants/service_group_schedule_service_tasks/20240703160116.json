@@ -1,0 +1,77 @@
+{
+  "attributes": [
+    {
+      "default": "nil",
+      "size": null,
+      "type": "uuid",
+      "source": "service_group_schedule_id",
+      "references": {
+        "name": "service_group_schedule_service_tasks_service_group_schedule_id_fkey",
+        "table": "service_group_schedules",
+        "multitenancy": {
+          "global": false,
+          "strategy": "context",
+          "attribute": null
+        },
+        "primary_key?": true,
+        "schema": "public",
+        "destination_attribute": "id",
+        "on_delete": "delete",
+        "on_update": null,
+        "deferrable": false,
+        "match_with": null,
+        "match_type": null,
+        "index?": false,
+        "destination_attribute_default": null,
+        "destination_attribute_generated": null
+      },
+      "allow_nil?": false,
+      "primary_key?": true,
+      "generated?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "uuid",
+      "source": "service_task_id",
+      "references": {
+        "name": "service_group_schedule_service_tasks_service_task_id_fkey",
+        "table": "service_tasks",
+        "multitenancy": {
+          "global": false,
+          "strategy": "context",
+          "attribute": null
+        },
+        "primary_key?": true,
+        "schema": "public",
+        "destination_attribute": "id",
+        "on_delete": null,
+        "on_update": null,
+        "deferrable": false,
+        "match_with": null,
+        "match_type": null,
+        "index?": false,
+        "destination_attribute_default": null,
+        "destination_attribute_generated": null
+      },
+      "allow_nil?": false,
+      "primary_key?": true,
+      "generated?": false
+    }
+  ],
+  "table": "service_group_schedule_service_tasks",
+  "hash": "79E393EE9A8D930EDEB593B68BB3C09165E3A3FE3B539FF23ECED57DDACA1E19",
+  "repo": "Elixir.Fleetms.Repo",
+  "identities": [],
+  "multitenancy": {
+    "global": false,
+    "strategy": "context",
+    "attribute": null
+  },
+  "schema": null,
+  "check_constraints": [],
+  "custom_indexes": [],
+  "base_filter": null,
+  "custom_statements": [],
+  "has_create_action": true
+}

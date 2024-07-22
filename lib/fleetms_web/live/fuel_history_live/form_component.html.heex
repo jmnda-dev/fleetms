@@ -1,0 +1,215 @@
+<div>
+  <.header>
+    <%= @title %>
+  </.header>
+
+  <.simple_form
+    for={@form}
+    id="fuel_history-form"
+    phx-target={@myself}
+    phx-change="validate"
+    phx-submit="save"
+  >
+    <div :if={@action in [:new, :edit]}>
+      <div class="grid gap-4 mb-4 sm:grid-cols-2">
+        <div id="vehicle-input" phx-update="ignore">
+          <.input
+            field={@form[:vehicle_id]}
+            type="select"
+            label="Vehicle"
+            options={@vehicles}
+            data-placeholder="Select Vehicle"
+            prompt=""
+            phx-hook="select2JS"
+            style="width: 100%;"
+            required
+          />
+        </div>
+
+        <div id="refueled_by-input" phx-update="ignore">
+          <.input
+            field={@form[:refueled_by_id]}
+            type="select"
+            label="Refueled By"
+            options={@users}
+            data-placeholder="Refueled By"
+            prompt=""
+            phx-hook="select2JS"
+            style="width: 100%;"
+          />
+        </div>
+
+        <.input
+          field={@form[:odometer_reading]}
+          type="number"
+          step="any"
+          label="Odometer Reading(KM)"
+        />
+
+        <.input
+          field={@form[:refuel_datetime]}
+          type="datetime-local"
+          label="Date and Time of Refuel"
+          required
+        />
+
+        <div id="fuel_type-input" phx-update="ignore">
+          <.input
+            field={@form[:fuel_type]}
+            type="select"
+            options={Fleetms.Enums.fuel_tracking_fuel_types()}
+            data-placeholder="Select Fuel Type"
+            label="Fuel Type"
+            prompt=""
+            phx-hook="select2JS"
+            style="width: 100%;"
+            required
+          />
+        </div>
+
+        <div id="payment_method-input" phx-update="ignore">
+          <.input
+            field={@form[:payment_method]}
+            type="select"
+            options={Fleetms.Enums.fuel_tracking_payment_methods()}
+            data-placeholder="Select Payment Method"
+            label="Payment Method"
+            prompt=""
+            phx-hook="select2JS"
+            style="width: 100%;"
+            required
+          />
+        </div>
+        <.input
+          field={@form[:refuel_quantity]}
+          type="number"
+          step="any"
+          required
+          label="Refuel Quantity(Litres)"
+        />
+
+        <.input field={@form[:refuel_cost]} type="text" step="any" required label="Refuel Cost" />
+        <.input
+          field={@form[:refuel_location]}
+          type="text"
+          step="any"
+          required
+          label="Refuel Location"
+        />
+
+        <.input field={@form[:notes]} type="textarea" label="Notes" />
+      </div>
+
+      <div class="mb-4">
+        <span class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          Fuel History Photos
+        </span>
+        <div
+          class="grid grid-cols-3 gap-4 mb-4 sm:grid-cols-4"
+          id="fuel_history-photos-list"
+          phx-update="ignore"
+        >
+          <%= if @fuel_history do %>
+            <div :for={photo <- @fuel_history.fuel_history_photos} x-data="{checked: false}">
+              <figure class="relative max-w-sm transition-all duration-300 cursor-pointer hover:grayscale-0">
+                <a href="#">
+                  <img
+                    class="rounded-lg"
+                    x-bind:class="checked && 'filter grayscale'"
+                    src={Fleetms.FuelHistoryPhoto.url({photo.filename, @fuel_history})}
+                    alt=""
+                  />
+                </a>
+                <figcaption class="absolute px-4 text-lg text-white bottom-2">
+                  <input
+                    id={["photo_id_", photo.id]}
+                    name={[@form[:photos_to_delete_ids].name, "[]"]}
+                    type="checkbox"
+                    class="hidden"
+                    value={photo.id}
+                  />
+                  <div x-show="! checked">
+                    <label
+                      class="px-2 py-1 text-sm font-semibold bg-red-600 rounded-md hover:bg-red-700 cursor-pointer"
+                      for={["photo_id_", photo.id]}
+                      x-on:click="checked = ! checked"
+                    >
+                      <i class="fa-solid fa-trash" /> Delete
+                    </label>
+                  </div>
+                  <div x-show="checked">
+                    <label
+                      class="px-2 py-1 text-sm font-semibold bg-green-600 rounded-md hover:bg-green-700 cursor-pointer"
+                      for={["photo_id_", photo.id]}
+                      x-on:click="checked = ! checked"
+                    >
+                      <i class="fa-solid fa-trash-arrow-up" /> Undo Delete
+                    </label>
+                  </div>
+                </figcaption>
+              </figure>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <.alert :if={@disallow_uploads} kind={:warning}>
+        <%= @upload_disallow_msg %>
+      </.alert>
+      <div :if={not @disallow_uploads}>
+        <.alert :for={err <- upload_errors(@uploads.fuel_history_photos)} kind={:error}>
+          <%= error_to_string(err) %>
+        </.alert>
+      </div>
+      <div :if={not @disallow_uploads} class="grid gap-6 mb-6 md:grid-cols-2">
+        <%= for {entry, _i} <- Enum.with_index(@uploads.fuel_history_photos.entries) do %>
+          <div>
+            <.live_img_preview entry={entry} width="auto" height="200" />
+            <div class="my-2">
+              <.alert
+                :for={err <- upload_errors(@uploads.fuel_history_photos, entry)}
+                kind={:error}
+              >
+                <%= error_to_string(err) %>
+              </.alert>
+            </div>
+            <div class="my-2">
+              <.progress_bar progress={entry.progress} />
+            </div>
+            <div>
+              <.button
+                kind={:warning}
+                type="button"
+                phx-click="remove_photo"
+                phx-value-ref={entry.ref}
+                phx-target={@myself}
+              >
+                Remove
+              </.button>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <.upload_input
+        :if={not @disallow_uploads}
+        upload={@uploads.fuel_history_photos}
+        ref={@uploads.fuel_history_photos.ref}
+      >
+        <:label>
+          <span class="font-semibold">Click to upload</span> or drag and drop
+        </:label>
+
+        <:description>
+          <span class="text-sm text-gray-500 dark:text-gray-400">
+            PNG, JPG, JPEG up to 2MB
+          </span>
+        </:description>
+      </.upload_input>
+    </div>
+    <:actions>
+      <.button phx-disable-with="Saving...">
+        <i class="fa-solid fa-floppy-disk me-1"></i>Save Fuel History
+      </.button>
+    </:actions>
+  </.simple_form>
+</div>

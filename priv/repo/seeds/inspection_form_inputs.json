@@ -1,0 +1,251 @@
+{
+    "dropdown_inputs": [
+        {
+            "name": "Power Steering Fluid Level",
+            "type": "dropdown_input",
+            "options": [
+                {
+                    "label": "Empty"
+                },
+                {
+                    "label": "Low"
+                },
+                {
+                    "label": "Normal"
+                },
+                {
+                    "label": "Full"
+                }
+            ]
+        },
+        {
+            "name": "Transmission Fluid Level",
+            "type": "dropdown_input",
+            "options": [
+                {
+                    "label": "Empty"
+                },
+                {
+                    "label": "Low"
+                },
+                {
+                    "label": "Normal"
+                },
+                {
+                    "label": "Full"
+                }
+            ]
+        },
+        {
+            "name": "Coolant Level",
+            "type": "dropdown_input",
+            "options": [
+                {
+                    "label": "Empty"
+                },
+                {
+                    "label": "Low"
+                },
+                {
+                    "label": "Normal"
+                },
+                {
+                    "label": "Full"
+                }
+            ]
+        },
+        {
+            "name": "Oil Level",
+            "type": "dropdown_input",
+            "options": [
+                {
+                    "label": "Empty"
+                },
+                {
+                    "label": "Low"
+                },
+                {
+                    "label": "Normal"
+                },
+                {
+                    "label": "Full"
+                }
+            ]
+        },
+        {
+            "name": "Fuel Level",
+            "type": "dropdown_input",
+            "options": [
+                {
+                    "label": "Empty"
+                },
+                {
+                    "label": "1/4"
+                },
+                {
+                    "label": "Half"
+                },
+                {
+                    "label": "3/4"
+                },
+                {
+                    "label": "Full"
+                }
+            ]
+        }
+    ],
+    "number_inputs": [
+        {
+            "name": "Trailer Tire Pressure",
+            "type": "number_input",
+            "pass_range_max": 250,
+            "pass_range_min": 220
+        },
+        {
+            "name": "Engine Hours",
+            "type": "number_input"
+        },
+        {
+            "name": "Odometer Reading",
+            "type": "number_input"
+        },
+        {
+            "name": "Rear Right Tire Pressure",
+            "type": "number_input",
+            "pass_range_max": 250,
+            "pass_range_min": 220
+        },
+        {
+            "name": "Rear Left Tire Pressure",
+            "type": "number_input",
+            "pass_range_max": 250,
+            "pass_range_min": 220
+        },
+        {
+            "name": "Front Right Tire Pressure",
+            "type": "number_input",
+            "pass_range_max": 250,
+            "pass_range_min": 220
+        },
+        {
+            "name": "Front Left Tire Pressure",
+            "type": "number_input",
+            "pass_range_max": 250,
+            "pass_range_min": 220
+        }
+    ],
+    "radio_inputs": [
+        {
+            "name": "Trailer Brakes",
+            "type": "radio_input"
+        },
+        {
+            "name": "Trailer Reflectors",
+            "type": "radio_input"
+        },
+        {
+            "name": "Trailer Lights",
+            "type": "radio_input"
+        },
+        {
+            "name": "Cargo Securement",
+            "type": "radio_input"
+        },
+        {
+            "name": "First Aid Kit",
+            "type": "radio_input"
+        },
+        {
+            "name": "Jack and Tools",
+            "type": "radio_input"
+        },
+        {
+            "name": "Spare Tire",
+            "type": "radio_input"
+        },
+        {
+            "name": "Fire Extinguisher",
+            "type": "radio_input"
+        },
+        {
+            "name": "Reflectors",
+            "type": "radio_input"
+        },
+        {
+            "name": "Emergency Equipment",
+            "type": "radio_input"
+        },
+        {
+            "name": "Air Filter",
+            "type": "radio_input"
+        },
+        {
+            "name": "Battery",
+            "type": "radio_input"
+        },
+        {
+            "name": "Suspension",
+            "type": "radio_input"
+        },
+        {
+            "name": "Steering",
+            "type": "radio_input"
+        },
+        {
+            "name": "Exhaust System",
+            "type": "radio_input"
+        },
+        {
+            "name": "Fluid Leaks",
+            "type": "radio_input"
+        },
+        {
+            "name": "Tire Condition",
+            "type": "radio_input"
+        },
+        {
+            "name": "Hazard Lights",
+            "type": "radio_input"
+        },
+        {
+            "name": "Headlights",
+            "type": "radio_input"
+        },
+        {
+            "name": "Brake Lights",
+            "type": "radio_input"
+        },
+        {
+            "name": "Turn Signals",
+            "type": "radio_input"
+        },
+        {
+            "name": "Seat Belts",
+            "type": "radio_input"
+        },
+        {
+            "name": "Mirrors",
+            "type": "radio_input"
+        },
+        {
+            "name": "Windshield Wipers",
+            "type": "radio_input"
+        },
+        {
+            "name": "Horn",
+            "type": "radio_input"
+        },
+        {
+            "name": "Lights",
+            "type": "radio_input"
+        },
+        {
+            "name": "Brakes",
+            "type": "radio_input"
+        },
+        {
+            "name": "Interior Clean",
+            "type": "radio_input"
+        }
+    ]
+}

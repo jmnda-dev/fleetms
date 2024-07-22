@@ -7,13 +7,13 @@
 # This file is based on these images:
 #
 #   - https://hub.docker.com/r/hexpm/elixir/tags - for the build image
-#   - https://hub.docker.com/_/debian?tab=tags&page=1&name=bullseye-20240130-slim - for the release image
+#   - https://hub.docker.com/_/debian?tab=tags&page=1&name=bullseye-20240513-slim - for the release image
 #   - https://pkgs.org/ - resource for finding needed packages
-#   - Ex: hexpm/elixir:1.15.7-erlang-26.1.2-debian-bullseye-20240130-slim
+#   - Ex: hexpm/elixir:1.16.2-erlang-26.1.2-debian-bullseye-20240513-slim
 #
-ARG ELIXIR_VERSION=1.15.7
+ARG ELIXIR_VERSION=1.16.2
 ARG OTP_VERSION=26.1.2
-ARG DEBIAN_VERSION=bullseye-20240130-slim
+ARG DEBIAN_VERSION=bullseye-20240513-slim
 
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
@@ -54,9 +54,7 @@ COPY priv priv
 COPY lib lib
 
 COPY assets assets
-
 RUN cd assets && yarn
-
 # compile assets
 RUN mix assets.deploy
 
@@ -76,9 +74,6 @@ FROM ${RUNNER_IMAGE}
 RUN apt-get update -y && \
   apt-get install -y libstdc++6 openssl libncurses5 locales ca-certificates \
   && apt-get -y install imagemagick \
-  && apt-get -y install curl gnupg \
-  && curl -sL https://deb.nodesource.com/setup_20.x | bash - \
-  && apt-get install nodejs -y \
   && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 # Set the locale
