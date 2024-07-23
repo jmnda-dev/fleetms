@@ -35,3 +35,4 @@ fleetms-*.tar
 npm-debug.log
 /assets/node_modules/
 /uploads
+/priv/reports
