@@ -84,6 +84,7 @@ defmodule FleetmsWeb.VehicleAssignmentLive.Index do
       |> assign(:total, count)
       |> assign(:total_pages, calc_total_pages(count, per_page))
 
+    # TODO: Initialize flowbite on client
     {:noreply, push_event(socket, "initFlowbiteJS", %{})}
   end
 
