@@ -4,7 +4,7 @@
     "alpinejs": "^3.13.0",
     "apexcharts": "^3.45.1",
     "choices.js": "^10.2.0",
-    "flowbite": "^1.5.3",
+    "flowbite": "^2.4.1",
     "humanize-duration": "^3.31.0",
     "moment": "^2.30.1",
     "phoenix": "file:../deps/phoenix",
