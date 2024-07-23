@@ -1,0 +1,58 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.209.6/containers/elixir-phoenix-postgres
+{
+    "name": "Fleetms",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "elixir",
+    "workspaceFolder": "/workspace",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "sqltools.connections": [
+                    {
+                        "name": "Container database",
+                        "driver": "PostgreSQL",
+                        "previewLimit": 50,
+                        "server": "localhost",
+                        "port": 5432,
+                        "database": "postgres",
+                        "username": "postgres",
+                        "password": "postgres"
+                    }
+                ],
+                "emmet.includeLanguages": {
+                    "phoenix-heex": "html"
+                },
+                "tailwindCSS.includeLanguages": {
+                    "elixir": "html",
+                    "phoenix-heex": "html"
+                },
+                "editor.fontSize": 14,
+                "editor.fontLigatures": true,
+                "editor.fontWeight": 600,
+                "terminal.integrated.fontFamily": "'FiraCode Nerd Font'",
+                "terminal.integrated.fontSize": 16,
+                "terminal.integrated.fontWeight": 650
+            },
+            "extensions": [
+                "JakeBecker.elixir-ls",
+                "mtxr.sqltools",
+                "mtxr.sqltools-driver-pg",
+                "phoenixframework.phoenix",
+                "bradlc.vscode-tailwindcss",
+                "vscodevim.vim",
+                "elixir-tools.elixir-tools"
+            ]
+        }
+    },
+    // Use 'forwardPorts' to make a list of ports inside the container available locally.
+    "forwardPorts": [
+        4000,
+        4001,
+        5432
+    ],
+    // Use 'postCreateCommand' to run commands after the container is created.
+    "postCreateCommand": "mix setup && cd assets && npm install",
+    // Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
+    "remoteUser": "vscode"
+}
