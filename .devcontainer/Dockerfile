@@ -1,8 +1,8 @@
 ARG ELIXIR_VERSION=1.17.2
 ARG OTP_VERSION=27.0
-ARG UBUNTU_VERSION=jammy-20240530
+ARG DEBIAN_VERSION=bookworm-20240701
 
-ARG IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-ubuntu-${UBUNTU_VERSION}"
+ARG IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 FROM ${IMAGE}
 
 # This Dockerfile adds a non-root user with sudo access. Update the “remoteUser” property in
@@ -39,11 +39,11 @@ RUN apt-get update \
   && apt-get install -y postgresql-client inotify-tools gnupg2 dirmngr gpg gawk \
   #
   # [Optional] Install Node.js for use with web applications
-  # && if [ "$NODE_VERSION" != "none" ]; then \
-  # curl -sSL ${NODE_SCRIPT_SOURCE} -o /tmp/node-setup.sh \
-  # && ([ "${NODE_SCRIPT_SHA}" = "dev-mode" ] || (echo "${NODE_SCRIPT_SHA} */tmp/node-setup.sh" | sha256sum -c -)) \
-  # && /bin/bash /tmp/node-setup.sh "${NVM_DIR}" "${NODE_VERSION}" "${USERNAME}"; \
-  # fi \
+  && if [ "$NODE_VERSION" != "none" ]; then \
+  curl -sSL ${NODE_SCRIPT_SOURCE} -o /tmp/node-setup.sh \
+  && ([ "${NODE_SCRIPT_SHA}" = "dev-mode" ] || (echo "${NODE_SCRIPT_SHA} */tmp/node-setup.sh" | sha256sum -c -)) \
+  && /bin/bash /tmp/node-setup.sh "${NVM_DIR}" "${NODE_VERSION}" "${USERNAME}"; \
+  fi \
   #
   # Install dependencies
   #
@@ -63,9 +63,6 @@ RUN su ${USERNAME} -c "mix local.hex --force \
 
 # [Optional] Uncomment this line to install additional package.
 # RUN  mix ...
-RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - \
-  && apt-get install nodejs -y \
-  && apt-get install -y libstdc++6 openssl libncurses5 locales ca-certificates \
-  && apt-get -y install imagemagick \
+RUN apt-get -y install imagemagick \
   && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
