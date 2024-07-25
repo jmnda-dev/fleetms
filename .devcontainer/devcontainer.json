@@ -62,8 +62,8 @@
 
 {
     "dockerComposeFile": "docker-compose.yml",
-    "workspaceFolder": "/workspaces/plfantasy",
-    "service": "plfantasy",
+    "workspaceFolder": "/workspaces/fleetms",
+    "service": "fleetms",
     "shutdownAction": "stopCompose",
     "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {
