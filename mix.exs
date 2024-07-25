@@ -79,7 +79,7 @@ defmodule Fleetms.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "compile", "assets.setup", "assets.build", "run priv/repo/seeds.exs"],
+      setup: ["deps.get", "compile", "assets.setup", "assets.build", "ash.reset", "run priv/repo/seeds.exs"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       seed: [
