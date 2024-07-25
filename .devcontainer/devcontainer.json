@@ -1,47 +1,105 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.209.6/containers/elixir-phoenix-postgres
+// {
+//     "name": "Fleetms",
+//     "dockerComposeFile": "docker-compose.yml",
+//     "service": "elixir",
+//     "workspaceFolder": "/workspace",
+//     "customizations": {
+//         "vscode": {
+//             "settings": {
+//                 "sqltools.connections": [
+//                     {
+//                         "name": "Container database",
+//                         "driver": "PostgreSQL",
+//                         "previewLimit": 50,
+//                         "server": "localhost",
+//                         "port": 5432,
+//                         "database": "postgres",
+//                         "username": "postgres",
+//                         "password": "postgres"
+//                     }
+//                 ],
+//                 "emmet.includeLanguages": {
+//                     "phoenix-heex": "html"
+//                 },
+//                 "tailwindCSS.includeLanguages": {
+//                     "elixir": "html",
+//                     "phoenix-heex": "html"
+//                 },
+//                 "editor.fontSize": 14,
+//                 "editor.fontLigatures": true,
+//                 "editor.fontWeight": 600,
+//                 "terminal.integrated.fontFamily": "'FiraCode Nerd Font'",
+//                 "terminal.integrated.fontSize": 16,
+//                 "terminal.integrated.fontWeight": 650
+//             },
+//             "extensions": [
+//                 "JakeBecker.elixir-ls",
+//                 "mtxr.sqltools",
+//                 "mtxr.sqltools-driver-pg",
+//                 "phoenixframework.phoenix",
+//                 "bradlc.vscode-tailwindcss",
+//                 "vscodevim.vim",
+//                 "elixir-tools.elixir-tools"
+//             ]
+//         }
+//     },
+//     // Use 'forwardPorts' to make a list of ports inside the container available locally.
+//     "forwardPorts": [
+//         4000,
+//         4001,
+//         5432
+//     ],
+//     // Use 'postCreateCommand' to run commands after the container is created.
+//     "postCreateCommand": "mix setup && cd assets && npm install",
+//     // Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
+//     "remoteUser": "vscode"
+// }
+
+
+
+
 {
-    "name": "Fleetms",
     "dockerComposeFile": "docker-compose.yml",
-    "service": "elixir",
-    "workspaceFolder": "/workspace",
+    "workspaceFolder": "/workspaces/plfantasy",
+    "service": "plfantasy",
+    "shutdownAction": "stopCompose",
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils:2": {
+            "installZsh": "true",
+            "username": "vscode",
+            "userUid": "1000",
+            "userGid": "1000",
+            "upgradePackages": "true"
+        },
+        "ghcr.io/devcontainers/features/git:1": {
+            "version": "latest",
+            "ppa": "false"
+        }
+    },
+    // Configure tool-specific properties.
     "customizations": {
+        // Configure properties specific to VS Code.
         "vscode": {
+            // Set *default* container specific settings.json values on container create.
             "settings": {
-                "sqltools.connections": [
-                    {
-                        "name": "Container database",
-                        "driver": "PostgreSQL",
-                        "previewLimit": 50,
-                        "server": "localhost",
-                        "port": 5432,
-                        "database": "postgres",
-                        "username": "postgres",
-                        "password": "postgres"
-                    }
-                ],
                 "emmet.includeLanguages": {
                     "phoenix-heex": "html"
                 },
                 "tailwindCSS.includeLanguages": {
                     "elixir": "html",
                     "phoenix-heex": "html"
-                },
-                "editor.fontSize": 14,
-                "editor.fontLigatures": true,
-                "editor.fontWeight": 600,
-                "terminal.integrated.fontFamily": "'FiraCode Nerd Font'",
-                "terminal.integrated.fontSize": 16,
-                "terminal.integrated.fontWeight": 650
+                }
             },
             "extensions": [
-                "JakeBecker.elixir-ls",
-                "mtxr.sqltools",
-                "mtxr.sqltools-driver-pg",
+                "jakebecker.elixir-ls",
                 "phoenixframework.phoenix",
+                "samuel-pordeus.elixir-test",
                 "bradlc.vscode-tailwindcss",
-                "vscodevim.vim",
-                "elixir-tools.elixir-tools"
+                "ms-azuretools.vscode-docker",
+                "ms-vscode.azurecli",
+                "eamodio.gitlens"
             ]
         }
     },
@@ -52,7 +110,7 @@
         5432
     ],
     // Use 'postCreateCommand' to run commands after the container is created.
-    "postCreateCommand": "mix setup && cd assets && npm install",
-    // Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
+    "postCreateCommand": "mix local.hex --force && mix local.rebar --force && mix archive.install --force hex phx_new",
+    // Set `remoteUser` to `root` to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
     "remoteUser": "vscode"
 }
