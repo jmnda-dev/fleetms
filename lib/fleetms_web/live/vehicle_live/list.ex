@@ -1,19 +1,27 @@
 defmodule FleetmsWeb.VehicleLive.List do
   use FleetmsWeb, :live_view
-  import Fleetms.Utils, only: [calc_total_pages: 2]
+  import Fleetms.Utils, only: [calc_total_pages: 2, atom_list_to_options_for_select: 1]
+  alias Fleetms.Common.PaginationSortParam
 
-  @per_page_opts ["10", "15", "20", "30", "50", "75", "100", "150"]
+  @per_page_opts [10, 20, 30, 50, 100, 250, 500]
   @sort_by_opts [
-    name: "Name",
-    vehicle_make: "Make",
-    model: "Model",
-    type: "Type",
-    created_at: "Date Created",
-    updated_at: "Date Updated",
-    year: "Year",
-    mileage: "Mileage"
+    :name,
+    :vehicle_make,
+    :model,
+    :type,
+    :created_at,
+    :updated_at,
+    :year,
+    :mileage
   ]
-  @sort_order [asc: "Ascending", desc: "Descending"]
+  @default_listing_limit 20
+  @sort_order [:asc, :desc]
+  @default_paginate_sort_params %{
+    page: 1,
+    per_page: @default_listing_limit,
+    sort_by: :updated_at,
+    sort_order: :desc
+  }
 
   @impl true
   def mount(_params, _session, socket) do
@@ -33,17 +41,13 @@ defmodule FleetmsWeb.VehicleLive.List do
   def handle_params(params, _uri, socket) do
     %{tenant: tenant, current_user: actor, live_action: live_action} = socket.assigns
 
-    pagination_params =
-      Fleetms.Vehicles.Vehicle.validate_pagination_params!(params)
-
-    sort_params =
-      Fleetms.Vehicles.Vehicle.validate_sorting_params!(params)
+    paginate_sort_opts = validate_paginate_sort_params(params)
 
     search_query = Map.get(params, "search_query", "")
 
     filter_form_data = filter_form_data_from_url_params(params)
 
-    paginate_sort_opts = Map.merge(pagination_params, sort_params)
+    # paginate_sort_opts = Map.merge(pagination_params, sort_params)
 
     socket =
       socket
@@ -253,6 +257,18 @@ defmodule FleetmsWeb.VehicleLive.List do
     )
   end
 
+  defp validate_paginate_sort_params(params) do
+    paginate_sort_params = Map.take(params, ["page", "per_page", "sort_by", "sort_order"])
+
+    case PaginationSortParam.validate(@per_page_opts, @sort_by_opts, paginate_sort_params) do
+      {:ok, validated_params} ->
+        Map.take(validated_params, [:page, :per_page, :sort_by, :sort_order])
+
+      {:error, _error} ->
+        @default_paginate_sort_params
+    end
+  end
+
   defp filter_form_data_from_url_params(url_params) do
     default_params = %{
       mileage_min: 0,
@@ -291,6 +307,6 @@ defmodule FleetmsWeb.VehicleLive.List do
   end
 
   defp get_items_per_page_opts, do: @per_page_opts
-  defp get_sort_by_opts, do: @sort_by_opts
-  defp get_sort_order_opts, do: @sort_order
+  defp get_sort_by_opts, do: atom_list_to_options_for_select(@sort_by_opts)
+  defp get_sort_order_opts, do: atom_list_to_options_for_select(@sort_order)
 end
