@@ -61,7 +61,8 @@ defmodule FleetmsWeb.UserLive.Index do
           actor: actor,
           paginate_sort_opts: paginate_sort_opts,
           search_query: search_query,
-          filter_form_data: filter_form_data
+          filter_form_data: filter_form_data,
+          current_org_id: actor.organization_id
         )
       end)
 
@@ -211,7 +212,8 @@ defmodule FleetmsWeb.UserLive.Index do
     |> Ash.Query.for_read(:list, %{
       paginate_sort_opts: opts[:paginate_sort_opts],
       search_query: opts[:search_query],
-      advanced_filter_params: opts[:filter_form_data]
+      advanced_filter_params: opts[:filter_form_data],
+      current_organization_id: opts[:current_org_id] # TODO: This is a temporary fix. This allows to show only users that belongs to the current tenant.
     })
     |> Ash.read!(
       actor: opts[:actor],
