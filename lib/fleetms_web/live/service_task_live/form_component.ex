@@ -13,6 +13,7 @@ defmodule FleetmsWeb.ServiceTaskLive.FormComponent do
           as: "service_task",
           domain: Fleetms.Service,
           actor: socket.assigns.current_user,
+          tenant: socket.assigns.tenant,
           forms: [auto?: true]
         )
       else
@@ -21,6 +22,7 @@ defmodule FleetmsWeb.ServiceTaskLive.FormComponent do
           as: "service_task",
           domain: Fleetms.Service,
           actor: socket.assigns.current_user,
+          tenant: socket.assigns.tenant,
           forms: [auto?: true]
         )
       end
