@@ -12,10 +12,6 @@ defmodule Fleetms.FuelTracking.FuelHistory do
 
   require Ash.Query
 
-  @default_listing_limit 20
-  @default_sorting_params %{sort_by: :desc, sort_order: :created_at}
-  @default_paginate_params %{page: 1, per_page: @default_listing_limit}
-
   attributes do
     uuid_primary_key :id
 
@@ -129,81 +125,6 @@ defmodule Fleetms.FuelTracking.FuelHistory do
 
   actions do
     defaults [:read]
-
-    action :validate_sorting_params, :map do
-      description "Validates the Sorting params from the URL e.g /?sort_by=name&sort_order=desc"
-      argument :url_params, :map, allow_nil?: false
-
-      run fn input, _context ->
-        params =
-          %{
-            sort_order: Map.get(input.arguments.url_params, "sort_order", "desc"),
-            sort_by: Map.get(input.arguments.url_params, "sort_by", "updated_at")
-          }
-
-        types = %{
-          sort_order:
-            Ecto.ParameterizedType.init(Ecto.Enum, values: [asc: "Ascending", desc: "Descending"]),
-          sort_by:
-            Ecto.ParameterizedType.init(Ecto.Enum,
-              values: [
-                refuel_datetime: "Date and Time of Refuel",
-                odometer_reading: "Odometer Reading",
-                refuel_quantity: "Refuel Quantity",
-                refuel_cost: "Refuel Cost",
-                fuel_type: "Fuel Type",
-                payment_method: "Payment Method",
-                created_at: "Date Created",
-                updated_at: "Date Updated"
-              ]
-            )
-        }
-
-        data = %{}
-
-        {data, types}
-        |> Ecto.Changeset.cast(params, Map.keys(types))
-        |> Ecto.Changeset.apply_action(:create)
-        |> case do
-          {:ok, sort_params} ->
-            {:ok, sort_params}
-
-          {:error, changeset} ->
-            {:ok, @default_sorting_params}
-        end
-      end
-    end
-
-    action :validate_pagination_params, :map do
-      description "Validates the Pagination params from the URL e.g /?page=1&per_page=10"
-      argument :url_params, :map, allow_nil?: false
-
-      run fn input, _context ->
-        params =
-          %{
-            page: Map.get(input.arguments.url_params, "page", 1),
-            per_page: Map.get(input.arguments.url_params, "per_page", @default_listing_limit)
-          }
-
-        types = %{
-          page: :integer,
-          per_page: :integer
-        }
-
-        data = %{}
-
-        {data, types}
-        |> Ecto.Changeset.cast(params, Map.keys(types))
-        |> Ecto.Changeset.apply_action(:create)
-        |> case do
-          {:ok, paginate_params} ->
-            {:ok, paginate_params}
-
-          {:error, _changeset} ->
-            {:ok, @default_paginate_params}
-        end
-      end
-    end
 
     action :get_dashboard_stats, {:array, :map} do
       argument :tenant, :string, allow_nil?: false
@@ -407,10 +328,7 @@ defmodule Fleetms.FuelTracking.FuelHistory do
   end
 
   code_interface do
-
     define :get_by_id, action: :get_by_id, args: [:id], get?: true
-    define :validate_sorting_params, action: :validate_sorting_params, args: [:url_params]
-    define :validate_pagination_params, action: :validate_pagination_params, args: [:url_params]
     define :save_fuel_history_photos, action: :save_fuel_history_photos, args: [:issue_photos]
     define :get_dashboard_stats, action: :get_dashboard_stats, args: [:tenant, :period]
   end

@@ -3,7 +3,12 @@ defmodule Fleetms.Issues do
     extensions: [AshAdmin.Domain]
 
   resources do
-    resource Fleetms.Issues.Issue
+    resource Fleetms.Issues.Issue do
+      define :list_issues,
+        action: :list,
+        args: [:paginate_sort_opts, :search_query, :advanced_filter_params]
+    end
+
     resource Fleetms.Issues.IssuePhoto
   end
 

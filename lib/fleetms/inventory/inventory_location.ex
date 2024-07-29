@@ -5,12 +5,9 @@ defmodule Fleetms.Inventory.InventoryLocation do
     authorizers: [
       Ash.Policy.Authorizer
     ]
+
   alias Fleetms.Accounts.User.Policies.{IsAdmin, IsFleetManager}
   require Ash.Query
-
-  @default_listing_limit 20
-  @default_sorting_params %{sort_by: :desc, sort_order: :created_at}
-  @default_paginate_params %{page: 1, per_page: @default_listing_limit}
 
   attributes do
     uuid_primary_key :id
@@ -42,76 +39,6 @@ defmodule Fleetms.Inventory.InventoryLocation do
 
   actions do
     defaults [:read, :destroy, create: :*, update: :*]
-
-    action :validate_sorting_params, :map do
-      description "Validates the Sorting params from the URL e.g /?sort_by=name&sort_order=desc"
-      argument :url_params, :map, allow_nil?: false
-
-      run fn input, _context ->
-        params =
-          %{
-            sort_order: Map.get(input.arguments.url_params, "sort_order", "desc"),
-            sort_by: Map.get(input.arguments.url_params, "sort_by", "updated_at")
-          }
-
-        types = %{
-          sort_order:
-            Ecto.ParameterizedType.init(Ecto.Enum, values: [asc: "Ascending", desc: "Descending"]),
-          sort_by:
-            Ecto.ParameterizedType.init(Ecto.Enum,
-              values: [
-                created_at: "Date Created",
-                updated_at: "Date Updated",
-                name: "Part Name"
-              ]
-            )
-        }
-
-        data = %{}
-
-        {data, types}
-        |> Ecto.Changeset.cast(params, Map.keys(types))
-        |> Ecto.Changeset.apply_action(:create)
-        |> case do
-          {:ok, sort_params} ->
-            {:ok, sort_params}
-
-          {:error, changeset} ->
-            {:ok, @default_sorting_params}
-        end
-      end
-    end
-
-    action :validate_pagination_params, :map do
-      description "Validates the Pagination params from the URL e.g /?page=1&per_page=10"
-      argument :url_params, :map, allow_nil?: false
-
-      run fn input, _context ->
-        params =
-          %{
-            page: Map.get(input.arguments.url_params, "page", 1),
-            per_page: Map.get(input.arguments.url_params, "per_page", @default_listing_limit)
-          }
-
-        types = %{
-          page: :integer,
-          per_page: :integer
-        }
-
-        data = %{}
-
-        {data, types}
-        |> Ecto.Changeset.cast(params, Map.keys(types))
-        |> Ecto.Changeset.apply_action(:create)
-        |> case do
-          {:ok, paginate_params} ->
-            {:ok, paginate_params}
-
-          {:error, _changeset} ->
-            {:ok, @default_paginate_params}
-        end
-      end
-    end
 
     read :list do
       pagination offset?: true, default_limit: 50, countable: true
@@ -177,11 +104,8 @@ defmodule Fleetms.Inventory.InventoryLocation do
   end
 
   code_interface do
-
     define :get_by_id, action: :get_by_id, args: [:id], get?: true
     define :get_all, action: :get_all
-    define :validate_sorting_params, action: :validate_sorting_params, args: [:url_params]
-    define :validate_pagination_params, action: :validate_pagination_params, args: [:url_params]
   end
 
   identities do

@@ -1,20 +1,27 @@
 defmodule FleetmsWeb.UserLive.Index do
   use FleetmsWeb, :live_view
+
+  import Fleetms.Utils, only: [calc_total_pages: 2, atom_list_to_options_for_select: 1]
+
   alias Fleetms.Accounts
   alias Fleetms.Accounts.User
+  alias Fleetms.Common.PaginationSortParam
 
-  import Fleetms.Utils, only: [calc_total_pages: 2]
-
-  @per_page_opts ["10", "15", "20", "30", "50", "75", "100", "150"]
+  @per_page_opts [10, 20, 30, 50, 100, 250, 500]
   @sort_by_opts [
-    created_at: "Date Created",
-    updated_at: "Date Updated",
-    first_name: "First Name",
-    last_name: "Last Name"
+    :created_at,
+    :updated_at,
+    :first_name,
+    :last_name
   ]
-
-  @sort_order [asc: "Ascending", desc: "Descending"]
-
+  @default_listing_limit 20
+  @sort_order [:asc, :desc]
+  @default_paginate_sort_params %{
+    page: 1,
+    per_page: @default_listing_limit,
+    sort_by: :updated_at,
+    sort_order: :desc
+  }
   @impl true
   def mount(_params, _session, socket) do
     if not Ash.can?({User, :list}, socket.assigns.current_user) do
@@ -36,17 +43,11 @@ defmodule FleetmsWeb.UserLive.Index do
 
   @impl true
   def handle_params(params, _url, socket) do
-    pagination_params =
-      User.validate_pagination_params!(params)
-
-    sort_params =
-      User.validate_sorting_params!(params)
+    paginate_sort_opts = validate_paginate_sort_params(params)
 
     search_query = Map.get(params, "search_query", "")
 
     filter_form_data = filter_form_data_from_url_params(params)
-
-    paginate_sort_opts = Map.merge(pagination_params, sort_params)
 
     %{current_user: actor, live_action: live_action} = socket.assigns
 
@@ -58,10 +59,10 @@ defmodule FleetmsWeb.UserLive.Index do
       |> assign(:filter_form_data, filter_form_data)
       |> start_async(:get_users, fn ->
         list_users(
-          actor: actor,
-          paginate_sort_opts: paginate_sort_opts,
-          search_query: search_query,
-          filter_form_data: filter_form_data
+          paginate_sort_opts,
+          search_query,
+          filter_form_data,
+          actor: actor
         )
       end)
 
@@ -204,19 +205,25 @@ defmodule FleetmsWeb.UserLive.Index do
     |> assign(:user, nil)
   end
 
-  defp list_users(opts) do
-    %{page: page, per_page: per_page} = opts[:paginate_sort_opts]
+  defp list_users(paginate_sort_opts, search_query, filter_form_data, opts) do
+    %{page: page, per_page: per_page} = paginate_sort_opts
 
-    User
-    |> Ash.Query.for_read(:list, %{
-      paginate_sort_opts: opts[:paginate_sort_opts],
-      search_query: opts[:search_query],
-      advanced_filter_params: opts[:filter_form_data]
-    })
-    |> Ash.read!(
+    Accounts.list_users!(paginate_sort_opts, search_query, filter_form_data,
       actor: opts[:actor],
       page: [limit: per_page, offset: (page - 1) * per_page, count: true]
     )
+  end
+
+  defp validate_paginate_sort_params(params) do
+    paginate_sort_params = Map.take(params, ["page", "per_page", "sort_by", "sort_order"])
+
+    case PaginationSortParam.validate(@per_page_opts, @sort_by_opts, paginate_sort_params) do
+      {:ok, validated_params} ->
+        Map.take(validated_params, [:page, :per_page, :sort_by, :sort_order])
+
+      {:error, _error} ->
+        @default_paginate_sort_params
+    end
   end
 
   defp filter_form_data_from_url_params(url_params) do
@@ -238,6 +245,6 @@ defmodule FleetmsWeb.UserLive.Index do
   end
 
   defp get_items_per_page_opts, do: @per_page_opts
-  defp get_sort_by_opts, do: @sort_by_opts
-  defp get_sort_order_opts, do: @sort_order
+  defp get_sort_by_opts, do: atom_list_to_options_for_select(@sort_by_opts)
+  defp get_sort_order_opts, do: atom_list_to_options_for_select(@sort_order)
 end

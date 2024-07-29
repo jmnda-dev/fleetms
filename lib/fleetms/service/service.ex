@@ -8,9 +8,21 @@ defmodule Fleetms.Service do
 
   resources do
     resource Fleetms.Service.ServiceGroup
-    resource Fleetms.Service.ServiceReminder
+
+    resource Fleetms.Service.ServiceReminder do
+      define :list_service_reminders,
+        action: :list,
+        args: [:paginate_sort_opts, :search_query, :advanced_filter_params]
+    end
+
     resource Fleetms.Service.ServiceTask
-    resource Fleetms.Service.WorkOrder
+
+    resource Fleetms.Service.WorkOrder do
+      define :list_work_orders,
+        action: :list,
+        args: [:paginate_sort_opts, :search_query, :advanced_filter_params]
+    end
+
     resource Fleetms.Service.WorkOrderPhoto
     resource Fleetms.Service.ServiceGroupVehicle
     resource Fleetms.Service.WorkOrderServiceTask

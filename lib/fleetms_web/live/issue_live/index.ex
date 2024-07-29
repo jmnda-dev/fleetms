@@ -1,21 +1,32 @@
 defmodule FleetmsWeb.IssueLive.Index do
   use FleetmsWeb, :live_view
 
-  import Fleetms.Utils, only: [calc_total_pages: 2, dates_in_map_to_string: 2]
+  import Fleetms.Utils,
+    only: [calc_total_pages: 2, dates_in_map_to_string: 2, atom_list_to_options_for_select: 1]
 
-  @per_page_opts ["10", "15", "20", "30", "50", "75", "100", "150"]
+  alias Fleetms.Common.PaginationSortParam
+  alias Fleetms.Issues
+
+  @per_page_opts [10, 20, 30, 50, 100, 250, 500]
   @sort_by_opts [
-    title: "Title",
-    issue_number: "Issue Number",
-    mileage: "Mileage",
-    date_reported: "Date Reported",
-    due_date: "Due Date",
-    priority: "Priority",
-    status: "Status",
-    created_at: "Date Created",
-    updated_at: "Date Updated"
+    :title,
+    :issue_number,
+    :mileage,
+    :date_reported,
+    :due_date,
+    :priority,
+    :status,
+    :created_at,
+    :updated_at
   ]
-  @sort_order [asc: "Ascending", desc: "Descending"]
+  @default_listing_limit 20
+  @sort_order [:asc, :desc]
+  @default_paginate_sort_params %{
+    page: 1,
+    per_page: @default_listing_limit,
+    sort_by: :updated_at,
+    sort_order: :desc
+  }
 
   @impl true
   def mount(_params, _session, socket) do
@@ -33,11 +44,7 @@ defmodule FleetmsWeb.IssueLive.Index do
 
   @impl true
   def handle_params(params, _url, socket) do
-    pagination_params =
-      Fleetms.Issues.Issue.validate_pagination_params!(params)
-
-    sort_params =
-      Fleetms.Issues.Issue.validate_sorting_params!(params)
+    paginate_sort_opts = validate_paginate_sort_params(params)
 
     search_query = Map.get(params, "search_query", "")
 
@@ -52,8 +59,6 @@ defmodule FleetmsWeb.IssueLive.Index do
         :due_date_to
       ])
 
-    paginate_sort_opts = Map.merge(pagination_params, sort_params)
-
     %{tenant: tenant, current_user: actor, live_action: live_action} = socket.assigns
 
     socket =
@@ -64,11 +69,11 @@ defmodule FleetmsWeb.IssueLive.Index do
       |> assign(:filter_form_data, filter_form_data_with_string_dates)
       |> start_async(:get_issues, fn ->
         list_issues(
+          paginate_sort_opts,
+          search_query,
+          filter_form_data,
           tenant: tenant,
-          actor: actor,
-          paginate_sort_opts: paginate_sort_opts,
-          search_query: search_query,
-          filter_form_data: filter_form_data
+          actor: actor
         )
       end)
 
@@ -274,20 +279,26 @@ defmodule FleetmsWeb.IssueLive.Index do
     {:noreply, stream_insert(socket, :issues, issue)}
   end
 
-  defp list_issues(opts) do
-    %{page: page, per_page: per_page} = opts[:paginate_sort_opts]
+  defp list_issues(paginate_sort_opts, search_query, filter_form_data, opts) do
+    %{page: page, per_page: per_page} = paginate_sort_opts
 
-    Fleetms.Issues.Issue
-    |> Ash.Query.for_read(:list, %{
-      paginate_sort_opts: opts[:paginate_sort_opts],
-      search_query: opts[:search_query],
-      advanced_filter_params: opts[:filter_form_data]
-    })
-    |> Ash.read!(
+    Issues.list_issues!(paginate_sort_opts, search_query, filter_form_data,
       tenant: opts[:tenant],
       actor: opts[:actor],
       page: [limit: per_page, offset: (page - 1) * per_page, count: true]
     )
+  end
+
+  defp validate_paginate_sort_params(params) do
+    paginate_sort_params = Map.take(params, ["page", "per_page", "sort_by", "sort_order"])
+
+    case PaginationSortParam.validate(@per_page_opts, @sort_by_opts, paginate_sort_params) do
+      {:ok, validated_params} ->
+        Map.take(validated_params, [:page, :per_page, :sort_by, :sort_order])
+
+      {:error, _error} ->
+        @default_paginate_sort_params
+    end
   end
 
   defp filter_form_data_from_url_params(url_params) do
@@ -330,6 +341,6 @@ defmodule FleetmsWeb.IssueLive.Index do
   end
 
   defp get_items_per_page_opts, do: @per_page_opts
-  defp get_sort_by_opts, do: @sort_by_opts
-  defp get_sort_order_opts, do: @sort_order
+  defp get_sort_by_opts, do: atom_list_to_options_for_select(@sort_by_opts)
+  defp get_sort_order_opts, do: atom_list_to_options_for_select(@sort_order)
 end

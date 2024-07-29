@@ -3,7 +3,12 @@ defmodule Fleetms.FuelTracking do
     extensions: [AshAdmin.Domain]
 
   resources do
-    resource Fleetms.FuelTracking.FuelHistory
+    resource Fleetms.FuelTracking.FuelHistory do
+      define :list_fuel_histories,
+        action: :list,
+        args: [:paginate_sort_opts, :search_query, :advanced_filter_params]
+    end
+
     resource Fleetms.FuelTracking.FuelHistoryPhoto
   end
 

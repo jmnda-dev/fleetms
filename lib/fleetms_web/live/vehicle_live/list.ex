@@ -2,6 +2,7 @@ defmodule FleetmsWeb.VehicleLive.List do
   use FleetmsWeb, :live_view
   import Fleetms.Utils, only: [calc_total_pages: 2, atom_list_to_options_for_select: 1]
   alias Fleetms.Common.PaginationSortParam
+  alias Fleetms.Vehicles
 
   @per_page_opts [10, 20, 30, 50, 100, 250, 500]
   @sort_by_opts [
@@ -47,8 +48,6 @@ defmodule FleetmsWeb.VehicleLive.List do
 
     filter_form_data = filter_form_data_from_url_params(params)
 
-    # paginate_sort_opts = Map.merge(pagination_params, sort_params)
-
     socket =
       socket
       |> assign(:paginate_sort_opts, paginate_sort_opts)
@@ -57,11 +56,11 @@ defmodule FleetmsWeb.VehicleLive.List do
       |> assign(:filter_form_data, filter_form_data)
       |> start_async(:get_vehicles, fn ->
         list_vehicles(
+          paginate_sort_opts,
+          search_query,
+          filter_form_data,
           tenant: tenant,
-          actor: actor,
-          paginate_sort_opts: paginate_sort_opts,
-          search_query: search_query,
-          filter_form_data: filter_form_data
+          actor: actor
         )
       end)
 
@@ -241,16 +240,10 @@ defmodule FleetmsWeb.VehicleLive.List do
     |> assign(:form, nil)
   end
 
-  defp list_vehicles(opts) do
-    %{page: page, per_page: per_page} = opts[:paginate_sort_opts]
+  defp list_vehicles(paginate_sort_opts, search_query, filter_form_data, opts) do
+    %{page: page, per_page: per_page} = paginate_sort_opts
 
-    Fleetms.Vehicles.Vehicle
-    |> Ash.Query.for_read(:list, %{
-      paginate_sort_opts: opts[:paginate_sort_opts],
-      search_query: opts[:search_query],
-      advanced_filter_params: opts[:filter_form_data]
-    })
-    |> Ash.read!(
+    Vehicles.list_vehicles!(paginate_sort_opts, search_query, filter_form_data,
       tenant: opts[:tenant],
       actor: opts[:actor],
       page: [limit: per_page, offset: (page - 1) * per_page, count: true]

@@ -154,16 +154,16 @@
                     <ul class="space-y-2 text-sm" aria-labelledby="per-page-select-dropdownButton">
                       <li :for={number <- get_items_per_page_opts()} class="flex items-center">
                         <input
-                          id={[number, "_items_per_page"]}
+                          id={"#{number}_items_per_page"}
                           name="paginate_sort_opts[per_page]"
                           type="radio"
                           value={number}
-                          checked={number == Integer.to_string(@paginate_sort_opts.per_page)}
+                          checked={number == @paginate_sort_opts.per_page}
                           class="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
                           phx-change="items_per_page_changed"
                         />
                         <label
-                          for={[number, "_items_per_page"]}
+                          for={"#{number}_items_per_page"}
                           class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
                         >
                           <%= number %>
@@ -208,7 +208,7 @@
                       class="space-y-2 text-sm"
                       aria-labelledby="sort-order-select-dropdownButton"
                     >
-                      <li :for={{value, label} <- get_sort_order_opts()} class="flex items-center">
+                      <li :for={{label, value} <- get_sort_order_opts()} class="flex items-center">
                         <input
                           id={"#{value}_sort_order"}
                           name="paginate_sort_opts[sort_order]"
@@ -261,7 +261,7 @@
                       Sort User by
                     </h6>
                     <ul class="space-y-2 text-sm" aria-labelledby="sort-by-select-dropdownButton">
-                      <li :for={{value, label} <- get_sort_by_opts()} class="flex items-center">
+                      <li :for={{label, value} <- get_sort_by_opts()} class="flex items-center">
                         <input
                           id={"#{value}_sort_by"}
                           name="paginate_sort_opts[sort_by]"
@@ -285,7 +285,10 @@
             </form>
           </div>
           <div class="w-full md:w-auto flex flex-col md:flex-row mb-3 md:mb-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-            <.link patch={~p"/users/new"} :if={Ash.can?({User, :create_organization_user}, @current_user)}>
+            <.link
+              :if={Ash.can?({User, :create_organization_user}, @current_user)}
+              patch={~p"/users/new"}
+            >
               <button
                 type="button"
                 class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
