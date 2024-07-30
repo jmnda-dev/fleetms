@@ -62,6 +62,7 @@ defmodule FleetmsWeb.UserLive.Index do
           paginate_sort_opts,
           search_query,
           filter_form_data,
+          actor.organization_id,
           actor: actor
         )
       end)
@@ -205,10 +206,15 @@ defmodule FleetmsWeb.UserLive.Index do
     |> assign(:user, nil)
   end
 
-  defp list_users(paginate_sort_opts, search_query, filter_form_data, opts) do
+  defp list_users(paginate_sort_opts, search_query, filter_form_data, current_org_id, opts) do
     %{page: page, per_page: per_page} = paginate_sort_opts
 
-    Accounts.list_users!(paginate_sort_opts, search_query, filter_form_data,
+    Accounts.list_users!(
+      paginate_sort_opts,
+      search_query,
+      filter_form_data,
+      # TODO: This is a temporary fix. This allows to show only users that belongs to the current tenant.
+      current_org_id,
       actor: opts[:actor],
       page: [limit: per_page, offset: (page - 1) * per_page, count: true]
     )

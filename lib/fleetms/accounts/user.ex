@@ -227,10 +227,11 @@ defmodule Fleetms.Accounts.User do
       argument :paginate_sort_opts, :map, default: @default_sorting_params
       argument :search_query, :string, default: ""
       argument :advanced_filter_params, :map, default: %{}
+      argument :current_organization_id, :uuid, allow_nil?: false # TODO: This is a temporay fix, to filter users by a tenant
 
       prepare build(load: [:full_name])
 
-      prepare fn query, _context ->
+      prepare fn query, context ->
         %{sort_order: sort_order, sort_by: sort_by} =
           query.arguments.paginate_sort_opts
 
@@ -284,6 +285,8 @@ defmodule Fleetms.Accounts.User do
           )
         end
       end
+
+      filter expr(organization_id == ^arg(:current_organization_id))
     end
   end
 

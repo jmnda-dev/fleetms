@@ -16,7 +16,8 @@ defmodule Fleetms.Accounts do
       define :list_users, action: :list, args: [
         :paginate_sort_opts,
         :search_query,
-        :advanced_filter_params
+        :advanced_filter_params,
+        :current_organization_id
       ]
     end
 
