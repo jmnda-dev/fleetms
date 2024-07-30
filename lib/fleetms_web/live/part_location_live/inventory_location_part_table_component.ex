@@ -2,19 +2,18 @@ defmodule FleetmsWeb.InventoryLocationLive.InventoryLocationPartTableComponent d
   use FleetmsWeb, :live_component
 
   require Ash.Query
-  import Fleetms.Utils, only: [calc_total_pages: 2]
 
-  @per_page_opts ["10", "15", "20", "30", "50", "75", "100", "150"]
+  import Fleetms.Utils, only: [calc_total_pages: 2]
+  alias Fleetms.Common.PaginationSortParam
+  @per_page_opts ["10", "20", "50", "75"]
+  @sort_by_opts %{sort_order: :desc, sort_by: :updated_at}
 
   @impl true
   def mount(socket) do
-    default_pagination_params =
-      Fleetms.Inventory.Part.validate_pagination_params!(%{})
+    paginate_sort_opts =
+      validate_paginate_sort_params(Map.merge(%{page: 1, per_page: 20}, @sort_by_opts))
 
-    default_sort_params =
-      Fleetms.Inventory.Part.validate_sorting_params!(%{})
-
-    paginate_sort_opts = Map.merge(default_pagination_params, default_sort_params)
+    IO.inspect(paginate_sort_opts, label: "OPTS")
 
     socket =
       socket
@@ -91,8 +90,7 @@ defmodule FleetmsWeb.InventoryLocationLive.InventoryLocationPartTableComponent d
         socket
       ) do
     # use page 1 instead of current page to reset the pagination, since its not necessary to maintain the current page if items per page is changed
-    new_paginate_opts =
-      Fleetms.Inventory.Part.validate_pagination_params!(%{"page" => 1, "per_page" => per_page})
+    new_paginate_opts = validate_paginate_sort_params(%{"page" => 1, "per_page" => per_page})
 
     socket =
       update(socket, :paginate_sort_opts, fn paginate_sort_opts ->
@@ -116,8 +114,7 @@ defmodule FleetmsWeb.InventoryLocationLive.InventoryLocationPartTableComponent d
       ) do
     %{per_page: per_page} = socket.assigns.paginate_sort_opts
 
-    new_paginate_opts =
-      Fleetms.Inventory.Part.validate_pagination_params!(%{"page" => page, "per_page" => per_page})
+    new_paginate_opts = validate_paginate_sort_params(%{"page" => page, "per_page" => per_page})
 
     socket =
       update(socket, :paginate_sort_opts, fn paginate_sort_opts ->
@@ -177,6 +174,18 @@ defmodule FleetmsWeb.InventoryLocationLive.InventoryLocationPartTableComponent d
       actor: opts[:tenant],
       page: [limit: per_page, offset: (page - 1) * per_page, count: true]
     )
+  end
+
+  defp validate_paginate_sort_params(params) do
+    paginate_sort_params = Map.take(params, ["page", "per_page", "sort_by", "sort_order"])
+
+    case PaginationSortParam.validate(@per_page_opts, @sort_by_opts, paginate_sort_params) do
+      {:ok, validated_params} ->
+        Map.take(validated_params, [:page, :per_page, :sort_by, :sort_order])
+
+      {:error, _error} ->
+        Map.merge(%{page: 1, per_page: 20}, @sort_by_opts)
+    end
   end
 
   defp get_items_per_page_opts, do: @per_page_opts

@@ -1,16 +1,24 @@
 defmodule FleetmsWeb.InventoryLocationLive.Index do
   use FleetmsWeb, :live_view
 
-  import Fleetms.Utils, only: [calc_total_pages: 2]
+  import Fleetms.Utils, only: [calc_total_pages: 2, atom_list_to_options_for_select: 1]
+  alias Fleetms.Common.PaginationSortParam
+  alias Fleetms.Inventory
 
-  @per_page_opts ["10", "15", "20", "30", "50", "75", "100", "150"]
+  @per_page_opts [10, 20, 30, 50, 100, 250, 500]
   @sort_by_opts [
-    created_at: "Date Created",
-    updated_at: "Date Updated",
-    name: "Inventory Location Name"
+    :created_at,
+    :updated_at,
+    :name
   ]
-
-  @sort_order [asc: "Ascending", desc: "Descending"]
+  @default_listing_limit 20
+  @sort_order [:asc, :desc]
+  @default_paginate_sort_params %{
+    page: 1,
+    per_page: @default_listing_limit,
+    sort_by: :updated_at,
+    sort_order: :desc
+  }
 
   @impl true
   def mount(_params, _session, socket) do
@@ -28,15 +36,10 @@ defmodule FleetmsWeb.InventoryLocationLive.Index do
 
   @impl true
   def handle_params(params, _url, socket) do
-    pagination_params =
-      Fleetms.Inventory.InventoryLocation.validate_pagination_params!(params)
-
-    sort_params =
-      Fleetms.Inventory.InventoryLocation.validate_sorting_params!(params)
+    paginate_sort_opts = validate_paginate_sort_params(params)
 
     search_query = Map.get(params, "search_query", "")
 
-    paginate_sort_opts = Map.merge(pagination_params, sort_params)
     %{tenant: tenant, current_user: actor, live_action: live_action} = socket.assigns
 
     socket =
@@ -46,10 +49,10 @@ defmodule FleetmsWeb.InventoryLocationLive.Index do
       |> assign(:search_params, %{search_query: search_query})
       |> start_async(:get_inventory_locations, fn ->
         list_inventory_locations(
+          paginate_sort_opts,
+          search_query,
           tenant: tenant,
-          actor: actor,
-          paginate_sort_opts: paginate_sort_opts,
-          search_query: search_query
+          actor: actor
         )
       end)
 
@@ -204,22 +207,29 @@ defmodule FleetmsWeb.InventoryLocationLive.Index do
     |> assign(:inventory_location, nil)
   end
 
-  defp list_inventory_locations(opts) do
-    %{page: page, per_page: per_page} = opts[:paginate_sort_opts]
+  defp list_inventory_locations(paginate_sort_opts, search_query, opts) do
+    %{page: page, per_page: per_page} = paginate_sort_opts
 
-    Fleetms.Inventory.InventoryLocation
-    |> Ash.Query.for_read(:list, %{
-      paginate_sort_opts: opts[:paginate_sort_opts],
-      search_query: opts[:search_query]
-    })
-    |> Ash.read!(
+    Inventory.list_inventory_locations!(paginate_sort_opts, search_query,
       tenant: opts[:tenant],
       actor: opts[:actor],
       page: [limit: per_page, offset: (page - 1) * per_page, count: true]
     )
   end
 
+  defp validate_paginate_sort_params(params) do
+    paginate_sort_params = Map.take(params, ["page", "per_page", "sort_by", "sort_order"])
+
+    case PaginationSortParam.validate(@per_page_opts, @sort_by_opts, paginate_sort_params) do
+      {:ok, validated_params} ->
+        Map.take(validated_params, [:page, :per_page, :sort_by, :sort_order])
+
+      {:error, _error} ->
+        @default_paginate_sort_params
+    end
+  end
+
   defp get_items_per_page_opts, do: @per_page_opts
-  defp get_sort_by_opts, do: @sort_by_opts
-  defp get_sort_order_opts, do: @sort_order
+  defp get_sort_by_opts, do: atom_list_to_options_for_select(@sort_by_opts)
+  defp get_sort_order_opts, do: atom_list_to_options_for_select(@sort_order)
 end

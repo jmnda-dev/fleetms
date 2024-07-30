@@ -13,9 +13,7 @@ defmodule Fleetms.Accounts.User do
   alias Fleetms.Accounts.{Organization, Token, UserProfile}
   alias Fleetms.Accounts.User.Policies.{IsAdmin, IsFleetManager, IsTechnician}
 
-  @default_listing_limit 20
-  @default_sorting_params %{sort_by: :created_at, sort_order: :desc}
-  @default_paginate_params %{page: 1, per_page: @default_listing_limit}
+  @default_sorting_params %{sort_by: :updated_at, sort_order: :desc}
   @password_regex ~r/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$\-_+])[A-Za-z\d!@#$\-_+]+$/
   @invalid_password_msg "Invalid password format. Password should be a combination of lowercase and uppercase letters, numbers, and at least one of these characters: @#$-_+"
 
@@ -107,79 +105,6 @@ defmodule Fleetms.Accounts.User do
 
   actions do
     defaults [:destroy]
-
-    action :validate_sorting_params, :map do
-      description "Validates the Sorting params from the URL e.g /?sort_by=name&sort_order=desc"
-      argument :url_params, :map, allow_nil?: false
-
-      run fn input, _context ->
-        params =
-          %{
-            sort_order: Map.get(input.arguments.url_params, "sort_order", "desc"),
-            sort_by: Map.get(input.arguments.url_params, "sort_by", "updated_at")
-          }
-
-        types = %{
-          sort_order:
-            Ecto.ParameterizedType.init(Ecto.Enum, values: [asc: "Ascending", desc: "Descending"]),
-          sort_by:
-            Ecto.ParameterizedType.init(Ecto.Enum,
-              values: [
-                created_at: "Date Created",
-                updated_at: "Date Updated",
-                first_name: "First Name",
-                last_name: "Last Name",
-                role: "Role",
-                status: "Status"
-              ]
-            )
-        }
-
-        data = %{}
-
-        {data, types}
-        |> Ecto.Changeset.cast(params, Map.keys(types))
-        |> Ecto.Changeset.apply_action(:create)
-        |> case do
-          {:ok, sort_params} ->
-            {:ok, sort_params}
-
-          {:error, changeset} ->
-            {:ok, @default_sorting_params}
-        end
-      end
-    end
-
-    action :validate_pagination_params, :map do
-      description "Validates the Pagination params from the URL e.g /?page=1&per_page=10"
-      argument :url_params, :map, allow_nil?: false
-
-      run fn input, _context ->
-        params =
-          %{
-            page: Map.get(input.arguments.url_params, "page", 1),
-            per_page: Map.get(input.arguments.url_params, "per_page", @default_listing_limit)
-          }
-
-        types = %{
-          page: :integer,
-          per_page: :integer
-        }
-
-        data = %{}
-
-        {data, types}
-        |> Ecto.Changeset.cast(params, Map.keys(types))
-        |> Ecto.Changeset.apply_action(:create)
-        |> case do
-          {:ok, paginate_params} ->
-            {:ok, paginate_params}
-
-          {:error, _changeset} ->
-            {:ok, @default_paginate_params}
-        end
-      end
-    end
 
     create :register_with_password do
       accept [:email]
@@ -297,7 +222,7 @@ defmodule Fleetms.Accounts.User do
     end
 
     read :list do
-      pagination offset?: true, default_limit: 50, countable: true
+      pagination offset?: true, countable: true
 
       argument :paginate_sort_opts, :map, default: @default_sorting_params
       argument :search_query, :string, default: ""
@@ -373,11 +298,6 @@ defmodule Fleetms.Accounts.User do
     identity :unique_username, [:username] do
       eager_check? true
     end
-  end
-
-  code_interface do
-    define :validate_sorting_params, action: :validate_sorting_params, args: [:url_params]
-    define :validate_pagination_params, action: :validate_pagination_params, args: [:url_params]
   end
 
   preparations do

@@ -140,6 +140,7 @@ defmodule FleetmsWeb.VehicleLive.FilterFormComponent do
 
   @impl true
   def handle_event("vehicle_make_selected", %{"filter_form" => form_params}, socket) do
+    IO.inspect(form_params, label: "FORM PARAMS")
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     case form_params["vehicle_make"] do

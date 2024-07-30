@@ -12,10 +12,6 @@ defmodule Fleetms.Service.WorkOrder do
   alias Fleetms.Accounts.User.Policies.{IsAdmin, IsFleetManager, IsTechnician}
   require Ash.Query
 
-  @default_listing_limit 20
-  @default_sorting_params %{sort_by: :desc, sort_order: :created_at}
-  @default_paginate_params %{page: 1, per_page: @default_listing_limit}
-
   attributes do
     uuid_primary_key :id
 
@@ -181,81 +177,6 @@ defmodule Fleetms.Service.WorkOrder do
 
   actions do
     defaults [:read]
-
-    action :validate_sorting_params, :map do
-      description "Validates the Sorting params from the URL e.g /?sort_by=name&sort_order=desc"
-      argument :url_params, :map, allow_nil?: false
-
-      run fn input, _context ->
-        params =
-          %{
-            sort_order: Map.get(input.arguments.url_params, "sort_order", "desc"),
-            sort_by: Map.get(input.arguments.url_params, "sort_by", "updated_at")
-          }
-
-        types = %{
-          sort_order:
-            Ecto.ParameterizedType.init(Ecto.Enum, values: [asc: "Ascending", desc: "Descending"]),
-          sort_by:
-            Ecto.ParameterizedType.init(Ecto.Enum,
-              values: [
-                created_at: "Date Created",
-                updated_at: "Date Updated",
-                date_and_time_issued: "Date Issued",
-                date_and_time_started: "Date Started",
-                date_and_time_completed: "Date Completed",
-                status: "Status",
-                count_of_service_tasks: "Number of Service Tasks",
-                repair_category: "Repair Category"
-              ]
-            )
-        }
-
-        data = %{}
-
-        {data, types}
-        |> Ecto.Changeset.cast(params, Map.keys(types))
-        |> Ecto.Changeset.apply_action(:create)
-        |> case do
-          {:ok, sort_params} ->
-            {:ok, sort_params}
-
-          {:error, changeset} ->
-            {:ok, @default_sorting_params}
-        end
-      end
-    end
-
-    action :validate_pagination_params, :map do
-      description "Validates the Pagination params from the URL e.g /?page=1&per_page=10"
-      argument :url_params, :map, allow_nil?: false
-
-      run fn input, _context ->
-        params =
-          %{
-            page: Map.get(input.arguments.url_params, "page", 1),
-            per_page: Map.get(input.arguments.url_params, "per_page", @default_listing_limit)
-          }
-
-        types = %{
-          page: :integer,
-          per_page: :integer
-        }
-
-        data = %{}
-
-        {data, types}
-        |> Ecto.Changeset.cast(params, Map.keys(types))
-        |> Ecto.Changeset.apply_action(:create)
-        |> case do
-          {:ok, paginate_params} ->
-            {:ok, paginate_params}
-
-          {:error, _changeset} ->
-            {:ok, @default_paginate_params}
-        end
-      end
-    end
 
     action :get_dashboard_stats, :map do
       import Ecto.Query
@@ -620,8 +541,6 @@ defmodule Fleetms.Service.WorkOrder do
 
   code_interface do
     define :get_by_id, action: :get_by_id, args: [:id], get?: true
-    define :validate_sorting_params, action: :validate_sorting_params, args: [:url_params]
-    define :validate_pagination_params, action: :validate_pagination_params, args: [:url_params]
     define :get_dashboard_stats, action: :get_dashboard_stats, args: [:tenant]
   end
 
@@ -640,11 +559,9 @@ defmodule Fleetms.Service.WorkOrder do
       |> Ash.Changeset.for_update(:resolve_from_work_order, params)
       |> Ash.update!()
     end)
-
   end
 
   def reset_service_reminders(changeset) do
-
     reminders =
       Ash.Changeset.get_data(changeset, :work_order_service_tasks)
       |> Stream.filter(&(not is_nil(&1.service_reminder)))
@@ -658,7 +575,6 @@ defmodule Fleetms.Service.WorkOrder do
     Enum.map(reminders, fn reminder ->
       reset_reminder(reminder, work_order_id, changeset.tenant)
     end)
-
   end
 
   @doc """

@@ -6,6 +6,7 @@ defmodule Fleetms.Common do
     resource Fleetms.Common.Vendor
     resource Fleetms.Common.VendorPart
     resource Fleetms.Common.Sequence
+    resource Fleetms.Common.PaginationSortParam
   end
 
   admin do

@@ -3,25 +3,34 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
   require Logger
 
   alias Fleetms.Accounts
-  import Fleetms.Utils, only: [calc_total_pages: 2, dates_in_map_to_string: 2]
+
+  import Fleetms.Utils,
+    only: [calc_total_pages: 2, dates_in_map_to_string: 2, atom_list_to_options_for_select: 1]
+
+  alias Fleetms.Common.PaginationSortParam
+  alias Fleetms.Service
 
   @photos_upload_ref :work_order_photos
   @default_max_upload_entries 10
-
-  @per_page_opts ["10", "15", "20", "30", "50", "75", "100", "150"]
+  @per_page_opts [10, 20, 30, 50, 100, 250, 500]
   @sort_by_opts [
-    created_at: "Date Created",
-    updated_at: "Date Updated",
-    date_and_time_issued: "Date Issued",
-    date_and_time_started: "Date Started",
-    date_and_time_completed: "Date Completed",
-    status: "Status",
-    count_of_service_tasks: "Number of Service Tasks",
-    repair_category: "Repair Category"
+    :created_at,
+    :updated_at,
+    :date_and_time_issued,
+    :date_and_time_started,
+    :date_and_time_completed,
+    :status,
+    :count_of_service_tasks,
+    :repair_category
   ]
-
-  @sort_order [asc: "Ascending", desc: "Descending"]
-
+  @default_listing_limit 20
+  @sort_order [:asc, :desc]
+  @default_paginate_sort_params %{
+    page: 1,
+    per_page: @default_listing_limit,
+    sort_by: :updated_at,
+    sort_order: :desc
+  }
   @impl true
   def mount(_params, _session, socket) do
     socket =
@@ -38,11 +47,7 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
 
   @impl true
   def handle_params(params, _uri, socket) do
-    pagination_params =
-      Fleetms.Service.WorkOrder.validate_pagination_params!(params)
-
-    sort_params =
-      Fleetms.Service.WorkOrder.validate_sorting_params!(params)
+    paginate_sort_opts = validate_paginate_sort_params(params)
 
     search_query = Map.get(params, "search_query", "")
 
@@ -59,8 +64,6 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
         :date_and_time_completed_to
       ])
 
-    paginate_sort_opts = Map.merge(pagination_params, sort_params)
-
     %{tenant: tenant, current_user: actor, live_action: live_action} = socket.assigns
 
     socket =
@@ -71,11 +74,11 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
       |> assign(:filter_form_data, filter_form_data_with_string_dates)
       |> start_async(:get_work_orders, fn ->
         list_work_orders(
+          paginate_sort_opts,
+          search_query,
+          filter_form_data,
           tenant: tenant,
-          actor: actor,
-          paginate_sort_opts: paginate_sort_opts,
-          search_query: search_query,
-          filter_form_data: filter_form_data
+          actor: actor
         )
       end)
 
@@ -782,20 +785,26 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
     end
   end
 
-  defp list_work_orders(opts) do
-    %{page: page, per_page: per_page} = opts[:paginate_sort_opts]
+  defp list_work_orders(paginate_sort_opts, search_query, filter_form_data, opts) do
+    %{page: page, per_page: per_page} = paginate_sort_opts
 
-    Fleetms.Service.WorkOrder
-    |> Ash.Query.for_read(:list, %{
-      paginate_sort_opts: opts[:paginate_sort_opts],
-      search_query: opts[:search_query],
-      advanced_filter_params: opts[:filter_form_data]
-    })
-    |> Ash.read!(
+    Service.list_work_orders!(paginate_sort_opts, search_query, filter_form_data,
       tenant: opts[:tenant],
       actor: opts[:actor],
       page: [limit: per_page, offset: (page - 1) * per_page, count: true]
     )
+  end
+
+  defp validate_paginate_sort_params(params) do
+    paginate_sort_params = Map.take(params, ["page", "per_page", "sort_by", "sort_order"])
+
+    case PaginationSortParam.validate(@per_page_opts, @sort_by_opts, paginate_sort_params) do
+      {:ok, validated_params} ->
+        Map.take(validated_params, [:page, :per_page, :sort_by, :sort_order])
+
+      {:error, _error} ->
+        @default_paginate_sort_params
+    end
   end
 
   defp filter_form_data_from_url_params(url_params) do
@@ -826,8 +835,8 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
   end
 
   defp get_items_per_page_opts, do: @per_page_opts
-  defp get_sort_by_opts, do: @sort_by_opts
-  defp get_sort_order_opts, do: @sort_order
+  defp get_sort_by_opts, do: atom_list_to_options_for_select(@sort_by_opts)
+  defp get_sort_order_opts, do: atom_list_to_options_for_select(@sort_order)
 
   defp has_reminder?(service_task_form) do
     case get_form_value(service_task_form, :service_reminder) do
