@@ -5,6 +5,7 @@ import ApexCharts from 'apexcharts'
 import { Drawer } from 'flowbite';
 import moment from 'moment';
 import sidebarInitJs from "./sidebar.js"
+import {Dropdown} from 'flowbite'
 const humanizeDuration = require('humanize-duration');
 
 
@@ -30,6 +31,16 @@ Hooks.initSidebarJs = {
   mounted() {
     sidebarInitJs()
   },
+}
+
+Hooks.initDropdown = {
+  mounted() {
+    let $triggerEl = this.el
+    let $targetElId =$triggerEl.getAttribute('data-dropdown-toggle')  
+    let $targetEl = document.getElementById($targetElId)
+
+    const _dropdown = new Dropdown($targetEl, $triggerEl)
+  }
 }
 
 Hooks.signaturePad = {

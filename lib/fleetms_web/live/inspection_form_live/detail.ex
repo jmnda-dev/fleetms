@@ -95,8 +95,8 @@ defmodule FleetmsWeb.InspectionFormLive.Detail do
   def handle_event("add_form", %{"path" => path}, socket) do
     form = AshPhoenix.Form.add_form(socket.assigns.form, path)
     socket = assign(socket, :form, form)
-    # TODO: Initialize flowbite on client
-    {:noreply, push_event(socket, "initFlowbiteJS", %{})}
+
+    {:noreply, socket}
   end
 
   @impl true
