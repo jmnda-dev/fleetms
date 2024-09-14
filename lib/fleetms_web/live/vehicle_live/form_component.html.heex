@@ -173,15 +173,15 @@
         <% end %>
       </div>
     </div>
-    <.alert :if={@disallow_photo_uploads} kind={:warning}>
-      <%= @upload_photo_disallow_msg %>
+    <.alert :if={@photo_upload_disallowed?} kind={:warning}>
+      <%= @photo_upload_disallow_msg %>
     </.alert>
-    <div :if={not @disallow_photo_uploads}>
+    <div :if={not @photo_upload_disallowed?}>
       <.alert :for={err <- upload_errors(@uploads.vehicle_photos)} kind={:error}>
         <%= error_to_string(err) %>
       </.alert>
     </div>
-    <div :if={not @disallow_photo_uploads} class="grid gap-6 mb-6 md:grid-cols-2">
+    <div :if={not @photo_upload_disallowed?} class="grid gap-6 mb-6 md:grid-cols-2">
       <%= for {entry, _i} <- Enum.with_index(@uploads.vehicle_photos.entries) do %>
         <div>
           <.live_img_preview entry={entry} width="auto" height="200" />
@@ -209,7 +209,7 @@
     </div>
 
     <.upload_input
-      :if={not @disallow_photo_uploads}
+      :if={not @photo_upload_disallowed?}
       upload={@uploads.vehicle_photos}
       ref={@uploads.vehicle_photos.ref}
     >

@@ -11,7 +11,13 @@ defmodule Fleetms.Vehicles.Vehicle do
       Ash.Policy.Authorizer
     ]
 
+  @default_max_photo_upload_entries 10
+  @default_max_document_upload_entries 10
+
   alias Fleetms.Accounts.User.Policies.{IsAdmin, IsFleetManager}
+
+  def get_max_photo_uploads, do: @default_max_photo_upload_entries
+  def get_max_document_uploads, do: @default_max_document_upload_entries
 
   attributes do
     uuid_primary_key :id
@@ -422,6 +428,8 @@ defmodule Fleetms.Vehicles.Vehicle do
 
       prepare build(
                 load: [
+                  :num_of_photos,
+                  :num_of_docs,
                   :photos,
                   :documents,
                   :vehicle_engine_spec,
@@ -536,6 +544,9 @@ defmodule Fleetms.Vehicles.Vehicle do
     first :model, :vehicle_model, :name do
       filterable? true
     end
+
+    count :num_of_photos, :photos, default: 0
+    count :num_of_docs, :documents, default: 0
   end
 
   calculations do

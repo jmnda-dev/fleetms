@@ -1,9 +1,9 @@
 defmodule FleetmsWeb.VehicleLive.FormComponent do
+  alias Fleetms.Vehicles.Vehicle
   use FleetmsWeb, :live_component
 
   @photos_upload_ref :vehicle_photos
   @documents_upload_ref :vehicle_documents
-  @default_max_photo_upload_entries 10
   @default_max_document_upload_entries 30
 
   @impl true
@@ -20,16 +20,14 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
   def update(%{vehicle: vehicle} = assigns, socket) do
     socket = assign(socket, assigns)
     %{tenant: tenant, current_user: actor} = socket.assigns
-    max_photo_upload_entries = get_max_photo_upload_entries(vehicle) # TODO: Perhaps use an Ash Resource aggregate to determine the number of uploads to allow
+    # TODO: Perhaps use an Ash Resource aggregate to determine the number of uploads to allow
     max_document_upload_entries = get_max_document_upload_entries(vehicle)
 
     vehicle_makes = Fleetms.Vehicles.VehicleMake.get_all!(tenant: tenant, actor: actor)
 
     socket =
       socket
-      |> assign(:max_photo_upload_entries, max_photo_upload_entries)
       |> assign(:max_document_upload_entries, max_document_upload_entries)
-      |> assign(:disallow_photo_uploads, max_photo_upload_entries == 0)
       |> assign(:disallow_document_uploads, max_document_upload_entries == 0)
       |> assign_form()
       |> assign(:vehicle_makes, vehicle_makes)
@@ -108,13 +106,17 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
 
   defp assign_vehicle_models(socket, vehicle) do
     %{tenant: tenant, current_user: actor} = socket.assigns
+
     case socket.assigns.action do
       :add ->
         assign(socket, :vehicle_models, [])
 
       :edit ->
         vehicle_models =
-          Fleetms.Vehicles.VehicleModel.list_by_vehicle_make!(vehicle.vehicle_make, tenant: tenant, actor: actor)
+          Fleetms.Vehicles.VehicleModel.list_by_vehicle_make!(vehicle.vehicle_make,
+            tenant: tenant,
+            actor: actor
+          )
 
         assign(socket, :vehicle_models, vehicle_models)
     end
@@ -220,7 +222,7 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
       |> Enum.map(&%{id: &1.id})
 
     # Check if uploads have been disallowed, so as to not run consume_uploaded_entry/3 which would fail if there is no upload config in the socket
-    if socket.assigns.disallow_photo_uploads do
+    if socket.assigns.photo_upload_disallowed? do
       # TODO: Fix this duplication logic of updating vehicle photos, see line 207 and 216 as well
       Ash.Changeset.for_update(vehicle, :maybe_delete_existing_photos, %{
         photo: get_photo_value(vehicle, [], photos_to_keep_params),
@@ -315,16 +317,6 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
     end
   end
 
-  defp get_max_photo_upload_entries(nil), do: @default_max_photo_upload_entries
-
-  defp get_max_photo_upload_entries(%Fleetms.Vehicles.Vehicle{photos: nil}),
-    do: @default_max_photo_upload_entries
-
-  defp get_max_photo_upload_entries(%Fleetms.Vehicles.Vehicle{photos: photos}) do
-    total = Enum.count(photos)
-    @default_max_photo_upload_entries - total
-  end
-
   defp get_max_document_upload_entries(nil), do: @default_max_document_upload_entries
 
   defp get_max_document_upload_entries(%Fleetms.Vehicles.Vehicle{documents: nil}),
@@ -336,19 +328,32 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
   end
 
   defp assign_photo_upload_config(socket) do
-    max_photo_upload_entries = socket.assigns.max_photo_upload_entries
+    num_of_max_uploads = Vehicle.get_max_photo_uploads()
+    vehicle = socket.assigns.vehicle
 
-    upload_disallow_msg =
-      "Max number of photos is reached, select photos to delete, save and upload new photos."
+    cond do
+      is_nil(vehicle) ->
+        allow_upload(socket, @photos_upload_ref,
+          accept: ~w(.jpg .jpeg .png),
+          max_entries: num_of_max_uploads,
+          max_file_size: 4096_000
+        )
+        |> assign(:photo_upload_disallowed?, true)
 
-    if max_photo_upload_entries == 0 do
-      assign(socket, :upload_disallow_msg, upload_disallow_msg)
-    else
-      allow_upload(socket, @photos_upload_ref,
-        accept: ~w(.jpg .jpeg .png),
-        max_entries: max_photo_upload_entries,
-        max_file_size: 4096_000
-      )
+      vehicle.num_of_photos == num_of_max_uploads ->
+        assign(socket,
+          photo_upload_disallowed?: true,
+          photo_upload_disallow_msg:
+            "Max number of photos is reached, select photos to delete, save and upload new photos."
+        )
+
+      vehicle.num_of_photos < num_of_max_uploads ->
+        allow_upload(socket, @photos_upload_ref,
+          accept: ~w(.jpg .jpeg .png),
+          max_entries: num_of_max_uploads - vehicle.num_of_photos,
+          max_file_size: 4096_000
+        )
+        |> assign(:photo_upload_disallowed?, false)
     end
   end
 
