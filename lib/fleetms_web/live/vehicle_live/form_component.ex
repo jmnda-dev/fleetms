@@ -4,7 +4,6 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
 
   @photos_upload_ref :vehicle_photos
   @documents_upload_ref :vehicle_documents
-  @default_max_document_upload_entries 30
 
   @impl true
   def update(%{vehicle_models: vehicle_models} = _assigns, socket) do
@@ -21,18 +20,15 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
     socket = assign(socket, assigns)
     %{tenant: tenant, current_user: actor} = socket.assigns
     # TODO: Perhaps use an Ash Resource aggregate to determine the number of uploads to allow
-    max_document_upload_entries = get_max_document_upload_entries(vehicle)
 
     vehicle_makes = Fleetms.Vehicles.VehicleMake.get_all!(tenant: tenant, actor: actor)
 
     socket =
       socket
-      |> assign(:max_document_upload_entries, max_document_upload_entries)
-      |> assign(:disallow_document_uploads, max_document_upload_entries == 0)
       |> assign_form()
       |> assign(:vehicle_makes, vehicle_makes)
-      |> assign(:upload_photo_disallow_msg, nil)
-      |> assign(:upload_document_disallow_msg, nil)
+      |> assign(:photo_upload_disallow_msg, nil)
+      |> assign(:document_upload_disallow_msg, nil)
       |> assign_vehicle_models(vehicle)
       |> assign_photo_upload_config()
       |> assign_document_upload_config()
@@ -262,8 +258,9 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
       Stream.filter(current_vehicle_documents, &(&1.id not in documents_to_delete_ids))
       |> Enum.map(&%{id: &1.id})
 
-    if socket.assigns.disallow_document_uploads do
-      Ash.Changeset.for_update(vehicle, :maybe_delete_existing_documents, %{
+    if socket.assigns.document_upload_disallowed? do
+      vehicle
+      |> Ash.Changeset.for_update(:maybe_delete_existing_documents, %{
         current_documents: documents_to_keep_params
       })
       |> Ash.update!(tenant: tenant, actor: actor)
@@ -297,7 +294,7 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
   end
 
   defp get_photo_value(
-         %Fleetms.Vehicles.Vehicle{photo: photo_filename},
+         %Vehicle{photo: photo_filename},
          uploaded_photos_params,
          photos_to_keep_params
        ) do
@@ -317,16 +314,6 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
     end
   end
 
-  defp get_max_document_upload_entries(nil), do: @default_max_document_upload_entries
-
-  defp get_max_document_upload_entries(%Fleetms.Vehicles.Vehicle{documents: nil}),
-    do: @default_max_document_upload_entries
-
-  defp get_max_document_upload_entries(%Fleetms.Vehicles.Vehicle{documents: documents}) do
-    total = Enum.count(documents)
-    @default_max_document_upload_entries - total
-  end
-
   defp assign_photo_upload_config(socket) do
     num_of_max_uploads = Vehicle.get_max_photo_uploads()
     vehicle = socket.assigns.vehicle
@@ -338,7 +325,7 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
           max_entries: num_of_max_uploads,
           max_file_size: 4096_000
         )
-        |> assign(:photo_upload_disallowed?, true)
+        |> assign(:photo_upload_disallowed?, false)
 
       vehicle.num_of_photos == num_of_max_uploads ->
         assign(socket,
@@ -358,30 +345,43 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
   end
 
   defp assign_document_upload_config(socket) do
-    max_document_upload_entries = socket.assigns.max_document_upload_entries
+    num_of_max_uploads = Vehicle.get_max_document_uploads()
+    vehicle = socket.assigns.vehicle
 
-    upload_disallow_msg =
-      "Max number of documents is reached, select documents to delete, save and upload new documents."
+    cond do
+      is_nil(vehicle) ->
+        allow_upload(socket, @documents_upload_ref,
+          accept: ~w(.pdf .docx .xlsx),
+          max_entries: num_of_max_uploads,
+          max_file_size: 4096_000
+        )
+        |> assign(:document_upload_disallowed?, false)
 
-    if max_document_upload_entries == 0 do
-      assign(socket, :upload_disallow_msg, upload_disallow_msg)
-    else
-      allow_upload(socket, @documents_upload_ref,
-        accept: ~w(.pdf .docx .xlsx),
-        max_entries: max_document_upload_entries,
-        max_file_size: 8196_000
-      )
+      vehicle.num_of_docs == num_of_max_uploads ->
+        assign(socket,
+          document_upload_disallowed?: true,
+          document_upload_disallow_msg:
+            "Max number of documents is reached, select documents to delete, save and upload new documents."
+        )
+
+      vehicle.num_of_docs < num_of_max_uploads ->
+        allow_upload(socket, @documents_upload_ref,
+          accept: ~w(.pdf .docx .xlsx),
+          max_entries: num_of_max_uploads - vehicle.num_of_docs,
+          max_file_size: 4096_000
+        )
+        |> assign(:document_upload_disallowed?, false)
     end
   end
 
-  defp get_current_vehicle_photos(%Fleetms.Vehicles.Vehicle{photos: photos}) when is_list(photos),
+  defp get_current_vehicle_photos(%Vehicle{photos: photos}) when is_list(photos),
     do: photos
 
-  defp get_current_vehicle_photos(%Fleetms.Vehicles.Vehicle{photos: _photos}), do: []
+  defp get_current_vehicle_photos(%Vehicle{photos: _photos}), do: []
 
-  defp get_current_vehicle_documents(%Fleetms.Vehicles.Vehicle{documents: documents})
+  defp get_current_vehicle_documents(%Vehicle{documents: documents})
        when is_list(documents),
        do: documents
 
-  defp get_current_vehicle_documents(%Fleetms.Vehicles.Vehicle{documents: _documents}), do: []
+  defp get_current_vehicle_documents(%Vehicle{documents: _documents}), do: []
 end

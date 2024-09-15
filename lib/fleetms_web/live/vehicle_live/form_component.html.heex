@@ -293,15 +293,15 @@
         <% end %>
       </div>
     </div>
-    <.alert :if={@disallow_document_uploads} kind={:warning}>
-      <%= @upload_document_disallow_msg %>
+    <.alert :if={@document_upload_disallowed?} kind={:warning}>
+      <%= @document_upload_disallow_msg %>
     </.alert>
-    <div :if={not @disallow_document_uploads}>
+    <div :if={not @document_upload_disallowed?}>
       <.alert :for={err <- upload_errors(@uploads.vehicle_documents)} kind={:error}>
         <%= error_to_string(err) %>
       </.alert>
     </div>
-    <div :if={not @disallow_document_uploads} class="grid gap-6 mb-6 md:grid-cols-2">
+    <div :if={not @document_upload_disallowed?} class="grid gap-6 mb-6 md:grid-cols-2">
       <div class="pt-4" id="documents-upload-entries" role="tabpanel">
         <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
           <li
@@ -350,13 +350,21 @@
                 </button>
               </div>
             </div>
+            <div class="my-2">
+              <.alert :for={err <- upload_errors(@uploads.vehicle_documents, entry)} kind={:error}>
+                <%= error_to_string(err) %>
+              </.alert>
+            </div>
+            <div class="my-2">
+              <.progress_bar progress={entry.progress} />
+            </div>
           </li>
         </ul>
       </div>
     </div>
 
     <.upload_input
-      :if={not @disallow_document_uploads}
+      :if={not @document_upload_disallowed?}
       upload={@uploads.vehicle_documents}
       ref={@uploads.vehicle_documents.ref}
     >
