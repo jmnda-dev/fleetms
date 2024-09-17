@@ -827,16 +827,17 @@ defmodule FleetmsWeb.CoreComponents do
 
   ## Example
 
-      <.breadcrumb links={[
+      <.breadcrumb class="flex mb-5" links={[
         %{label: "Home", to: ~p"/", link_type: :navigate},
         %{label: "Users", link_type: :navigate, active: true}
       ]} />
   """
   attr :links, :list, required: true
+  attr :class, :string, default: "flex mb-5"
 
   def breadcrumb(assigns) do
     ~H"""
-    <nav class="flex mb-5" aria-label="Breadcrumb">
+    <nav class={@class} aria-label="Breadcrumb">
       <ol class="inline-flex items-center space-x-1 md:space-x-2">
         <li
           :for={{link_item, index} <- Enum.with_index(@links)}
