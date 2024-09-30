@@ -5,6 +5,7 @@
     %{label: "Vehicles", link_type: :navigate, active: true}
   ]}
 />
+
 <section class="bg-gray-50 dark:bg-gray-900 py-3 sm:py-5">
   <div class="mx-auto max-w-screen-2xl px-4 lg:px-2">
     <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg">
@@ -58,13 +59,38 @@
                 </button>
               </div>
             </form>
-            <.link patch={
-              ~p"/vehicles/filter_form?#{Map.merge(@paginate_sort_opts, @search_params) |> Map.merge(@filter_form_data)}"
-            }>
+            <%!-- <.link patch={ --%>
+            <%!--   ~p"/vehicles/filter_form?#{Map.merge(@paginate_sort_opts, @search_params) |> Map.merge(@filter_form_data)}" --%>
+            <%!-- }> --%>
+            <%!--   <button --%>
+            <%!--     id="filterDropdownButton" --%>
+            <%!--     type="button" --%>
+            <%!--     class="flex items-center justify-center w-full px-4 py-2 mr-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg md:w-auto focus:outline-none hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" --%>
+            <%!--   > --%>
+            <%!--     <svg --%>
+            <%!--       xmlns="http://www.w3.org/2000/svg" --%>
+            <%!--       aria-hidden="true" --%>
+            <%!--       class="w-4 h-4 mr-2 text-gray-400" --%>
+            <%!--       viewbox="0 0 20 20" --%>
+            <%!--       fill="currentColor" --%>
+            <%!--     > --%>
+            <%!--       <path --%>
+            <%!--         fill-rule="evenodd" --%>
+            <%!--         clip-rule="evenodd" --%>
+            <%!--         d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" --%>
+            <%!--       /> --%>
+            <%!--     </svg> --%>
+            <%!--     Filter --%>
+            <%!--   </button> --%>
+            <%!-- </.link> --%>
+            <%= if @applied_filters == %{} do %>
               <button
-                id="filterDropdownButton"
+                id="vehicle-filter-drawer-button"
                 type="button"
                 class="flex items-center justify-center w-full px-4 py-2 mr-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg md:w-auto focus:outline-none hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                data-drawer-target="vehicle-filters-drawer"
+                data-drawer-show="vehicle-filters-drawer"
+                aria-controls="vehicle-filters-drawer"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -81,7 +107,21 @@
                 </svg>
                 Filter
               </button>
-            </.link>
+            <% else %>
+              <button
+                type="button"
+                class="inline-flex items-center px-5 py-2.5 mr-2 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                data-drawer-target="vehicle-filters-drawer"
+                data-drawer-show="vehicle-filters-drawer"
+                aria-controls="vehicle-filters-drawer"
+              >
+                Filters
+                <span class="inline-flex items-center justify-center w-4 h-4 ms-2 text-xs font-semibold text-primary-800 bg-primary-200 rounded-full">
+                  <%= Enum.count(@applied_filters) %>
+                </span>
+              </button>
+            <% end %>
+
             <form class="flex items-center space-x-4">
               <div>
                 <button
@@ -467,27 +507,19 @@
     patch={~p"/vehicles"}
   />
 </.modal>
-
-<.modal
-  :if={@live_action == :filter_form}
-  id="filter-form-modal"
-  show
-  max_width="max-w-5xl"
-  on_cancel={
-    JS.navigate(
-      ~p"/vehicles?#{Map.merge(@paginate_sort_opts, @search_params) |> Map.merge(@filter_form_data)}"
-    )
+<!-- drawer component -->
+<.live_component
+  :if={
+    # Work around to prevent the drawer from initializing twice, which can cause backdrop issues when drawer is closed
+    connected?(@socket)
   }
->
-  <.live_component
-    module={FleetmsWeb.VehicleLive.FilterFormComponent}
-    id="filter-form-component"
-    title={@page_title}
-    action={@live_action}
-    paginate_sort_opts={@paginate_sort_opts}
-    search_params={@search_params}
-    filter_form_data={@filter_form_data}
-    current_user={@current_user}
-    tenant={@tenant}
-  />
-</.modal>
+  module={FleetmsWeb.VehicleLive.FilterFormComponent}
+  id="filter-form-component"
+  title={@page_title}
+  action={@live_action}
+  paginate_sort_opts={@paginate_sort_opts}
+  search_params={@search_params}
+  applied_filters={@applied_filters}
+  current_user={@current_user}
+  tenant={@tenant}
+/>

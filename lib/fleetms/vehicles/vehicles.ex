@@ -3,10 +3,12 @@ defmodule Fleetms.Vehicles do
     extensions: [AshAdmin.Domain]
 
   resources do
+    resource Fleetms.Vehicles.VehicleListFilter
+
     resource Fleetms.Vehicles.Vehicle do
       define :list_vehicles,
         action: :list,
-        args: [:paginate_sort_opts, :search_query, :advanced_filter_params]
+        args: [:paginate_sort_opts, :search_query, :filters]
     end
 
     resource Fleetms.Vehicles.VehicleMake
