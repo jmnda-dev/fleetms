@@ -11,7 +11,13 @@ defmodule Fleetms.Vehicles.Vehicle do
       Ash.Policy.Authorizer
     ]
 
+  @default_max_photo_upload_entries 10
+  @default_max_document_upload_entries 10
+
   alias Fleetms.Accounts.User.Policies.{IsAdmin, IsFleetManager}
+
+  def get_max_photo_uploads, do: @default_max_photo_upload_entries
+  def get_max_document_uploads, do: @default_max_document_upload_entries
 
   attributes do
     uuid_primary_key :id
@@ -342,7 +348,7 @@ defmodule Fleetms.Vehicles.Vehicle do
     read :list do
       argument :paginate_sort_opts, :map, allow_nil?: false
       argument :search_query, :string, default: ""
-      argument :advanced_filter_params, :map, default: %{}
+      argument :filters, :map, default: %{}
 
       pagination offset?: true, countable: true
 
@@ -351,21 +357,21 @@ defmodule Fleetms.Vehicles.Vehicle do
           query.arguments.paginate_sort_opts
 
         search_query = Ash.Query.get_argument(query, :search_query)
-        advanced_filter_params = Ash.Query.get_argument(query, :advanced_filter_params)
+        filters = Ash.Query.get_argument(query, :filters)
 
         query =
-          Enum.reduce(advanced_filter_params, query, fn
-            {_, "All"}, accumulated_query ->
+          Enum.reduce(filters, query, fn
+            {_key, nil}, accumulated_query ->
               accumulated_query
 
-            {_, :All}, accumulated_query ->
-              accumulated_query
+            {:make, vehicle_make}, accumulated_query ->
+              Ash.Query.filter(
+                accumulated_query,
+                expr(vehicle_make == ^vehicle_make)
+              )
 
-            {:vehicle_make, vehicle_make}, accumulated_query ->
-              Ash.Query.filter(accumulated_query, expr(vehicle_make == ^vehicle_make))
-
-            {:model, model}, accumulated_query ->
-              Ash.Query.filter(accumulated_query, expr(model == ^model))
+            {:model, model_id}, accumulated_query ->
+              Ash.Query.filter(accumulated_query, expr(vehicle_model.id == ^model_id))
 
             {:mileage_min, mileage_min}, accumulated_query ->
               Ash.Query.filter(accumulated_query, expr(mileage >= ^mileage_min))
@@ -373,20 +379,20 @@ defmodule Fleetms.Vehicles.Vehicle do
             {:mileage_max, mileage_max}, accumulated_query ->
               Ash.Query.filter(accumulated_query, expr(mileage <= ^mileage_max))
 
-            {:year_from, year_from}, accumulated_query ->
-              Ash.Query.filter(accumulated_query, expr(year >= ^year_from))
+            {:year_min, year_min}, accumulated_query ->
+              Ash.Query.filter(accumulated_query, expr(year >= ^year_min))
 
-            {:year_to, year_to}, accumulated_query ->
-              Ash.Query.filter(accumulated_query, expr(year <= ^year_to))
+            {:year_max, year_max}, accumulated_query ->
+              Ash.Query.filter(accumulated_query, expr(year <= ^year_max))
 
-            {:type, vehicle_type}, accumulated_query ->
-              Ash.Query.filter(accumulated_query, expr(type == ^vehicle_type))
+            {:types, types}, accumulated_query ->
+              Ash.Query.filter(accumulated_query, expr(type in ^types))
 
-            {:status, vehicle_status}, accumulated_query ->
-              Ash.Query.filter(accumulated_query, expr(status == ^vehicle_status))
+            {:statuses, statuses}, accumulated_query ->
+              Ash.Query.filter(accumulated_query, expr(status in ^statuses))
 
-            {:category, vehicle_category}, accumulated_query ->
-              Ash.Query.filter(accumulated_query, expr(status == ^vehicle_category))
+            {:categories, categories}, accumulated_query ->
+              Ash.Query.filter(accumulated_query, expr(category in ^categories))
 
             _, accumulated_query ->
               accumulated_query
@@ -422,6 +428,8 @@ defmodule Fleetms.Vehicles.Vehicle do
 
       prepare build(
                 load: [
+                  :num_of_photos,
+                  :num_of_docs,
                   :photos,
                   :documents,
                   :vehicle_engine_spec,
@@ -536,6 +544,9 @@ defmodule Fleetms.Vehicles.Vehicle do
     first :model, :vehicle_model, :name do
       filterable? true
     end
+
+    count :num_of_photos, :photos, default: 0
+    count :num_of_docs, :documents, default: 0
   end
 
   calculations do

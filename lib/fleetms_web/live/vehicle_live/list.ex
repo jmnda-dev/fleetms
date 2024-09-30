@@ -1,4 +1,5 @@
 defmodule FleetmsWeb.VehicleLive.List do
+  alias Fleetms.Vehicles.VehicleListFilter
   use FleetmsWeb, :live_view
   import Fleetms.Utils, only: [calc_total_pages: 2, atom_list_to_options_for_select: 1]
   alias Fleetms.Common.PaginationSortParam
@@ -34,6 +35,7 @@ defmodule FleetmsWeb.VehicleLive.List do
       |> assign(:total_pages, 0)
       |> assign(:search_params, %{search_query: ""})
       |> assign(:has_more?, false)
+      |> assign(:applied_filters, %{})
 
     {:ok, socket}
   end
@@ -43,24 +45,31 @@ defmodule FleetmsWeb.VehicleLive.List do
     %{tenant: tenant, current_user: actor, live_action: live_action} = socket.assigns
 
     paginate_sort_opts = validate_paginate_sort_params(params)
-
     search_query = Map.get(params, "search_query", "")
 
-    filter_form_data = filter_form_data_from_url_params(params)
+    {socket, filters} =
+      with query_params <- get_applied_filters(params),
+           {:ok, %VehicleListFilter{} = filters_struct} <-
+             Vehicles.VehicleListFilter.validate(query_params) do
+        {socket, VehicleListFilter.to_params!(filters_struct)}
+      else
+        {:error, _changeset} ->
+          {put_flash(socket, :error, "URL contains invalid filters, no filters applied!"), %{}}
+      end
+
+    %{page: page, per_page: per_page} = paginate_sort_opts
 
     socket =
       socket
       |> assign(:paginate_sort_opts, paginate_sort_opts)
       |> assign(:loading, true)
       |> assign(:search_params, %{search_query: search_query})
-      |> assign(:filter_form_data, filter_form_data)
+      |> assign(:applied_filters, filters)
       |> start_async(:get_vehicles, fn ->
-        list_vehicles(
-          paginate_sort_opts,
-          search_query,
-          filter_form_data,
+        Vehicles.list_vehicles!(paginate_sort_opts, search_query, filters,
           tenant: tenant,
-          actor: actor
+          actor: actor,
+          page: [limit: per_page, offset: (page - 1) * per_page, count: true]
         )
       end)
 
@@ -124,7 +133,7 @@ defmodule FleetmsWeb.VehicleLive.List do
       socket.assigns.paginate_sort_opts
       |> Map.put(:per_page, per_page)
       |> Map.merge(socket.assigns.search_params)
-      |> Map.merge(socket.assigns.filter_form_data)
+      |> Map.merge(socket.assigns.applied_filters)
 
     {:noreply, push_patch(socket, to: ~p"/vehicles?#{new_url_params}")}
   end
@@ -139,7 +148,7 @@ defmodule FleetmsWeb.VehicleLive.List do
       socket.assigns.paginate_sort_opts
       |> Map.put(:sort_order, sort_order)
       |> Map.merge(socket.assigns.search_params)
-      |> Map.merge(socket.assigns.filter_form_data)
+      |> Map.merge(socket.assigns.applied_filters)
 
     {:noreply, push_patch(socket, to: ~p"/vehicles?#{new_url_params}")}
   end
@@ -150,7 +159,7 @@ defmodule FleetmsWeb.VehicleLive.List do
       socket.assigns.paginate_sort_opts
       |> Map.put(:sort_by, sort_by)
       |> Map.merge(socket.assigns.search_params)
-      |> Map.merge(socket.assigns.filter_form_data)
+      |> Map.merge(socket.assigns.applied_filters)
 
     {:noreply, push_patch(socket, to: ~p"/vehicles?#{new_url_params}")}
   end
@@ -161,7 +170,7 @@ defmodule FleetmsWeb.VehicleLive.List do
 
     new_url_params =
       Map.merge(search_params, socket.assigns.paginate_sort_opts)
-      |> Map.merge(socket.assigns.filter_form_data)
+      |> Map.merge(socket.assigns.applied_filters)
 
     socket = assign(socket, :search_params, search_params)
 
@@ -239,16 +248,6 @@ defmodule FleetmsWeb.VehicleLive.List do
     |> assign(:form, nil)
   end
 
-  defp list_vehicles(paginate_sort_opts, search_query, filter_form_data, opts) do
-    %{page: page, per_page: per_page} = paginate_sort_opts
-
-    Vehicles.list_vehicles!(paginate_sort_opts, search_query, filter_form_data,
-      tenant: opts[:tenant],
-      actor: opts[:actor],
-      page: [limit: per_page, offset: (page - 1) * per_page, count: true]
-    )
-  end
-
   defp validate_paginate_sort_params(params) do
     paginate_sort_params = Map.take(params, ["page", "per_page", "sort_by", "sort_order"])
 
@@ -261,41 +260,21 @@ defmodule FleetmsWeb.VehicleLive.List do
     end
   end
 
-  defp filter_form_data_from_url_params(url_params) do
-    default_params = %{
-      mileage_min: 0,
-      mileage_max: 999_999_999,
-      year_from: 1970,
-      year_to: 2030,
-      type: :All,
-      status: :All,
-      category: :All,
-      make: :All,
-      model: :All
-    }
-
-    params =
-      Map.take(url_params, [
+  defp get_applied_filters(params) do
+    applied_filters =
+      Map.take(params, [
         "mileage_min",
         "mileage_max",
-        "year_to",
-        "year_from",
-        "type",
-        "status",
-        "category",
-        "vehicle_make",
+        "year_min",
+        "year_max",
+        "types",
+        "statuses",
+        "categories",
+        "make",
         "model"
       ])
 
-    FleetmsWeb.VehicleLive.FilterFormComponent.build_filter_changeset(%{}, params)
-    |> Ecto.Changeset.apply_action(:create)
-    |> case do
-      {:ok, validated_filter_params} ->
-        validated_filter_params
-
-      {:error, _changeset} ->
-        default_params
-    end
+    applied_filters
   end
 
   defp get_items_per_page_opts, do: @per_page_opts

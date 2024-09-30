@@ -65,8 +65,6 @@ defmodule Fleetms.Vehicles.VehicleModel do
   end
 
   code_interface do
-
-
     define :list_by_vehicle_make, action: :list_by_vehicle_make, args: [:vehicle_make]
   end
 

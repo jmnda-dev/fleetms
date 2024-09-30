@@ -13,8 +13,6 @@ defmodule FleetmsWeb.InventoryLocationLive.InventoryLocationPartTableComponent d
     paginate_sort_opts =
       validate_paginate_sort_params(Map.merge(%{page: 1, per_page: 20}, @sort_by_opts))
 
-    IO.inspect(paginate_sort_opts, label: "OPTS")
-
     socket =
       socket
       |> stream(:parts, [])
@@ -73,7 +71,6 @@ defmodule FleetmsWeb.InventoryLocationLive.InventoryLocationPartTableComponent d
       |> assign(has_more?: has_more?)
       |> assign(:total, count)
       |> assign(:total_pages, calc_total_pages(count, per_page))
-
 
     {:noreply, socket}
   end
