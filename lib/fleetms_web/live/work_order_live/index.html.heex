@@ -285,7 +285,7 @@
             </form>
           </div>
           <div
-            :if={Ash.can?({Fleetms.Service.WorkOrder, :create}, @current_user)}
+            :if={Ash.can?({Fleetms.VehicleMaintenance.WorkOrder, :create}, @current_user)}
             class="w-full md:w-auto flex flex-col md:flex-row mb-3 md:mb-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0"
           >
             <.link navigate={~p"/work_orders/new"}>
@@ -818,6 +818,28 @@
                         "--"
                     end
                   }
+                />
+
+                <.badge
+                  :if={not is_nil(get_form_value(service_task_form, :service_reminder))}
+                  kind={
+                    case get_form_value(reminder_form, :due_status) do
+                      :Upcoming ->
+                        :info
+
+                      :"Due Soon" ->
+                        :warning
+
+                      :Overdue ->
+                        :danger
+                    end
+                  }
+                  label={get_form_value(reminder_form, :due_status)}
+                />
+                <.badge
+                  :if={is_nil(get_form_value(service_task_form, :service_reminder))}
+                  kind={:warning}
+                  label="Has no related Service Reminder"
                 />
                 <.badge
                   :if={is_nil(get_form_value(service_task_form, :service_reminder))}

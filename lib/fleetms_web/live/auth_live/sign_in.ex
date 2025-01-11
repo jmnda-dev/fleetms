@@ -3,6 +3,7 @@ defmodule FleetmsWeb.AuthLive.SignIn do
   A Sign in LiveView
   """
   use FleetmsWeb, :live_view
+  alias Fleetms.FeatureFlags
 
   @impl true
   def mount(_params, _session, socket) do

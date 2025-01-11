@@ -38,7 +38,7 @@ defmodule Fleetms.Accounts.Emails do
 
     new()
     # TODO: Replace with your email
-    |> from({"Fleetms", "noreply@fleetms.com"})
+    |> from({"Fleetms", "mailgun@sandbox383e00a1be4340e281f05b0ad478f1c0.mailgun.org"})
     |> to(to_string(to))
     |> subject(subject)
     |> put_provider_option(:track_links, "None")

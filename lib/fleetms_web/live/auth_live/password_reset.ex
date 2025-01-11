@@ -49,12 +49,6 @@ defmodule FleetmsWeb.AuthLive.PasswordReset do
                 />
               </div>
               <.button type="submit" phx-disable-with="Reseting...">Reset Password</.button>
-              <p class="text-sm text-center text-gray-500 dark:text-gray-400">
-                If you still need help, contact <a
-                  href="#"
-                  class="font-medium text-primary-600 dark:text-primary-500 hover:underline"
-                >Flowbite support</a>.
-              </p>
             </.simple_form>
           </div>
         </div>
@@ -116,7 +110,7 @@ defmodule FleetmsWeb.AuthLive.PasswordReset do
 
     case form |> AshPhoenix.Form.errors() |> Enum.find(fn {:reset_token, _} -> true end) do
       nil -> socket
-      {_, error_message} -> put_flash(socket, :error, "Reset token #{error_message}")
+      {_, error_message} -> put_toast(socket, :error, "Reset token #{error_message}")
     end
   end
 end

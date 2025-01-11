@@ -9,7 +9,7 @@ defmodule FleetmsWeb.AuthController do
     conn
     |> delete_session(:return_to)
     |> store_in_session(user)
-    |> put_session(:tenant, Ash.ToTenant.to_tenant(user.organization, user.organization))
+    |> maybe_put_tenant_in_session(user)
     |> assign(:current_user, user)
     |> redirect(to: return_to)
   end
@@ -20,7 +20,7 @@ defmodule FleetmsWeb.AuthController do
         _reason
       ) do
     conn
-    |> put_flash(
+    |> LiveToast.put_toast(
       :error,
       "Email or password is incorrect"
     )
@@ -33,5 +33,11 @@ defmodule FleetmsWeb.AuthController do
     conn
     |> clear_session()
     |> redirect(to: return_to)
+  end
+
+  defp maybe_put_tenant_in_session(conn, nil), do: conn
+
+  defp maybe_put_tenant_in_session(conn, user) do
+    put_session(conn, :tenant, Ash.ToTenant.to_tenant(user.organization, user.organization))
   end
 end

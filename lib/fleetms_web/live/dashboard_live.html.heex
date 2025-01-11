@@ -42,7 +42,11 @@
       <div class="py-6" id="vehicles-stats-chart" phx-hook="vehiclesStats" phx-update="ignore">
       </div>
     </div>
-    <div class="w-full col-span-2 p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+
+    <div
+      :if={FeatureFlags.VehicleInspections.module_enabled?(@current_user.organization)}
+      class="w-full col-span-2 p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800"
+    >
       <div class="items-center justify-between pb-4 border-b border-gray-200 sm:flex dark:border-gray-700">
         <div class="w-full mb-4 sm:mb-0">
           <span class="text-2xl font-bold leading-none text-gray-900 sm:text-3xl dark:text-white">
@@ -74,7 +78,10 @@
       </.simple_form>
     </div>
   </div>
-  <div class="grid gap-2 grid-cols-12 mt-2">
+  <div
+    :if={FeatureFlags.VehicleIssues.module_enabled?(@current_user.organization)}
+    class="grid gap-2 grid-cols-12 mt-2"
+  >
     <div class="w-full p-4 md:col-span-6 lg:col-span-5 bg-white rounded-lg shadow dark:bg-gray-800">
       <!-- Card Title -->
       <h3 class="text-xl font-bold leading-none text-gray-900 dark:text-white">Issues</h3>
@@ -378,7 +385,10 @@
       </div>
     </div>
 
-    <div class="w-full md:col-span-6 bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
+    <div
+      :if={FeatureFlags.VehicleMaintenance.module_enabled?(@current_user.organization)}
+      class="w-full md:col-span-6 bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6"
+    >
       <div class="flex justify-between mb-3">
         <div class="flex items-center">
           <div class="flex justify-center items-center">
@@ -596,7 +606,10 @@
     </div>
   </div>
 
-  <div class="grid gap-2 grid-cols-12 mt-2">
+  <div
+    :if={FeatureFlags.VehicleMaintenance.module_enabled?(@current_user.organization)}
+    class="grid gap-2 grid-cols-12 mt-2"
+  >
     <div
       phx-mounted={JS.push("loadWorkOrderStats")}
       class="p-4 md:col-span-5 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800"
@@ -638,6 +651,7 @@
     </div>
 
     <div
+      :if={FeatureFlags.Inventory.module_enabled?(@current_user.organization)}
       phx-mounted={JS.push("loadPartsStats")}
       class="p-4 md:col-span-5 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800"
     >
@@ -670,7 +684,7 @@
     </div>
   </div>
 </div>
-<div class="p-4">
+<div :if={FeatureFlags.FuelManagement.module_enabled?(@current_user.organization)} class="p-4">
   <div class="w-full col-span-2 p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
     <div class="items-center justify-between pb-4 border-b border-gray-200 sm:flex dark:border-gray-700">
       <div class="w-full mb-4 sm:mb-0">

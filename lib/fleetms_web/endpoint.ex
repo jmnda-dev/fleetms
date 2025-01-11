@@ -1,6 +1,6 @@
 defmodule FleetmsWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :fleetms
-  use Sentry.PlugCapture
+  # use Sentry.PlugCapture
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
@@ -11,7 +11,9 @@ defmodule FleetmsWeb.Endpoint do
     same_site: "Lax"
   ]
 
-  socket "/live", Phoenix.LiveView.Socket, longpoll: true, websocket: [connect_info: [session: @session_options]]
+  socket "/live", Phoenix.LiveView.Socket,
+    longpoll: true,
+    websocket: [connect_info: [session: @session_options]]
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -35,6 +37,8 @@ defmodule FleetmsWeb.Endpoint do
       from: "/app/bin/uploads",
       gzip: false
   end
+
+  # plug PhoenixAnalytics.Plugs.RequestTracker
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

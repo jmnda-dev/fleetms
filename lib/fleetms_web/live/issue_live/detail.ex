@@ -1,6 +1,10 @@
 defmodule FleetmsWeb.IssueLive.Detail do
   use FleetmsWeb, :live_view
 
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :issues_module}
+
   @impl true
   def mount(_params, _session, socket) do
     {:ok, assign(socket, :active_link, :issues)}
@@ -15,7 +19,7 @@ defmodule FleetmsWeb.IssueLive.Detail do
      |> assign(:page_title, page_title(live_action))
      |> assign(
        :issue,
-       Fleetms.Issues.Issue.get_by_id!(id, tenant: tenant, actor: actor)
+       Fleetms.VehicleIssues.Issue.get_by_id!(id, tenant: tenant, actor: actor)
      )}
   end
 
@@ -30,7 +34,7 @@ defmodule FleetmsWeb.IssueLive.Detail do
 
     socket =
       assign(socket, :issue, updated_issue)
-      |> put_flash(:info, "Issue ##{updated_issue.issue_number} was reopened!")
+      |> put_toast(:info, "Issue ##{updated_issue.issue_number} was reopened!")
 
     {:noreply, socket}
   end

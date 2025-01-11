@@ -21,7 +21,7 @@ defmodule FleetmsWeb do
 
   def router do
     quote do
-      use Phoenix.Router, helpers: false
+      use Phoenix.Router, helpers: true
 
       # Import common connection and controller functions to use in pipelines
       import Plug.Conn
@@ -43,7 +43,7 @@ defmodule FleetmsWeb do
         layouts: [html: FleetmsWeb.Layouts]
 
       import Plug.Conn
-      import FleetmsWeb.Gettext
+      use Gettext, backend: FleetmsWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -87,9 +87,10 @@ defmodule FleetmsWeb do
       import FleetmsWeb.CoreComponents
       import FleetmsWeb.LayoutComponents
       import FleetmsWeb.LiveHelpers
-      import FleetmsWeb.Gettext
+      use Gettext, backend: FleetmsWeb.Gettext
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
+      import LiveToast
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())

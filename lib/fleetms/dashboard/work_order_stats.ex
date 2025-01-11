@@ -3,7 +3,7 @@ defmodule Fleetms.Dashboard.WorkOrderStats do
 
   def get_dashboard_stats(tenant) do
     {:ok, %{total: total, open: open, completed: completed}} =
-      Fleetms.Service.WorkOrder.get_dashboard_stats(tenant)
+      Fleetms.VehicleMaintenance.WorkOrder.get_dashboard_stats(tenant)
 
     %__MODULE__{
       total: total,

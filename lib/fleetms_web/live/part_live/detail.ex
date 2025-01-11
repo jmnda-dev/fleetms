@@ -1,5 +1,8 @@
 defmodule FleetmsWeb.PartLive.Detail do
   use FleetmsWeb, :live_view
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :inventory_module}
 
   @impl true
   def mount(_params, _session, socket) do
@@ -45,7 +48,7 @@ defmodule FleetmsWeb.PartLive.Detail do
     if can_perform_action? do
       socket
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end

@@ -4,7 +4,7 @@ defmodule Fleetms.Dashboard.InspectionStats do
 
   def get_dashboard_stats(tenant, opts \\ []) do
     {total, data} =
-      Fleetms.Inspection.InspectionSubmission.get_dashboard_stats!(
+      Fleetms.VehicleInspection.InspectionSubmission.get_dashboard_stats!(
         tenant,
         opts[:period]
       )

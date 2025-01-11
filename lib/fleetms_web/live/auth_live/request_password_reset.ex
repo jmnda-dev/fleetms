@@ -62,12 +62,12 @@ defmodule FleetmsWeb.AuthLive.RequestPasswordReset do
       case result do
         {:ok, _} ->
           socket
-          |> put_flash(:info, "Password reset request sent")
+          |> put_toast(:info, "Password reset request sent")
           |> assign(form: blank_form(), trigger_action: true)
 
         {:error, _} ->
           socket
-          |> put_flash(:error, "Password reset request failed")
+          |> put_toast(:error, "Password reset request failed")
           |> assign(form: blank_form(), trigger_action: false)
       end
 

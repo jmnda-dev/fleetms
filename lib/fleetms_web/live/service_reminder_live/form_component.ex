@@ -10,11 +10,11 @@ defmodule FleetmsWeb.ServiceReminderLive.FormComponent do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     vehicles =
-      Fleetms.Vehicles.Vehicle.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleManagement.Vehicle.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.full_name, &1.id})
 
     service_tasks =
-      Fleetms.Service.ServiceTask.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleMaintenance.ServiceTask.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.name, &1.id})
 
     {:ok,
@@ -71,7 +71,7 @@ defmodule FleetmsWeb.ServiceReminderLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Service Reminder updated successfully")
+         |> put_toast(:info, "Service Reminder updated successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -87,7 +87,7 @@ defmodule FleetmsWeb.ServiceReminderLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Service Reminder created successfully")
+         |> put_toast(:info, "Service Reminder created successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -119,10 +119,10 @@ defmodule FleetmsWeb.ServiceReminderLive.FormComponent do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     form =
-      Fleetms.Service.ServiceReminder
+      Fleetms.VehicleMaintenance.ServiceReminder
       |> AshPhoenix.Form.for_create(:create,
         as: "service_reminder",
-        domain: Fleetms.Service,
+        domain: Fleetms.VehicleMaintenance,
         actor: actor,
         tenant: tenant,
         forms: [auto?: true]
@@ -141,7 +141,7 @@ defmodule FleetmsWeb.ServiceReminderLive.FormComponent do
           service_reminder
           |> AshPhoenix.Form.for_update(:update,
             as: "service_reminder",
-            domain: Fleetms.Service,
+            domain: Fleetms.VehicleMaintenance,
             actor: actor,
             tenant: tenant,
             forms: [auto?: true]
@@ -155,7 +155,7 @@ defmodule FleetmsWeb.ServiceReminderLive.FormComponent do
           service_reminder
           |> AshPhoenix.Form.for_update(:reminder_with_service_group_schedule,
             as: "service_reminder",
-            domain: Fleetms.Service,
+            domain: Fleetms.VehicleMaintenance,
             actor: actor,
             tenant: tenant,
             forms: [auto?: true]

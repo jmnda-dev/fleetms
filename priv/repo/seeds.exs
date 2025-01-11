@@ -17,7 +17,7 @@ provider_org_attrs = %{
 }
 
 provider_user_attrs = %{
-  "email" => "user@example.com",
+  "email" => "demo_user@fleetms.com",
   "password" => "passWORD1234@",
   "password_confirmation" => "passWORD1234@",
   "user_profile" => %{
@@ -38,6 +38,7 @@ initial_user =
     Map.put(provider_user_attrs, "organization", provider_org_attrs)
   )
   |> Ash.Changeset.set_context(%{private: %{ash_authentication?: true}})
+  |> Ash.Changeset.force_change_attribute(:is_service_provider, true)
   |> Ash.create!()
   |> Ash.load!(:organization)
 
@@ -2340,14 +2341,14 @@ require Ash.Query
 defmodule Repo.Seeds.VehicleMakes do
   def create_vehicle_make_and_models(attrs, models, tenant, actor) do
     make =
-      Fleetms.Vehicles.VehicleMake
+      Fleetms.VehicleManagement.VehicleMake
       |> Ash.Changeset.for_create(:create, attrs)
       |> Ash.create!(actor: actor, tenant: tenant)
 
     Enum.each(models, fn model ->
       attrs = %{"name" => model, "vehicle_make" => %{"id" => make.id, "name" => make.name}}
 
-      Fleetms.Vehicles.VehicleModel
+      Fleetms.VehicleManagement.VehicleModel
       |> Ash.Changeset.for_create(:create, attrs)
       |> Ash.create!(actor: actor, tenant: tenant)
     end)
@@ -2615,7 +2616,7 @@ vehicles = [
 ]
 
 Enum.map(vehicles, fn attrs ->
-  Fleetms.Vehicles.Vehicle
+  Fleetms.VehicleManagement.Vehicle
   |> Ash.Changeset.for_create(:seeding, attrs)
   |> Ash.create!(tenant: tenant, actor: actor)
 end)
@@ -2639,7 +2640,7 @@ Enum.each(resource_names, fn resource_name ->
 end)
 
 Enum.each(service_tasks, fn attrs ->
-  Fleetms.Service.ServiceTask
+  Fleetms.VehicleMaintenance.ServiceTask
   |> Ash.Changeset.for_create(:create, attrs)
   |> Ash.create!(actor: actor, tenant: tenant)
 end)
@@ -2651,7 +2652,7 @@ Enum.each(parts, fn attrs ->
 end)
 
 inspection_form =
-  Ash.create!(Fleetms.Inspection.InspectionForm, %{title: "Light Vehicles"},
+  Ash.create!(Fleetms.VehicleInspection.InspectionForm, %{title: "Light Vehicles"},
     actor: actor,
     tenant: tenant
   )

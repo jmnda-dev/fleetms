@@ -4,6 +4,11 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
   require Logger
 
   alias Fleetms.Accounts
+
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :service_module}
+
   @photos_upload_ref :work_order_photos
   @default_max_upload_entries 10
 
@@ -17,7 +22,7 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
     %{tenant: tenant, current_user: actor, live_action: live_action} = socket.assigns
 
     work_order =
-      Fleetms.Service.WorkOrder.get_by_id!(id, tenant: tenant, actor: actor)
+      Fleetms.VehicleMaintenance.WorkOrder.get_by_id!(id, tenant: tenant, actor: actor)
 
     socket =
       socket
@@ -33,13 +38,13 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
         socket
       ) do
     %{tenant: tenant, current_user: actor} = socket.assigns
-    issues = Fleetms.Issues.Issue.get_by_vehicle_id!(vehicle_id, tenant: tenant, actor: actor)
+    issues = Fleetms.VehicleIssues.Issue.get_by_vehicle_id!(vehicle_id, tenant: tenant, actor: actor)
 
     service_reminders =
-      Fleetms.Service.ServiceReminder.get_by_vehicle_id!(vehicle_id, tenant: tenant, actor: actor)
+      Fleetms.VehicleMaintenance.ServiceReminder.get_by_vehicle_id!(vehicle_id, tenant: tenant, actor: actor)
 
     service_tasks =
-      Fleetms.Service.ServiceTask.list_with_vehicle_reminder!(vehicle_id,
+      Fleetms.VehicleMaintenance.ServiceTask.list_with_vehicle_reminder!(vehicle_id,
         tenant: tenant,
         actor: actor
       )
@@ -56,7 +61,7 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
   def handle_info({FleetmsWeb.WorkOrderLive.Detail, {:issue_added, issue}}, socket) do
     socket =
       stream_delete(socket, :vehicle_issues, issue)
-      |> put_flash(:info, "Issue was added to Work Order form")
+      |> put_toast(:info, "Issue was added to Work Order form")
 
     {:noreply, socket}
   end
@@ -65,7 +70,7 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
   def handle_info({FleetmsWeb.WorkOrderLive.Detail, {:issue_removed, issue}}, socket) do
     socket =
       stream_insert(socket, :vehicle_issues, issue)
-      |> put_flash(:info, "Issue was remove from Work Order form")
+      |> put_toast(:info, "Issue was remove from Work Order form")
 
     {:noreply, socket}
   end
@@ -80,7 +85,7 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
 
     socket =
       socket
-      |> put_flash(:info, "Issue was remove from Work Order form")
+      |> put_toast(:info, "Issue was remove from Work Order form")
       |> stream_insert(:vehicle_service_reminders, service_reminder)
       |> assign(:work_order_service_reminders_ids, ids)
 
@@ -97,7 +102,7 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
     %{tenant: tenant, current_user: actor, work_order: work_order} = socket.assigns
     Ash.destroy!(work_order, tenant: tenant, actor: actor)
 
-    socket = put_flash(socket, :info, "Work Order was deleted successfully")
+    socket = put_toast(socket, :info, "Work Order was deleted successfully")
 
     {:noreply, push_navigate(socket, to: ~p"/work_orders")}
   end
@@ -115,7 +120,7 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
 
   @impl true
   def handle_event("add_issue", %{"issue_id" => issue_id}, socket) do
-    issue = Fleetms.Issues.Issue.get_by_id!(issue_id)
+    issue = Fleetms.VehicleIssues.Issue.get_by_id!(issue_id)
 
     form =
       AshPhoenix.Form.add_form(socket.assigns.form, "work_order[issues]",
@@ -136,7 +141,7 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     service_reminder =
-      Fleetms.Service.ServiceReminder.get_for_form!(service_reminder_id,
+      Fleetms.VehicleMaintenance.ServiceReminder.get_for_form!(service_reminder_id,
         tenant: tenant,
         actor: actor
       )
@@ -177,7 +182,7 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
     %{tenant: tenant, current_user: actor, form: form} = socket.assigns
 
     service_task =
-      Fleetms.Service.ServiceTask.get_for_form!(service_task_id, vehicle_id,
+      Fleetms.VehicleMaintenance.ServiceTask.get_for_form!(service_task_id, vehicle_id,
         tenant: tenant,
         actor: actor
       )
@@ -215,7 +220,7 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
   @impl true
   def handle_event("remove_issue_from_form", %{"path" => path, "issue_id" => issue_id}, socket) do
     %{tenant: tenant, current_user: actor, form: form} = socket.assigns
-    issue = Fleetms.Issues.Issue.get_by_id!(issue_id, tenant: tenant, actor: actor)
+    issue = Fleetms.VehicleIssues.Issue.get_by_id!(issue_id, tenant: tenant, actor: actor)
     form = AshPhoenix.Form.remove_form(form, path)
 
     notify_parent({:issue_removed, issue})
@@ -228,7 +233,7 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
         %{"path" => path, "service_reminder_id" => service_reminder_id},
         socket
       ) do
-    service_reminder = Fleetms.Service.ServiceReminder.get_by_id!(service_reminder_id)
+    service_reminder = Fleetms.VehicleMaintenance.ServiceReminder.get_by_id!(service_reminder_id)
     form = AshPhoenix.Form.remove_form(socket.assigns.form, path)
 
     notify_parent({:service_reminder_removed, service_reminder})
@@ -287,7 +292,7 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
     |> Ash.update!(actor: socket.assigns.current_user)
 
     socket =
-      put_flash(socket, :info, "Work Order was marked as completed.")
+      put_toast(socket, :info, "Work Order was marked as completed.")
       |> push_patch(to: ~p"/work_orders/#{work_order}")
 
     {:noreply, socket}
@@ -303,7 +308,7 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
       |> Ash.Changeset.for_update(:reopen_work_order)
       |> Ash.update!(tenant: tenant, actor: actor)
 
-    socket = put_flash(socket, :info, "Work Order ##{work_order.work_order_number} was reopened.")
+    socket = put_toast(socket, :info, "Work Order ##{work_order.work_order_number} was reopened.")
 
     {:noreply, push_patch(socket, to: ~p"/work_orders/#{work_order}")}
   end
@@ -329,8 +334,8 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
     end
 
     work_order_service_reminders_ids =
-      Stream.filter(work_order.work_order_service_tasks, &(not is_nil(&1.service_reminder)))
-      |> Enum.map(& &1.service_reminder.id)
+      Stream.filter(work_order.work_order_service_tasks, &(not is_nil(&1.service_task.service_reminder)))
+      |> Enum.map(& &1.service_task.service_reminder.id)
 
     max_upload_entries = get_max_upload_entries(work_order)
 
@@ -368,7 +373,7 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Work Order updated successfully")
+         |> put_toast(:info, "Work Order updated successfully")
          |> push_patch(to: ~p"/work_orders/#{work_order}")}
 
       {:error, form} ->
@@ -385,20 +390,20 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
       work_order
       |> AshPhoenix.Form.for_update(:update,
         as: "work_order",
-        domain: Fleetms.Service,
+        domain: Fleetms.VehicleMaintenance,
         actor: actor,
         tenant: tenant,
         forms: [
           issues: [
             type: :list,
-            resource: Fleetms.Issues.Issue,
+            resource: Fleetms.VehicleIssues.Issue,
             data: work_order.issues,
             update_action: :update_from_work_order,
             read_action: :read
           ],
           work_order_service_tasks: [
             type: :list,
-            resource: Fleetms.Service.WorkOrderServiceTask,
+            resource: Fleetms.VehicleMaintenance.WorkOrderServiceTask,
             data: work_order.work_order_service_tasks,
             read_action: :read_for_form,
             create_action: :create,
@@ -406,29 +411,15 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
             forms: [
               service_reminder: [
                 type: :single,
-                resource: Fleetms.Service.ServiceReminder,
-                data: & &1.service_reminder,
+                resource: Fleetms.VehicleMaintenance.ServiceReminder,
+                data: & &1.service_task.service_reminder,
                 create_action: :ignore_create,
                 update_action: :ignore_update
               ],
               work_order_service_task_parts: [
                 type: :list,
-                resource: Fleetms.Service.WorkOrderServiceTaskPart,
+                resource: Fleetms.VehicleMaintenance.WorkOrderServiceTaskPart,
                 data: & &1.work_order_service_task_parts,
-                create_action: :create,
-                update_action: :update
-              ],
-              work_order_service_task_vendor_labor_details: [
-                type: :list,
-                resource: Fleetms.Service.WorkOrderServiceTaskVendorLaborDetail,
-                data: & &1.work_order_service_task_vendor_labor_details,
-                create_action: :create,
-                update_action: :update
-              ],
-              work_order_service_task_technician_labor_details: [
-                type: :list,
-                resource: Fleetms.Service.WorkOrderServiceTaskTechnicianLaborDetail,
-                data: & &1.work_order_service_task_technician_labor_details,
                 create_action: :create,
                 update_action: :update
               ]
@@ -444,11 +435,11 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     vehicles =
-      Fleetms.Vehicles.Vehicle.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleManagement.Vehicle.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.full_name, &1.id})
 
     service_tasks =
-      Fleetms.Service.ServiceTask.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleMaintenance.ServiceTask.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.name, &1.id})
 
     users =
@@ -535,10 +526,10 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
 
   defp get_max_upload_entries(nil), do: @default_max_upload_entries
 
-  defp get_max_upload_entries(%Fleetms.Service.WorkOrder{work_order_photos: nil}),
+  defp get_max_upload_entries(%Fleetms.VehicleMaintenance.WorkOrder{work_order_photos: nil}),
     do: @default_max_upload_entries
 
-  defp get_max_upload_entries(%Fleetms.Service.WorkOrder{work_order_photos: photos}) do
+  defp get_max_upload_entries(%Fleetms.VehicleMaintenance.WorkOrder{work_order_photos: photos}) do
     total = Enum.count(photos)
     @default_max_upload_entries - total
   end
@@ -560,10 +551,10 @@ defmodule FleetmsWeb.WorkOrderLive.Detail do
     end
   end
 
-  defp get_current_work_order_photos(%Fleetms.Service.WorkOrder{work_order_photos: photos})
+  defp get_current_work_order_photos(%Fleetms.VehicleMaintenance.WorkOrder{work_order_photos: photos})
        when is_list(photos),
        do: photos
 
-  defp get_current_work_order_photos(%Fleetms.Service.WorkOrder{work_order_photos: _photos}),
+  defp get_current_work_order_photos(%Fleetms.VehicleMaintenance.WorkOrder{work_order_photos: _photos}),
     do: []
 end

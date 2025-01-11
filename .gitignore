@@ -36,3 +36,6 @@ npm-debug.log
 /assets/node_modules/
 /uploads
 /priv/reports
+*.env
+*.duckdb
+/.idx/.*

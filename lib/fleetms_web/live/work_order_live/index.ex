@@ -8,7 +8,11 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
     only: [calc_total_pages: 2, dates_in_map_to_string: 2, atom_list_to_options_for_select: 1]
 
   alias Fleetms.Common.PaginationSortParam
-  alias Fleetms.Service
+  alias Fleetms.VehicleMaintenance
+
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :service_module}
 
   @photos_upload_ref :work_order_photos
   @default_max_upload_entries 10
@@ -172,14 +176,14 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     %{tenant: tenant, current_user: actor} = socket.assigns
-    work_order = Fleetms.Service.WorkOrder.get_by_id!(id, tenant: tenant, actor: actor)
+    work_order = Fleetms.VehicleMaintenance.WorkOrder.get_by_id!(id, tenant: tenant, actor: actor)
 
     Ash.destroy!(work_order, tenant: tenant, actor: actor)
 
     socket =
       socket
       |> stream_delete(:work_orders, work_order)
-      |> put_flash(:info, "Work Order was deleted successfully")
+      |> put_toast(:info, "Work Order was deleted successfully")
 
     {:noreply, socket}
   end
@@ -198,7 +202,7 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
   @impl true
   def handle_event("add_issue", %{"issue_id" => issue_id}, socket) do
     %{tenant: tenant, current_user: actor, form: form} = socket.assigns
-    issue = Fleetms.Issues.Issue.get_by_id!(issue_id, tenant: tenant, actor: actor)
+    issue = Fleetms.VehicleIssues.Issue.get_by_id!(issue_id, tenant: tenant, actor: actor)
 
     form =
       AshPhoenix.Form.add_form(form, "work_order[issues]",
@@ -219,7 +223,7 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     service_reminder =
-      Fleetms.Service.ServiceReminder.get_for_form!(service_reminder_id,
+      Fleetms.VehicleMaintenance.ServiceReminder.get_for_form!(service_reminder_id,
         tenant: tenant,
         actor: actor
       )
@@ -259,7 +263,7 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
     vehicle_id = get_form_value(socket.assigns.form, :vehicle_id)
 
     service_task =
-      Fleetms.Service.ServiceTask.get_for_form!(service_task_id, vehicle_id,
+      Fleetms.VehicleMaintenance.ServiceTask.get_for_form!(service_task_id, vehicle_id,
         tenant: tenant,
         actor: actor
       )
@@ -299,7 +303,7 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
   @impl true
   def handle_event("remove_issue_from_form", %{"path" => path, "issue_id" => issue_id}, socket) do
     %{tenant: tenant, current_user: actor, form: form} = socket.assigns
-    issue = Fleetms.Issues.Issue.get_by_id!(issue_id, tenant: tenant, actor: actor)
+    issue = Fleetms.VehicleIssues.Issue.get_by_id!(issue_id, tenant: tenant, actor: actor)
     form = AshPhoenix.Form.remove_form(form, path)
 
     notify_parent({:issue_removed, issue})
@@ -315,7 +319,7 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
     %{tenant: tenant, current_user: actor, form: form} = socket.assigns
 
     service_reminder =
-      Fleetms.Service.ServiceReminder.get_by_id!(service_reminder_id,
+      Fleetms.VehicleMaintenance.ServiceReminder.get_by_id!(service_reminder_id,
         tenant: tenant,
         actor: actor
       )
@@ -389,13 +393,13 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
         socket
       ) do
     %{tenant: tenant, current_user: actor} = socket.assigns
-    issues = Fleetms.Issues.Issue.get_by_vehicle_id!(vehicle_id, tenant: tenant, actor: actor)
+    issues = Fleetms.VehicleIssues.Issue.get_by_vehicle_id!(vehicle_id, tenant: tenant, actor: actor)
 
     service_reminders =
-      Fleetms.Service.ServiceReminder.get_by_vehicle_id!(vehicle_id, tenant: tenant, actor: actor)
+      Fleetms.VehicleMaintenance.ServiceReminder.get_by_vehicle_id!(vehicle_id, tenant: tenant, actor: actor)
 
     service_tasks =
-      Fleetms.Service.ServiceTask.list_with_vehicle_reminder!(vehicle_id,
+      Fleetms.VehicleMaintenance.ServiceTask.list_with_vehicle_reminder!(vehicle_id,
         tenant: tenant,
         actor: actor
       )
@@ -412,7 +416,7 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
   def handle_info({FleetmsWeb.WorkOrderLive.Index, {:issue_added, issue}}, socket) do
     socket =
       stream_delete(socket, :vehicle_issues, issue)
-      |> put_flash(:info, "Issue was added to Work Order form")
+      |> put_toast(:info, "Issue was added to Work Order form")
 
     {:noreply, socket}
   end
@@ -421,7 +425,7 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
   def handle_info({FleetmsWeb.WorkOrderLive.Index, {:issue_removed, issue}}, socket) do
     socket =
       stream_insert(socket, :vehicle_issues, issue)
-      |> put_flash(:info, "Issue was remove from Work Order form")
+      |> put_toast(:info, "Issue was remove from Work Order form")
 
     {:noreply, socket}
   end
@@ -436,7 +440,7 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
 
     socket =
       socket
-      |> put_flash(:info, "Issue was remove from Work Order form")
+      |> put_toast(:info, "Issue was remove from Work Order form")
       |> stream_insert(:vehicle_service_reminders, service_reminder)
       |> assign(:work_order_service_reminders_ids, ids)
 
@@ -445,7 +449,7 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     %{tenant: tenant, current_user: actor} = socket.assigns
-    work_order = Fleetms.Service.WorkOrder.get_by_id!(id, tenant: tenant, actor: actor)
+    work_order = Fleetms.VehicleMaintenance.WorkOrder.get_by_id!(id, tenant: tenant, actor: actor)
 
     can_perform_action? =
       Ash.can?(
@@ -464,8 +468,8 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
       end
 
       work_order_service_reminders_ids =
-        Stream.filter(work_order.work_order_service_tasks, &(not is_nil(&1.service_reminder)))
-        |> Enum.map(& &1.service_reminder.id)
+        Stream.filter(work_order.work_order_service_tasks, &(not is_nil(&1.service_task.service_reminder)))
+        |> Enum.map(& &1.service_task.service_reminder.id)
 
       max_upload_entries = get_max_upload_entries(work_order)
 
@@ -485,7 +489,7 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
       |> stream(:service_tasks, [], reset: true)
       |> assign_form()
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -493,7 +497,7 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
   defp apply_action(socket, :new, _params) do
     can_perform_action? =
       Ash.can?(
-        {Fleetms.Service.WorkOrder, :create},
+        {Fleetms.VehicleMaintenance.WorkOrder, :create},
         socket.assigns.current_user
       )
 
@@ -515,7 +519,7 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
       |> stream(:service_tasks, [], reset: true)
       |> assign_form()
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -554,14 +558,14 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
 
           {:noreply,
            socket
-           |> put_flash(:info, "Work Order updated successfully")
+           |> put_toast(:info, "Work Order updated successfully")
            |> push_patch(to: ~p"/work_orders")}
 
         {:error, form} ->
           {:noreply, assign(socket, :form, form)}
       end
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
 
       {:noreply, socket}
@@ -571,7 +575,7 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
   defp save_work_order(socket, :new, work_order_params) do
     can_perform_action? =
       Ash.can?(
-        {Fleetms.Service.WorkOrder, :create},
+        {Fleetms.VehicleMaintenance.WorkOrder, :create},
         socket.assigns.current_user
       )
 
@@ -583,14 +587,14 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
 
           {:noreply,
            socket
-           |> put_flash(:info, "Work Order created successfully")
+           |> put_toast(:info, "Work Order created successfully")
            |> push_patch(to: ~p"/work_orders")}
 
         {:error, form} ->
           {:noreply, assign(socket, :form, form)}
       end
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
 
       {:noreply, socket}
@@ -607,96 +611,82 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
         work_order
         |> AshPhoenix.Form.for_update(:update,
           as: "work_order",
-          domain: Fleetms.Service,
+          domain: Fleetms.VehicleMaintenance,
           actor: actor,
           tenant: tenant,
           forms: [
             issues: [
               type: :list,
-              resource: Fleetms.Issues.Issue,
+              resource: Fleetms.VehicleIssues.Issue,
               data: work_order.issues,
               update_action: :update_from_work_order,
               read_action: :read
             ],
-            work_order_service_tasks: [
-              type: :list,
-              resource: Fleetms.Service.WorkOrderServiceTask,
-              data: work_order.work_order_service_tasks,
-              read_action: :read_for_form,
-              create_action: :create,
-              update_action: :update,
-              forms: [
-                service_reminder: [
-                  type: :single,
-                  resource: Fleetms.Service.ServiceReminder,
-                  data: & &1.service_reminder,
-                  create_action: :ignore_create,
-                  update_action: :ignore_update
-                ],
-                work_order_service_task_parts: [
-                  type: :list,
-                  resource: Fleetms.Service.WorkOrderServiceTaskPart,
-                  data: & &1.work_order_service_task_parts,
-                  create_action: :create,
-                  update_action: :update
-                ],
-                work_order_service_task_vendor_labor_details: [
-                  type: :list,
-                  resource: Fleetms.Service.WorkOrderServiceTaskVendorLaborDetail,
-                  data: & &1.work_order_service_task_vendor_labor_details,
-                  create_action: :create,
-                  update_action: :update
-                ],
-                work_order_service_task_technician_labor_details: [
-                  type: :list,
-                  resource: Fleetms.Service.WorkOrderServiceTaskTechnicianLaborDetail,
-                  data: & &1.work_order_service_task_technician_labor_details,
-                  create_action: :create,
-                  update_action: :update
-                ]
-              ]
+          work_order_service_tasks: [
+            type: :list,
+            resource: Fleetms.VehicleMaintenance.WorkOrderServiceTask,
+            data: work_order.work_order_service_tasks,
+            read_action: :read_for_form,
+            create_action: :create,
+            update_action: :update,
+            forms: [
+              service_reminder: [
+                type: :single,
+                resource: Fleetms.VehicleMaintenance.ServiceReminder,
+                data: & &1.service_task.service_reminder,
+                create_action: :ignore_create,
+                update_action: :ignore_update
+              ],
+              work_order_service_task_parts: [
+                type: :list,
+                resource: Fleetms.VehicleMaintenance.WorkOrderServiceTaskPart,
+                data: & &1.work_order_service_task_parts,
+                create_action: :create,
+                update_action: :update
+              ],
             ]
+          ]
           ]
         )
       else
-        Fleetms.Service.WorkOrder
+        Fleetms.VehicleMaintenance.WorkOrder
         |> AshPhoenix.Form.for_create(:create,
           as: "work_order",
-          domain: Fleetms.Service,
+          domain: Fleetms.VehicleMaintenance,
           actor: actor,
           tenant: tenant,
           forms: [
             issues: [
               type: :list,
-              resource: Fleetms.Issues.Issue,
+              resource: Fleetms.VehicleIssues.Issue,
               update_action: :update_from_work_order,
               read_action: :read
             ],
             work_order_service_tasks: [
               type: :list,
-              resource: Fleetms.Service.WorkOrderServiceTask,
+              resource: Fleetms.VehicleMaintenance.WorkOrderServiceTask,
               create_action: :create,
               update_action: :update,
               forms: [
                 service_reminder: [
                   type: :single,
-                  resource: Fleetms.Service.ServiceReminder,
+                  resource: Fleetms.VehicleMaintenance.ServiceReminder,
                   create_action: :ignore_create,
                   update_action: :ignore_update
                 ],
                 work_order_service_task_parts: [
                   type: :list,
-                  resource: Fleetms.Service.WorkOrderServiceTaskPart,
+                  resource: Fleetms.VehicleMaintenance.WorkOrderServiceTaskPart,
                   create_action: :create
                 ],
                 work_order_service_task_vendor_labor_details: [
                   type: :list,
-                  resource: Fleetms.Service.WorkOrderServiceTaskVendorLaborDetail,
+                  resource: Fleetms.VehicleMaintenance.WorkOrderServiceTaskVendorLaborDetail,
                   create_action: :create
                 ],
                 work_order_service_task_technician_labor_details: [
                   type: :list,
-                  resource: Fleetms.Service.WorkOrderServiceTaskTechnicianLaborDetail,
+                  resource: Fleetms.VehicleMaintenance.WorkOrderServiceTaskTechnicianLaborDetail,
                   create_action: :create
                 ]
               ]
@@ -712,11 +702,11 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     vehicles =
-      Fleetms.Vehicles.Vehicle.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleManagement.Vehicle.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.full_name, &1.id})
 
     service_tasks =
-      Fleetms.Service.ServiceTask.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleMaintenance.ServiceTask.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.name, &1.id})
 
     users =
@@ -787,7 +777,7 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
   defp list_work_orders(paginate_sort_opts, search_query, filter_form_data, opts) do
     %{page: page, per_page: per_page} = paginate_sort_opts
 
-    Service.list_work_orders!(paginate_sort_opts, search_query, filter_form_data,
+    VehicleMaintenance.list_work_orders!(paginate_sort_opts, search_query, filter_form_data,
       tenant: opts[:tenant],
       actor: opts[:actor],
       page: [limit: per_page, offset: (page - 1) * per_page, count: true]
@@ -857,10 +847,10 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
 
   defp get_max_upload_entries(nil), do: @default_max_upload_entries
 
-  defp get_max_upload_entries(%Fleetms.Service.WorkOrder{work_order_photos: nil}),
+  defp get_max_upload_entries(%Fleetms.VehicleMaintenance.WorkOrder{work_order_photos: nil}),
     do: @default_max_upload_entries
 
-  defp get_max_upload_entries(%Fleetms.Service.WorkOrder{work_order_photos: photos}) do
+  defp get_max_upload_entries(%Fleetms.VehicleMaintenance.WorkOrder{work_order_photos: photos}) do
     total = Enum.count(photos)
     @default_max_upload_entries - total
   end
@@ -882,10 +872,10 @@ defmodule FleetmsWeb.WorkOrderLive.Index do
     end
   end
 
-  defp get_current_work_order_photos(%Fleetms.Service.WorkOrder{work_order_photos: photos})
+  defp get_current_work_order_photos(%Fleetms.VehicleMaintenance.WorkOrder{work_order_photos: photos})
        when is_list(photos),
        do: photos
 
-  defp get_current_work_order_photos(%Fleetms.Service.WorkOrder{work_order_photos: _photos}),
+  defp get_current_work_order_photos(%Fleetms.VehicleMaintenance.WorkOrder{work_order_photos: _photos}),
     do: []
 end

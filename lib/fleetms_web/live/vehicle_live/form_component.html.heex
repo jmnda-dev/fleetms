@@ -378,11 +378,6 @@
         </span>
       </:description>
     </.upload_input>
-    <:actions>
-      <.button phx-disable-with="Saving...">
-        Save Vehicle
-      </.button>
-    </:actions>
 
     <:extra_block :if={@action == :edit}>
       <div id="accordion-collapse-form" data-accordion="collapse">
@@ -971,12 +966,11 @@
           </div>
         </div>
       </div>
-
-      <div class="mt-4">
-        <.button phx-disable-with="Saving...">
-          Save
-        </.button>
-      </div>
     </:extra_block>
+    <:actions>
+      <.button phx-disable-with="Saving...">
+        Save Vehicle
+      </.button>
+    </:actions>
   </.simple_form>
 </div>

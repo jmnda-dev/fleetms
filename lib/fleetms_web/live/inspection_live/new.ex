@@ -1,18 +1,22 @@
 defmodule FleetmsWeb.InspectionLive.New do
   use FleetmsWeb, :live_view
 
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :inspections_module}
+
   @impl true
   def mount(_params, _session, socket) do
     can_perform_action? =
       Ash.can?(
-        {Fleetms.Inspection.InspectionSubmission, :create},
+        {Fleetms.VehicleInspection.InspectionSubmission, :create},
         socket.assigns.current_user
       )
 
     if can_perform_action? do
       {:ok, assign(socket, :active_link, :inspection_submissions)}
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
 
       {:ok, socket}
@@ -24,39 +28,39 @@ defmodule FleetmsWeb.InspectionLive.New do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     vehicles =
-      Fleetms.Vehicles.Vehicle.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleManagement.Vehicle.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.name, &1.id})
 
     inspection_forms =
-      Fleetms.Inspection.InspectionForm.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleInspection.InspectionForm.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.title, &1.id})
 
     form =
-      Fleetms.Inspection.InspectionSubmission
+      Fleetms.VehicleInspection.InspectionSubmission
       |> AshPhoenix.Form.for_create(:create,
         as: "inspection_submission",
-        domain: Fleetms.Inspection,
+        domain: Fleetms.VehicleInspection,
         actor: socket.assigns.current_user,
         tenant: tenant,
         forms: [
           radio_input_values: [
             type: :list,
-            resource: Fleetms.Inspection.RadioInputValue,
+            resource: Fleetms.VehicleInspection.RadioInputValue,
             create_action: :create
           ],
           dropdown_input_values: [
             type: :list,
-            resource: Fleetms.Inspection.DropdownInputValue,
+            resource: Fleetms.VehicleInspection.DropdownInputValue,
             create_action: :create
           ],
           number_input_values: [
             type: :list,
-            resource: Fleetms.Inspection.NumberInputValue,
+            resource: Fleetms.VehicleInspection.NumberInputValue,
             create_action: :create
           ],
           signature_input_values: [
             type: :list,
-            resource: Fleetms.Inspection.SignatureInputValue,
+            resource: Fleetms.VehicleInspection.SignatureInputValue,
             create_action: :create
           ]
         ]
@@ -87,7 +91,7 @@ defmodule FleetmsWeb.InspectionLive.New do
       {:ok, _inspection_form} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Inspection was saved successfully")
+         |> put_toast(:info, "Inspection was saved successfully")
          |> push_navigate(to: ~p"/inspections")}
 
       {:error, form} ->
@@ -104,7 +108,7 @@ defmodule FleetmsWeb.InspectionLive.New do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     inspection_form =
-      Fleetms.Inspection.InspectionForm.get_by_id!(id, tenant: tenant, actor: actor)
+      Fleetms.VehicleInspection.InspectionForm.get_by_id!(id, tenant: tenant, actor: actor)
 
     form =
       AshPhoenix.Form.validate(socket.assigns.form, params)

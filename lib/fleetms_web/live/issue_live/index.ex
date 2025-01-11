@@ -1,11 +1,15 @@
 defmodule FleetmsWeb.IssueLive.Index do
   use FleetmsWeb, :live_view
 
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :issues_module}
+
   import Fleetms.Utils,
     only: [calc_total_pages: 2, dates_in_map_to_string: 2, atom_list_to_options_for_select: 1]
 
   alias Fleetms.Common.PaginationSortParam
-  alias Fleetms.Issues
+  alias Fleetms.VehicleIssues
 
   @per_page_opts [10, 20, 30, 50, 100, 250, 500]
   @sort_by_opts [
@@ -97,7 +101,6 @@ defmodule FleetmsWeb.IssueLive.Index do
       |> assign(:total, count)
       |> assign(:total_pages, calc_total_pages(count, per_page))
 
-
     {:noreply, socket}
   end
 
@@ -163,14 +166,14 @@ defmodule FleetmsWeb.IssueLive.Index do
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     %{tenant: tenant, current_user: actor} = socket.assigns
-    issue = Fleetms.Issues.Issue.get_by_id!(id, tenant: tenant, actor: actor)
+    issue = Fleetms.VehicleIssues.Issue.get_by_id!(id, tenant: tenant, actor: actor)
 
     Ash.destroy!(issue, tenant: tenant, actor: actor)
 
     socket =
       socket
       |> stream_delete(:issues, issue)
-      |> put_flash(:info, "Issue was deleted successfully")
+      |> put_toast(:info, "Issue was deleted successfully")
 
     {:noreply, socket}
   end
@@ -180,21 +183,21 @@ defmodule FleetmsWeb.IssueLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     can_perform_action? =
-      Ash.can?({Fleetms.Issues.Issue, :update}, socket.assigns.current_user)
+      Ash.can?({Fleetms.VehicleIssues.Issue, :update}, socket.assigns.current_user)
 
     if can_perform_action? do
       updated_issue =
-        Fleetms.Issues.Issue.get_by_id!(id, tenant: tenant, actor: actor)
+        Fleetms.VehicleIssues.Issue.get_by_id!(id, tenant: tenant, actor: actor)
         |> Ash.Changeset.for_update(:reopen_issue)
         |> Ash.update!(tenant: tenant, actor: actor)
 
       socket =
         stream_insert(socket, :issues, updated_issue)
-        |> put_flash(:info, "Issue ##{updated_issue.issue_number} was reopened!")
+        |> put_toast(:info, "Issue ##{updated_issue.issue_number} was reopened!")
 
       {:noreply, socket}
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
 
       {:noreply, socket}
@@ -205,14 +208,14 @@ defmodule FleetmsWeb.IssueLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     can_perform_action? =
-      Ash.can?({Fleetms.Issues.Issue, :update}, actor)
+      Ash.can?({Fleetms.VehicleIssues.Issue, :update}, actor)
 
     if can_perform_action? do
       socket
       |> assign(:page_title, "Edit Issue")
-      |> assign(:issue, Fleetms.Issues.Issue.get_by_id!(id, tenant: tenant, actor: actor))
+      |> assign(:issue, Fleetms.VehicleIssues.Issue.get_by_id!(id, tenant: tenant, actor: actor))
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -221,14 +224,14 @@ defmodule FleetmsWeb.IssueLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     can_perform_action? =
-      Ash.can?({Fleetms.Issues.Issue, :update}, actor)
+      Ash.can?({Fleetms.VehicleIssues.Issue, :update}, actor)
 
     if can_perform_action? do
       socket
       |> assign(:page_title, "Resolve Issue with Comment")
-      |> assign(:issue, Fleetms.Issues.Issue.get_by_id!(id, tenant: tenant, actor: actor))
+      |> assign(:issue, Fleetms.VehicleIssues.Issue.get_by_id!(id, tenant: tenant, actor: actor))
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -237,14 +240,14 @@ defmodule FleetmsWeb.IssueLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     can_perform_action? =
-      Ash.can?({Fleetms.Issues.Issue, :update}, actor)
+      Ash.can?({Fleetms.VehicleIssues.Issue, :update}, actor)
 
     if can_perform_action? do
       socket
       |> assign(:page_title, "Close Issue")
-      |> assign(:issue, Fleetms.Issues.Issue.get_by_id!(id, tenant: tenant, actor: actor))
+      |> assign(:issue, Fleetms.VehicleIssues.Issue.get_by_id!(id, tenant: tenant, actor: actor))
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -256,14 +259,14 @@ defmodule FleetmsWeb.IssueLive.Index do
 
   defp apply_action(socket, :new, _params) do
     can_perform_action? =
-      Ash.can?({Fleetms.Issues.Issue, :create}, socket.assigns.current_user)
+      Ash.can?({Fleetms.VehicleIssues.Issue, :create}, socket.assigns.current_user)
 
     if can_perform_action? do
       socket
       |> assign(:page_title, "New Issue")
       |> assign(:issue, nil)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -282,7 +285,7 @@ defmodule FleetmsWeb.IssueLive.Index do
   defp list_issues(paginate_sort_opts, search_query, filter_form_data, opts) do
     %{page: page, per_page: per_page} = paginate_sort_opts
 
-    Issues.list_issues!(paginate_sort_opts, search_query, filter_form_data,
+    VehicleIssues.list_issues!(paginate_sort_opts, search_query, filter_form_data,
       tenant: opts[:tenant],
       actor: opts[:actor],
       page: [limit: per_page, offset: (page - 1) * per_page, count: true]

@@ -97,7 +97,7 @@
           <div
             :if={
 Ash.can?(
-                {Fleetms.Service.ServiceGroup, :create},
+                {Fleetms.VehicleMaintenance.ServiceGroup, :create},
                 @current_user
               )
             }
@@ -175,7 +175,7 @@ Ash.can?(
             >
               <li :if={
                 Ash.can?(
-                  {Fleetms.Service.ServiceGroup, :update},
+                  {Fleetms.VehicleMaintenance.ServiceGroup, :update},
                   @current_user
                 )
               }>
@@ -190,7 +190,7 @@ Ash.can?(
             <div
               :if={
                 Ash.can?(
-                  {Fleetms.Service.ServiceGroup, :destroy},
+                  {Fleetms.VehicleMaintenance.ServiceGroup, :destroy},
                   @current_user
                 )
               }

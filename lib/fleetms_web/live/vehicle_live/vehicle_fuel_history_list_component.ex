@@ -91,7 +91,7 @@ defmodule FleetmsWeb.VehicleLive.VehicleFuelHistoryListComponent do
   end
 
   defp load_vehicle_fuel_histories(vehicle, tenant, actor) do
-    Fleetms.FuelTracking.FuelHistory
+    Fleetms.FuelManagement.FuelHistory
     |> Ash.Query.new()
     |> Ash.Query.set_argument(:vehicle_id, vehicle.id)
     |> Ash.Query.for_read(:list_vehicle_fuel_histories)

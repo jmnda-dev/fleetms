@@ -190,7 +190,7 @@ defmodule FleetmsWeb.VehicleLive.VehicleServiceReminderListComponent do
   end
 
   defp load_issues(vehicle, tenant, actor) do
-    Fleetms.Service.ServiceReminder
+    Fleetms.VehicleMaintenance.ServiceReminder
     |> Ash.Query.new()
     |> Ash.Query.set_argument(:vehicle_id, vehicle.id)
     |> Ash.Query.for_read(:list_vehicle_service_reminders)

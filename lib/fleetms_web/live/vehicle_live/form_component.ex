@@ -1,5 +1,5 @@
 defmodule FleetmsWeb.VehicleLive.FormComponent do
-  alias Fleetms.Vehicles.Vehicle
+  alias Fleetms.VehicleManagement.Vehicle
   use FleetmsWeb, :live_component
 
   @photos_upload_ref :vehicle_photos
@@ -21,7 +21,7 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
     %{tenant: tenant, current_user: actor} = socket.assigns
     # TODO: Perhaps use an Ash Resource aggregate to determine the number of uploads to allow
 
-    vehicle_makes = Fleetms.Vehicles.VehicleMake.get_all!(tenant: tenant, actor: actor)
+    vehicle_makes = Fleetms.VehicleManagement.VehicleMake.get_all!(tenant: tenant, actor: actor)
 
     socket =
       socket
@@ -72,7 +72,7 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Vehicle was updated successfully")
+         |> put_toast(:info, "Vehicle was updated successfully", [icon: icon(%{name: "hero-information-circle-mini"})])
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -90,7 +90,7 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Vehicle was added successfully")
+         |> put_toast(:info, "Vehicle was added successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -109,7 +109,7 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
 
       :edit ->
         vehicle_models =
-          Fleetms.Vehicles.VehicleModel.list_by_vehicle_make!(vehicle.vehicle_make,
+          Fleetms.VehicleManagement.VehicleModel.list_by_vehicle_make!(vehicle.vehicle_make,
             tenant: tenant,
             actor: actor
           )
@@ -124,21 +124,21 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
     form =
       if vehicle do
         AshPhoenix.Form.for_update(vehicle, :update,
-          domain: Fleetms.Vehicles,
+          domain: Fleetms.VehicleManagement,
           as: "vehicle",
           actor: actor,
           tenant: tenant,
           forms: [
             vehicle_model: [
               type: :single,
-              resource: Fleetms.Vehicles.VehicleModel,
+              resource: Fleetms.VehicleManagement.VehicleModel,
               data: vehicle.vehicle_model,
               create_action: :create,
               update_action: :update,
               forms: [
                 vehicle_make: [
                   type: :single,
-                  resource: Fleetms.Vehicles.VehicleMake,
+                  resource: Fleetms.VehicleManagement.VehicleMake,
                   data: vehicle.vehicle_model.vehicle_make,
                   create_action: :create,
                   update_action: :update
@@ -147,28 +147,28 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
             ],
             vehicle_engine_spec: [
               type: :single,
-              resource: Fleetms.Vehicles.VehicleEngineSpec,
+              resource: Fleetms.VehicleManagement.VehicleEngineSpec,
               data: vehicle.vehicle_engine_spec,
               create_action: :create,
               update_action: :update
             ],
             vehicle_drivetrain_spec: [
               type: :single,
-              resource: Fleetms.Vehicles.VehicleDrivetrainSpec,
+              resource: Fleetms.VehicleManagement.VehicleDrivetrainSpec,
               data: vehicle.vehicle_drivetrain_spec,
               create_action: :create,
               update_action: :update
             ],
             vehicle_other_spec: [
               type: :single,
-              resource: Fleetms.Vehicles.VehicleOtherSpec,
+              resource: Fleetms.VehicleManagement.VehicleOtherSpec,
               data: vehicle.vehicle_other_spec,
               create_action: :create,
               update_action: :update
             ],
             vehicle_performance_spec: [
               type: :single,
-              resource: Fleetms.Vehicles.VehiclePerformanceSpec,
+              resource: Fleetms.VehicleManagement.VehiclePerformanceSpec,
               data: vehicle.vehicle_performance_spec,
               create_action: :create,
               update_action: :update
@@ -176,21 +176,21 @@ defmodule FleetmsWeb.VehicleLive.FormComponent do
           ]
         )
       else
-        AshPhoenix.Form.for_create(Fleetms.Vehicles.Vehicle, :create,
-          domain: Fleetms.Vehicles,
+        AshPhoenix.Form.for_create(Fleetms.VehicleManagement.Vehicle, :create,
+          domain: Fleetms.VehicleManagement,
           as: "vehicle",
           actor: actor,
           tenant: tenant,
           forms: [
             vehicle_model: [
               type: :single,
-              resource: Fleetms.Vehicles.VehicleModel,
+              resource: Fleetms.VehicleManagement.VehicleModel,
               create_action: :create,
               update_action: :update,
               forms: [
                 vehicle_make: [
                   type: :single,
-                  resource: Fleetms.Vehicles.VehicleMake,
+                  resource: Fleetms.VehicleManagement.VehicleMake,
                   create_action: :create,
                   update_action: :update
                 ]

@@ -91,7 +91,7 @@
       </li>
       <li class="mr-2">
         <.tab
-          id="form_details_tab"
+          id="form_preview_tab"
           active={@live_action == :preview}
           patch={~p"/inspection_forms/#{@inspection_form}"}
           label="Preview Form"
@@ -100,7 +100,7 @@
       </li>
       <li class="mr-2">
         <.tab
-          id="form_details_tab"
+        id="form_schedule_tab"
           active={@live_action == :schedule}
           patch={~p"/inspection_forms/#{@inspection_form}"}
           label="Schedules"
@@ -109,7 +109,7 @@
       </li>
     </ul>
   </div>
-  <%= if Ash.can?({Fleetms.Inspection.InspectionForm, :update}, @current_user) do %>
+  <%= if Ash.can?({Fleetms.VehicleInspection.InspectionForm, :update}, @current_user) do %>
     <.simple_form for={@form} id="inspection-form-form" phx-change="validate" phx-submit="save">
       <div class="py-2 px-2">
         <.input field={@form[:title]} type="text" label="Title" />

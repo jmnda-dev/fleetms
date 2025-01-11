@@ -53,7 +53,7 @@ defmodule FleetmsWeb.InventoryLocationLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Inventory Location updated successfully")
+         |> put_toast(:info, "Inventory Location updated successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -68,7 +68,7 @@ defmodule FleetmsWeb.InventoryLocationLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Inventory Location created successfully")
+         |> put_toast(:info, "Inventory Location created successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->

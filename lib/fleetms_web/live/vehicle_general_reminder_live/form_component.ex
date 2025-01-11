@@ -10,14 +10,14 @@ defmodule FleetmsWeb.VehicleGeneralReminderLive.FormComponent do
     form =
       if vehicle_general_reminder do
         AshPhoenix.Form.for_update(vehicle_general_reminder, :update,
-          domain: Fleetms.Vehicles,
+          domain: Fleetms.VehicleManagement,
           as: "vehicle_general_reminder",
           actor: actor,
           tenant: tenant,
           forms: [
             vehicle_reminder_purpose: [
               type: :single,
-              resource: Fleetms.Vehicles.VehicleReminderPurpose,
+              resource: Fleetms.VehicleManagement.VehicleReminderPurpose,
               data: vehicle_general_reminder.vehicle_reminder_purpose,
               create_action: :create,
               update_action: :update
@@ -25,16 +25,16 @@ defmodule FleetmsWeb.VehicleGeneralReminderLive.FormComponent do
           ]
         )
       else
-        AshPhoenix.Form.for_create(Fleetms.Vehicles.VehicleGeneralReminder, :create,
-          domain: Fleetms.Vehicles,
+        AshPhoenix.Form.for_create(Fleetms.VehicleManagement.VehicleGeneralReminder, :create,
+          domain: Fleetms.VehicleManagement,
           as: "vehicle_general_reminder",
           actor: actor,
           tenant: tenant,
           forms: [
             vehicle_reminder_purpose: [
               type: :single,
-              resource: Fleetms.Vehicles.VehicleReminderPurpose,
-              data: %Fleetms.Vehicles.VehicleReminderPurpose{},
+              resource: Fleetms.VehicleManagement.VehicleReminderPurpose,
+              data: %Fleetms.VehicleManagement.VehicleReminderPurpose{},
               create_action: :create,
               update_action: :update
             ]
@@ -43,11 +43,11 @@ defmodule FleetmsWeb.VehicleGeneralReminderLive.FormComponent do
       end
 
     vehicles =
-      Fleetms.Vehicles.Vehicle.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleManagement.Vehicle.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.full_name, &1.id})
 
     vehicle_reminder_purposes =
-      Fleetms.Vehicles.VehicleReminderPurpose.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleManagement.VehicleReminderPurpose.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.name, &1.name})
 
     socket =
@@ -86,7 +86,7 @@ defmodule FleetmsWeb.VehicleGeneralReminderLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Vehicle General Reminder was updated successfully")
+         |> put_toast(:info, "Vehicle General Reminder was updated successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -101,7 +101,7 @@ defmodule FleetmsWeb.VehicleGeneralReminderLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Vehicle General Reminder was added successfully")
+         |> put_toast(:info, "Vehicle General Reminder was added successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->

@@ -5,11 +5,90 @@ import ApexCharts from 'apexcharts'
 import { Drawer } from 'flowbite';
 import moment from 'moment';
 import sidebarInitJs from "./sidebar.js"
-import {Dropdown} from 'flowbite'
+import { Dropdown } from 'flowbite'
+import { createLiveToastHook } from 'live_toast'
+import fuelCostOvertimeChart from "./charts/fuel_costs_over_time.js";
 const humanizeDuration = require('humanize-duration');
 
 
 Hooks = {};
+
+Hooks.LiveToast = createLiveToastHook()
+
+Hooks.fuelCostChart = {
+  mounted() {
+    this.pushEvent("loadFuelCostOverTimeStats", {})
+    this.handleEvent("renderFuelCostOverTimeStats", ({ series, categories, horizontal }) => {
+      if (window.fuelCostOverTimeStatsChart) {
+        window.fuelCostOverTimeStatsChart.destroy()
+      }
+      const options = {
+        series: series,
+        // chart: {
+        //   type: 'area',
+        //   height: horizontal && '2044px' || '620px',
+        //   width: '100%',
+        //   stacked: true,
+        // },
+        chart: {
+          type: 'bar',
+          height: 350
+        },
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            columnWidth: '55%',
+            endingShape: 'rounded'
+          },
+        },
+        stroke: {
+          show: true,
+          width: 2,
+          colors: ['transparent']
+        },
+        dataLabels: {
+          formatter: (val) => {
+            if (val >= 1000) {
+              return val / 1000 + 'K'
+            } else {
+              return val
+            }
+          }
+        },
+        xaxis: {
+          categories: categories
+        },
+        fill: {
+          opacity: 1
+        },
+        tooltip: {
+          y: {
+            formatter: function (val) {
+              return "K " + val + " Kwacha"
+            }
+          }
+        },
+        // colors: ['#008FFB', '#80c7fd', '#00E396'],
+        yaxis: {
+          labels: {
+            formatter: (val) => {
+              if (val >= 1000) {
+                return val
+              } else {
+                return val
+              }
+            }
+          }
+        },
+      };
+
+      var chart = new ApexCharts(document.querySelector("#fuel-stats-chart"), options);
+      chart.render();
+
+      window.fuelCostOverTimeStatsChart = chart
+    })
+  }
+}
 
 Hooks.dispatchPhxLoadingStopEvent = {
   mounted() {
@@ -36,7 +115,7 @@ Hooks.initSidebarJs = {
 Hooks.initDropdown = {
   mounted() {
     let $triggerEl = this.el
-    let $targetElId =$triggerEl.getAttribute('data-dropdown-toggle')  
+    let $targetElId = $triggerEl.getAttribute('data-dropdown-toggle')
     let $targetEl = document.getElementById($targetElId)
 
     const _dropdown = new Dropdown($targetEl, $triggerEl)

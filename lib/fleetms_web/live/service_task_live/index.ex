@@ -1,6 +1,10 @@
 defmodule FleetmsWeb.ServiceTaskLive.Index do
   use FleetmsWeb, :live_view
 
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :service_module}
+
   @impl true
   def mount(_params, _session, socket) do
     %{tenant: tenant, current_user: actor} = socket.assigns
@@ -23,17 +27,17 @@ defmodule FleetmsWeb.ServiceTaskLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     can_perform_action? =
-      Ash.can?({Fleetms.Service.ServiceTask, :update}, actor)
+      Ash.can?({Fleetms.VehicleMaintenance.ServiceTask, :update}, actor)
 
     if can_perform_action? do
       socket
       |> assign(:page_title, "Edit Service Task")
       |> assign(
         :service_task,
-        Fleetms.Service.ServiceTask.get_by_id!(id, tenant: tenant, actor: actor)
+        Fleetms.VehicleMaintenance.ServiceTask.get_by_id!(id, tenant: tenant, actor: actor)
       )
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -41,7 +45,7 @@ defmodule FleetmsWeb.ServiceTaskLive.Index do
   defp apply_action(socket, :new, _params) do
     can_perform_action? =
       Ash.can?(
-        {Fleetms.Service.ServiceTask, :create},
+        {Fleetms.VehicleMaintenance.ServiceTask, :create},
         socket.assigns.current_user
       )
 
@@ -50,7 +54,7 @@ defmodule FleetmsWeb.ServiceTaskLive.Index do
       |> assign(:page_title, "New Service Task")
       |> assign(:service_task, nil)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -71,21 +75,21 @@ defmodule FleetmsWeb.ServiceTaskLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     can_perform_action? =
-      Ash.can?({Fleetms.Service.ServiceTask, :destroy}, actor)
+      Ash.can?({Fleetms.VehicleMaintenance.ServiceTask, :destroy}, actor)
 
     if can_perform_action? do
-      service_task = Fleetms.Service.ServiceTask.get_by_id!(id, tenant: tenant, actor: actor)
+      service_task = Fleetms.VehicleMaintenance.ServiceTask.get_by_id!(id, tenant: tenant, actor: actor)
 
       Ash.destroy!(service_task, tenant: tenant, actor: actor)
 
       socket =
         socket
         |> stream_delete(:service_tasks, service_task)
-        |> put_flash(:info, "Service task was deleted successfully")
+        |> put_toast(:info, "Service task was deleted successfully")
 
       {:noreply, socket}
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
 
       {:noreply, socket}
@@ -93,7 +97,7 @@ defmodule FleetmsWeb.ServiceTaskLive.Index do
   end
 
   defp list_service_tasks(tenant, actor) do
-    Fleetms.Service.ServiceTask
+    Fleetms.VehicleMaintenance.ServiceTask
     |> Ash.Query.for_read(:list)
     |> Ash.read!(tenant: tenant, actor: actor)
   end

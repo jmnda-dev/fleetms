@@ -1,6 +1,7 @@
 defmodule FleetmsWeb.Router do
   use FleetmsWeb, :router
   use AshAuthentication.Phoenix.Router
+  # use PhoenixAnalytics.Web, :router
 
   import AshAdmin.Router
 
@@ -36,6 +37,7 @@ defmodule FleetmsWeb.Router do
     pipe_through [:browser, :public_layout]
 
     get "/", PageController, :home
+    get "/demo/sign-in", PageController, :demo_signin
   end
 
   scope "/", FleetmsWeb do
@@ -54,6 +56,7 @@ defmodule FleetmsWeb.Router do
 
       live "/vehicles/:id", VehicleLive.Detail, :detail
       live "/vehicles/:id/detail/edit", VehicleLive.Detail, :edit
+      live "/vehicles/:id/detail/documents", VehicleLive.DocumentList
       live "/vehicles/:id/detail/issues", VehicleLive.Detail, :vehicle_issues
 
       live "/vehicles/:id/detail/service_reminders",
@@ -175,10 +178,12 @@ defmodule FleetmsWeb.Router do
       live "/settings", UserLive.Settings
 
       live "/reports", ReportLive.Summary
+      live "/reports/fuel_costs", ReportLive.FuelCosts
       live "/reports/downloads", ReportLive.Download
     end
 
     get "/reports/downloads/:filename", DownloadController, :report_download
+    get "/vehicles/documents/download/:id", VehicleDocumentDownloadController, :download
   end
 
   scope "/", FleetmsWeb do
@@ -204,6 +209,21 @@ defmodule FleetmsWeb.Router do
     reset_route([])
   end
 
+  scope "/platform" do
+    pipe_through [:browser, :require_service_provider_user]
+    ash_admin "/admin"
+    # phoenix_analytics_dashboard("/analytics")
+
+    import Phoenix.LiveDashboard.Router
+    live_dashboard "/dashboard", metrics: FleetmsWeb.Telemetry
+  end
+
+  scope "/" do
+    pipe_through [:browser, :require_service_provider_user]
+
+    forward "/feature-flags", FunWithFlags.UI.Router, namespace: "feature-flags"
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", FleetmsWeb do
   #   pipe_through :api
@@ -211,7 +231,6 @@ defmodule FleetmsWeb.Router do
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:fleetms, :dev_routes) do
-    import Phoenix.LiveDashboard.Router
     # If you want to use the LiveDashboard in production, you should put
     # it behind authentication and allow only admins to access it.
     # If your application does not have an admins-only section yet,
@@ -221,8 +240,6 @@ defmodule FleetmsWeb.Router do
     scope "/dev" do
       pipe_through :browser
 
-      ash_admin "/admin"
-      live_dashboard "/dashboard", metrics: FleetmsWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end

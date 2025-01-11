@@ -110,6 +110,7 @@
         kind={:success}
         type="button"
         id="successButton"
+        data-modal-target="successModal"
         data-modal-toggle="successModal"
       >
         <i class="fa-solid fa-check text-sm" aria-hidden="true"></i> Mark as Completed
@@ -122,6 +123,7 @@
         kind={:info}
         type="button"
         id="reopenWorkOrderButton"
+        data-modal-target="reopenWorkOrderModal"
         data-modal-toggle="reopenWorkOrderModal"
       >
         <i class="fa-solid fa-check text-sm" aria-hidden="true"></i> Reopen
@@ -385,115 +387,134 @@
         role="tabpanel"
         aria-labelledby="summary-tab"
       >
-<div class="grid grid-cols-12 gap-4">
-  <div class="col-span-12 p-4 mx-4 mb-4 bg-white rounded-lg shadow sm:p-6 xl:p-8 dark:bg-gray-800 xl:col-start-2 xl:col-span-10 2xl:col-start-3 2xl:col-span-8 md:mx-6 lg:my-6">
-    <div class="overflow-hidden p-4 space-y-6 md:p-8">
-      <div class="sm:flex">
-        <div class="mb-5 text-2xl font-bold sm:text-3xl sm:mb-0 dark:text-white">
-          Work Order #<%= @work_order.work_order_number %>
-        </div>
-        <div class="space-y-3 text-left sm:ml-auto sm:text-right">
-          <img src="/images/logo_light.svg" class="dark:hidden w-auto h-10 sm:ml-auto" />
-          <img src="/images/logo_dark.svg" class="hidden dark:block w-10 h-10 sm:ml-auto" />
-          <div class="space-y-1">
-            <div class="text-lg font-semibold text-gray-900 dark:text-white">
-              Fleetms Work Order
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-12 p-4 mx-4 mb-4 bg-white rounded-lg shadow sm:p-6 xl:p-8 dark:bg-gray-800 xl:col-start-2 xl:col-span-10 2xl:col-start-3 2xl:col-span-8 md:mx-6 lg:my-6">
+            <div class="overflow-hidden p-4 space-y-6 md:p-8">
+              <div class="sm:flex">
+                <div class="mb-5 text-2xl font-bold sm:text-3xl sm:mb-0 dark:text-white">
+                  Work Order #<%= @work_order.work_order_number %>
+                </div>
+                <div class="space-y-3 text-left sm:ml-auto sm:text-right">
+                  <img src="/images/logo_light.svg" class="dark:hidden w-auto h-10 sm:ml-auto" />
+                  <img src="/images/logo_dark.svg" class="hidden dark:block w-10 h-10 sm:ml-auto" />
+                  <div class="space-y-1">
+                    <div class="text-lg font-semibold text-gray-900 dark:text-white">
+                      Fleetms Work Order
+                    </div>
+                  </div>
+                  <div class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                    <time id="datetime-work-order-issued-2" phx-hook="LocalTime" class="invisible">
+                      <%= @work_order.date_and_time_issued %>
+                    </time>
+                  </div>
+                </div>
+              </div>
+              <div class="w-full sm:w-72">
+                <div class="mb-4 text-base font-bold text-gray-900 uppercase dark:text-white">
+                  Vehicle Details
+                </div>
+                <ul class="max-w-md space-y-1 text-gray-500 list-none list-inside dark:text-gray-400">
+                  <li>
+                    Name: <span class="font-semibold"><%= @work_order.vehicle.full_name %></span>
+                  </li>
+                  <li>
+                    Status:
+                    <span>
+                      <.badge :if={@work_order.status == :Open} kind={:primary} label="Open" />
+                      <.badge
+                        :if={@work_order.status == :Resolved}
+                        kind={:success}
+                        label="Resolved"
+                      />
+                    </span>
+                  </li>
+                </ul>
+              </div>
+              <!-- Table -->
+              <div class="flex flex-col my-8">
+                <div class="overflow-x-auto border-b border-gray-200 dark:border-gray-600">
+                  <div class="inline-block min-w-full align-middle">
+                    <div class="overflow-hidden shadow">
+                      <table class="min-w-full">
+                        <thead class="text-gray-900 bg-gray-50 dark:text-white dark:bg-gray-700">
+                          <tr>
+                            <th
+                              scope="col"
+                              class="p-4 text-xs font-semibold tracking-wider text-left uppercase rounded-l-lg"
+                            >
+                              Service Task
+                            </th>
+                            <th
+                              scope="col"
+                              class="p-4 text-xs font-semibold tracking-wider text-left uppercase rounded-r-lg"
+                            >
+                              Total
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody class="text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+                          <tr
+                            :for={
+                              {work_order_service_task, index} <-
+                                Enum.with_index(@work_order.work_order_service_tasks)
+                            }
+                            class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
+                            <td class="p-4 text-sm font-normal whitespace-nowrap">
+                              <div class="text-base font-semibold">
+                                <i class="fa-solid fa-wrench mr-2" /> <%= work_order_service_task.service_task.name %>
+                              </div>
+                              <div class="ml-1 md:ml-4">
+                                <.table_2
+                                  id={"work_order_service_task_parts_table-#{index}"}
+                                  rows={work_order_service_task.work_order_service_task_parts}
+                                >
+                                  <:col :let={part} label="Part">
+                                    <i class="fa-solid fa-box-open mr-2" /> <%= part.part.name %>
+                                  </:col>
+                                  <:col :let={part} label="Unit Cost">
+                                    <%= part.unit_cost %>
+                                  </:col>
+                                  <:col :let={part} label="Quantity">
+                                    <%= part.quantity %>
+                                  </:col>
+                                  <:col :let={part} label="SubTotal">
+                                    <%= part.subtotal %>
+                                  </:col>
+                                </.table_2>
+                              </div>
+                            </td>
+                            <td class="p-4 text-base font-normal whitespace-nowrap">
+                              <%= work_order_service_task.total_cost_parts %>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="space-y-3 sm:text-right sm:ml-auto sm:w-72">
+                <div class="flex justify-between">
+                  <div class="text-sm font-medium text-gray-500 uppercase dark:text-gray-400">
+                    Subtotal
+                  </div>
+                  <div class="text-base font-medium text-gray-900 dark:text-white">
+                    <%= @work_order.total_cost_parts %>
+                  </div>
+                </div>
+                <div class="flex justify-between">
+                  <div class="text-base font-semibold text-gray-900 uppercase dark:text-white">
+                    Total
+                  </div>
+                  <div class="text-base font-bold text-gray-900 dark:text-white">
+                    <%= @work_order.total_cost_parts %>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="text-sm font-normal text-gray-500 dark:text-gray-400">
-            <time id="datetime-work-order-issued" phx-hook="LocalTime" class="invisible">
-              <%= @work_order.date_and_time_issued %>
-            </time>
-          </div>
         </div>
-      </div>
-      <div class="w-full sm:w-72">
-        <div class="mb-4 text-base font-bold text-gray-900 uppercase dark:text-white">
-          Vehicle Details
-        </div>
-        <ul class="max-w-md space-y-1 text-gray-500 list-none list-inside dark:text-gray-400">
-          <li>
-            Name: <span class="font-semibold"><%= @work_order.vehicle.full_name %></span>
-          </li>
-          <li>
-            Status:
-            <span>
-              <.badge :if={@work_order.status == :Open} kind={:primary} label="Open" />
-              <.badge :if={@work_order.status == :Resolved} kind={:success} label="Resolved" />
-            </span>
-          </li>
-        </ul>
-      </div>
-      <!-- Table -->
-      <div class="flex flex-col my-8">
-        <div class="overflow-x-auto border-b border-gray-200 dark:border-gray-600">
-          <div class="inline-block min-w-full align-middle">
-            <div class="overflow-hidden shadow">
-              <table class="min-w-full">
-                <thead class="text-gray-900 bg-gray-50 dark:text-white dark:bg-gray-700">
-                  <tr>
-                    <th
-                      scope="col"
-                      class="p-4 text-xs font-semibold tracking-wider text-left uppercase rounded-l-lg"
-                    >
-                      Service Task
-                    </th>
-                    <th
-                      scope="col"
-                      class="p-4 text-xs font-semibold tracking-wider text-left uppercase rounded-r-lg"
-                    >
-                      Total
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-                  <tr :for={work_order_service_task <- @work_order.work_order_service_tasks} class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <td class="p-4 text-sm font-normal whitespace-nowrap">
-                      <div class="text-base font-semibold">
-                        <i class="fa-solid fa-wrench mr-2" /> <%= work_order_service_task.service_task.name %>
-                      </div>
-                      <div class="ml-1 md:ml-4">
-                      <.table_2 id="work_order_service_task_parts_table" rows={work_order_service_task.work_order_service_task_parts}>
-                        <:col :let={part} label="Part">
-                         <i class="fa-solid fa-box-open mr-2" /> <%= part.part.name %>
-                        </:col>
-                        <:col :let={part} label="Unit Cost">
-                          <%= part.unit_cost %>
-                        </:col>
-                        <:col :let={part} label="Quantity">
-                          <%= part.quantity %>
-                        </:col>
-                        <:col :let={part} label="SubTotal">
-                          <%= part.subtotal %>
-                        </:col>
-                      </.table_2>
-                      </div>
-                    </td>
-                    <td class="p-4 text-base font-normal whitespace-nowrap">
-                      <%= work_order_service_task.total_cost_parts %>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="space-y-3 sm:text-right sm:ml-auto sm:w-72">
-        <div class="flex justify-between">
-          <div class="text-sm font-medium text-gray-500 uppercase dark:text-gray-400">
-            Subtotal
-          </div>
-          <div class="text-base font-medium text-gray-900 dark:text-white"><%= @work_order.total_cost_parts %></div>
-        </div>
-        <div class="flex justify-between">
-          <div class="text-base font-semibold text-gray-900 uppercase dark:text-white">Total</div>
-          <div class="text-base font-bold text-gray-900 dark:text-white"><%= @work_order.total_cost_parts %></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
         <section class="bg-gray-50 dark:bg-gray-900 mt-4">
           <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
@@ -621,33 +642,31 @@
                     </div>
                     <div class="flex flex-col items-start pb-10 px-2">
                       <h5 class="mb-1 text-xl font-medium text-gray-900 dark:text-white">
-                        <%= work_order_service_task.service_task.name %>
                         <span :if={@work_order.status != :Completed} class="text-sm font-light">
                           Reminder Info:
-                          <%= if is_nil(work_order_service_task.service_reminder) do %>
+                          <%= if is_nil(work_order_service_task.service_task.service_reminder) do %>
                             <.badge kind={:warning} label="Has no associated service reminder." />
                           <% else %>
                             <.badge
                               kind={:info}
                               label={
                                 cond do
-                                  work_order_service_task.service_reminder.mileage_interval &&
-                                      work_order_service_task.service_reminder.time_interval ->
-                                    "Every #{work_order_service_task.service_reminder.mileage_interval}km or  #{work_order_service_task.service_reminder.time_interval} #{work_order_service_task.service_reminder.time_interval_unit}"
+                                  work_order_service_task.service_task.service_reminder.mileage_interval &&
+                                      work_order_service_task.service_task.service_reminder.time_interval ->
+                                    "Every #{work_order_service_task.service_task.service_reminder.mileage_interval}km or  #{work_order_service_task.service_task.service_reminder.time_interval} #{work_order_service_task.service_task.service_reminder.time_interval_unit}"
 
-                                  work_order_service_task.service_reminder.mileage_interval ->
-                                    "Every #{work_order_service_task.service_reminder.mileage_interval}km"
+                                  work_order_service_task.service_task.service_reminder.mileage_interval ->
+                                    "Every #{work_order_service_task.service_task.service_reminder.mileage_interval}km"
 
-                                  work_order_service_task.service_reminder.time_interval ->
-                                    "Every #{work_order_service_task.service_reminder.time_interval} #{work_order_service_task.service_reminder.time_interval_unit}"
+                                  work_order_service_task.service_task.service_reminder.time_interval ->
+                                    "Every #{work_order_service_task.service_task.service_reminder.time_interval} #{work_order_service_task.service_task.service_reminder.time_interval_unit}"
 
                                   true ->
                                     "--"
                                 end
                               }
                             />
-
-                            <%= case work_order_service_task.service_reminder.due_status do %>
+                            <%= case work_order_service_task.service_task.service_reminder.due_status do %>
                               <% :Upcoming -> %>
                                 <.badge kind={:info} label="Upcoming" />
                               <% :"Due Soon" -> %>
@@ -771,9 +790,6 @@
                                 <li>
                                   <button
                                     type="button"
-                                    data-drawer-target="drawer-update-product"
-                                    data-drawer-show="drawer-update-product"
-                                    aria-controls="drawer-update-product"
                                     class="w-full flex items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-500 dark:hover:text-white text-gray-700 dark:text-gray-200"
                                   >
                                     <svg
@@ -1116,6 +1132,22 @@
                   }
                 />
                 <.badge
+                  :if={not is_nil(get_form_value(service_task_form, :service_reminder))}
+                  kind={
+                    case get_form_value(reminder_form, :due_status) do
+                      :Upcoming ->
+                        :info
+
+                      :"Due Soon" ->
+                        :warning
+
+                      :Overdue ->
+                        :danger
+                    end
+                  }
+                  label={get_form_value(reminder_form, :due_status)}
+                />
+                <.badge
                   :if={is_nil(get_form_value(service_task_form, :service_reminder))}
                   kind={:warning}
                   label="Has no related Service Reminder"
@@ -1129,6 +1161,7 @@
                 field={reminder_form[:is_from_service_reminder]}
                 type="checkbox"
                 class="hidden"
+                checkbox_div_class="hidden"
               />
             </.inputs_for>
 

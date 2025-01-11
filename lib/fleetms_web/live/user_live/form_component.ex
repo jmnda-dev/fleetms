@@ -32,7 +32,7 @@ defmodule FleetmsWeb.UserLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, get_success_message(socket))
+         |> put_toast(:info, get_success_message(socket))
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->

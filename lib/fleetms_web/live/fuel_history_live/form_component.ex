@@ -17,16 +17,16 @@ defmodule FleetmsWeb.FuelHistoryLive.FormComponent do
         fuel_history
         |> AshPhoenix.Form.for_update(:update,
           as: "fuel_history",
-          domain: Fleetms.FuelTracking,
+          domain: Fleetms.FuelManagement,
           actor: actor,
           tenant: tenant,
           forms: [auto?: true]
         )
       else
-        Fleetms.FuelTracking.FuelHistory
+        Fleetms.FuelManagement.FuelHistory
         |> AshPhoenix.Form.for_create(:create,
           as: "fuel_history",
-          domain: Fleetms.FuelTracking,
+          domain: Fleetms.FuelManagement,
           actor: actor,
           tenant: tenant,
           forms: [auto?: true]
@@ -34,7 +34,7 @@ defmodule FleetmsWeb.FuelHistoryLive.FormComponent do
       end
 
     vehicles =
-      Fleetms.Vehicles.Vehicle.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleManagement.Vehicle.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.full_name, &1.id})
 
     users =
@@ -81,7 +81,7 @@ defmodule FleetmsWeb.FuelHistoryLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Fuel History updated successfully")
+         |> put_toast(:info, "Fuel History updated successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -98,7 +98,7 @@ defmodule FleetmsWeb.FuelHistoryLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Fuel History created successfully")
+         |> put_toast(:info, "Fuel History created successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -153,10 +153,10 @@ defmodule FleetmsWeb.FuelHistoryLive.FormComponent do
 
   defp get_max_upload_entries(nil), do: @default_max_upload_entries
 
-  defp get_max_upload_entries(%Fleetms.FuelTracking.FuelHistory{fuel_history_photos: nil}),
+  defp get_max_upload_entries(%Fleetms.FuelManagement.FuelHistory{fuel_history_photos: nil}),
     do: @default_max_upload_entries
 
-  defp get_max_upload_entries(%Fleetms.FuelTracking.FuelHistory{fuel_history_photos: photos}) do
+  defp get_max_upload_entries(%Fleetms.FuelManagement.FuelHistory{fuel_history_photos: photos}) do
     total = Enum.count(photos)
     @default_max_upload_entries - total
   end
@@ -178,13 +178,13 @@ defmodule FleetmsWeb.FuelHistoryLive.FormComponent do
     end
   end
 
-  defp get_current_fuel_history_photos(%Fleetms.FuelTracking.FuelHistory{
+  defp get_current_fuel_history_photos(%Fleetms.FuelManagement.FuelHistory{
          fuel_history_photos: photos
        })
        when is_list(photos),
        do: photos
 
-  defp get_current_fuel_history_photos(%Fleetms.FuelTracking.FuelHistory{
+  defp get_current_fuel_history_photos(%Fleetms.FuelManagement.FuelHistory{
          fuel_history_photos: _photos
        }),
        do: []

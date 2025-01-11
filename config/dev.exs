@@ -1,5 +1,6 @@
 import Config
 
+config :phoenix_live_view, debug_heex_annotations: true
 # Configure your database
 config :fleetms, Fleetms.Repo,
   username: "postgres",
@@ -8,7 +9,11 @@ config :fleetms, Fleetms.Repo,
   database: "fleetms_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+  pool_size: 15,
+  # Default is 50ms, increase to 5000ms (5 seconds)
+  queue_target: 5000,
+  # Default is 1000ms
+  queue_interval: 1000
 
 # For development, we disable any cache and enable
 # debugging and code reloading.

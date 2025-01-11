@@ -10,7 +10,7 @@ defmodule Fleetms.Dashboard.IssueStats do
             labels: []
 
   def get_dashboard_stats(tenant, opts \\ []) do
-    {issues_by_status, issues_by_priorities} = Fleetms.Issues.Issue.get_dashboard_stats!(tenant)
+    {issues_by_status, issues_by_priorities} = Fleetms.VehicleIssues.Issue.get_dashboard_stats!(tenant)
 
     %{total: total, open: open, closed: closed, resolved: resolved} = issues_by_status
     %{high: high, medium: medium, low_or_none: low_or_none} = issues_by_priorities

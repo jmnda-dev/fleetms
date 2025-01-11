@@ -38,7 +38,7 @@ defmodule Fleetms.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 4.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 0.20"},
+      {:phoenix_live_view, "~> 1.0-rc.1", override: true},
       {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.2"},
       {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
@@ -50,13 +50,12 @@ defmodule Fleetms.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
-      {:ash, "~> 3.0"},
+      {:ash, "~> 3.4.0"},
       {:picosat_elixir, "~> 0.2"},
-      {:ash_postgres, "~> 2.0"},
+      {:ash_postgres, "~> 2.4"},
       {:ash_phoenix, "~> 2.0"},
       {:ash_authentication, "~> 4.0"},
       {:ash_authentication_phoenix, "~> 2.0"},
-      {:triplex, "~> 1.3"},
       {:timex, "~> 3.7"},
       {:waffle, "~> 1.1"},
       {:ash_admin, "~> 0.11"},
@@ -67,7 +66,16 @@ defmodule Fleetms.MixProject do
       {:nimble_csv, "~> 1.2"},
       {:sentry, "~> 10.2.0"},
       {:hackney, "~> 1.8"},
-      {:ecto_psql_extras, "~> 0.6"}
+      {:ecto_psql_extras, "~> 0.6"},
+      {:fun_with_flags, "~> 1.12.0"},
+      {:fun_with_flags_ui, "~> 0.8"},
+      {:dotenvy, "~> 0.8.0"},
+      {:multipart, "~> 0.4.0"},
+      {:oban, "~> 2.17"},
+      {:req, "~> 0.5.6"},
+      {:faker, "~> 0.18"},
+      {:live_toast, "~> 0.6.4"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -79,7 +87,14 @@ defmodule Fleetms.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "compile", "assets.setup", "assets.build", "ash.reset", "run priv/repo/seeds.exs"],
+      setup: [
+        "deps.get",
+        "compile",
+        "assets.setup",
+        "assets.build",
+        "ash.reset",
+        "run priv/repo/seeds.exs"
+      ],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       seed: [

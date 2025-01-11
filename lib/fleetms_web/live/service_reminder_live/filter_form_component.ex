@@ -186,15 +186,15 @@ defmodule FleetmsWeb.ServiceReminderLive.FilterFormComponent do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     vehicles =
-      Fleetms.Vehicles.Vehicle.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleManagement.Vehicle.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.full_name, &1.id})
 
     service_tasks =
-      Fleetms.Service.ServiceTask.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleMaintenance.ServiceTask.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.name, &1.id})
 
     service_groups =
-      Fleetms.Service.ServiceGroup.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleMaintenance.ServiceGroup.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.name, &1.id})
 
     socket =

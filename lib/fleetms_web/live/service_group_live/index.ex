@@ -1,6 +1,10 @@
 defmodule FleetmsWeb.ServiceGroupLive.Index do
   use FleetmsWeb, :live_view
 
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :service_module}
+
   @impl true
   def mount(_params, _session, socket) do
     %{tenant: tenant, current_user: actor} = socket.assigns
@@ -23,17 +27,17 @@ defmodule FleetmsWeb.ServiceGroupLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     can_perform_action? =
-      Ash.can?({Fleetms.Service.ServiceGroup, :update}, actor)
+      Ash.can?({Fleetms.VehicleMaintenance.ServiceGroup, :update}, actor)
 
     if can_perform_action? do
       socket
       |> assign(:page_title, "Edit Service Group")
       |> assign(
         :service_group,
-        Fleetms.Service.ServiceGroup.get_by_id!(id, tenant: tenant, actor: actor)
+        Fleetms.VehicleMaintenance.ServiceGroup.get_by_id!(id, tenant: tenant, actor: actor)
       )
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -42,14 +46,14 @@ defmodule FleetmsWeb.ServiceGroupLive.Index do
     actor = socket.assigns.current_user
 
     can_perform_action? =
-      Ash.can?({Fleetms.Service.ServiceGroup, :create}, actor)
+      Ash.can?({Fleetms.VehicleMaintenance.ServiceGroup, :create}, actor)
 
     if can_perform_action? do
       socket
       |> assign(:page_title, "New Service Group")
       |> assign(:service_group, nil)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -70,21 +74,21 @@ defmodule FleetmsWeb.ServiceGroupLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     can_perform_action? =
-      Ash.can?({Fleetms.Service.ServiceGroup, :destroy}, actor)
+      Ash.can?({Fleetms.VehicleMaintenance.ServiceGroup, :destroy}, actor)
 
     if can_perform_action? do
-      service_group = Fleetms.Service.ServiceGroup.get_by_id!(id, tenant: tenant, actor: actor)
+      service_group = Fleetms.VehicleMaintenance.ServiceGroup.get_by_id!(id, tenant: tenant, actor: actor)
 
       Ash.destroy!(service_group, tenant: tenant, actor: actor)
 
       socket =
         socket
         |> stream_delete(:service_groups, service_group)
-        |> put_flash(:info, "#{service_group.name} was deleted successfully")
+        |> put_toast(:info, "#{service_group.name} was deleted successfully")
 
       {:noreply, socket}
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
 
       {:noreply, socket}
@@ -92,7 +96,7 @@ defmodule FleetmsWeb.ServiceGroupLive.Index do
   end
 
   defp list_service_groups(tenant, actor) do
-    Fleetms.Service.ServiceGroup
+    Fleetms.VehicleMaintenance.ServiceGroup
     |> Ash.Query.for_read(:list)
     |> Ash.read!(tenant: tenant, actor: actor)
   end

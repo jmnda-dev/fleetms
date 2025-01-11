@@ -1,6 +1,10 @@
 defmodule FleetmsWeb.ServiceGroupLive.Detail do
   use FleetmsWeb, :live_view
 
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :service_module}
+
   @impl true
   def mount(_params, _session, socket) do
     {:ok, assign(socket, :active_link, :service_groups)}
@@ -15,7 +19,7 @@ defmodule FleetmsWeb.ServiceGroupLive.Detail do
       |> assign(:page_title, page_title(live_action))
       |> assign(
         :service_group,
-        Fleetms.Service.ServiceGroup.get_by_id!(id, tenant: tenant, actor: actor)
+        Fleetms.VehicleMaintenance.ServiceGroup.get_by_id!(id, tenant: tenant, actor: actor)
       )
 
     {:noreply, apply_action(socket, live_action, params)}
@@ -26,14 +30,14 @@ defmodule FleetmsWeb.ServiceGroupLive.Detail do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     service_group_schedule =
-      Fleetms.Service.ServiceGroupSchedule.get_by_id!(id, tenant: tenant, actor: actor)
+      Fleetms.VehicleMaintenance.ServiceGroupSchedule.get_by_id!(id, tenant: tenant, actor: actor)
 
     Ash.destroy!(service_group_schedule, tenant: tenant, actor: actor)
 
     socket =
       socket
       |> stream_delete(:service_group_schedules, service_group_schedule)
-      |> put_flash(:info, "The Schedule was deleted successfully")
+      |> put_toast(:info, "The Schedule was deleted successfully")
 
     {:noreply, socket}
   end
@@ -58,12 +62,12 @@ defmodule FleetmsWeb.ServiceGroupLive.Detail do
     actor = socket.assigns.current_user
 
     can_perform_action? =
-      Ash.can?({Fleetms.Service.ServiceGroup, :update}, actor)
+      Ash.can?({Fleetms.VehicleMaintenance.ServiceGroup, :update}, actor)
 
     if can_perform_action? do
       socket
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -78,7 +82,7 @@ defmodule FleetmsWeb.ServiceGroupLive.Detail do
     service_group = socket.assigns.service_group
 
     service_group_schedules =
-      Fleetms.Service.ServiceGroupSchedule.get_service_group_schedules!(service_group.id,
+      Fleetms.VehicleMaintenance.ServiceGroupSchedule.get_service_group_schedules!(service_group.id,
         tenant: tenant,
         actor: actor
       )
@@ -90,12 +94,12 @@ defmodule FleetmsWeb.ServiceGroupLive.Detail do
     actor = socket.assigns.current_user
 
     can_perform_action? =
-      Ash.can?({Fleetms.Service.ServiceGroupSchedule, :create}, actor)
+      Ash.can?({Fleetms.VehicleMaintenance.ServiceGroupSchedule, :create}, actor)
 
     if can_perform_action? do
       assign(socket, :service_group_schedule, nil)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -108,15 +112,15 @@ defmodule FleetmsWeb.ServiceGroupLive.Detail do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     can_perform_action? =
-      Ash.can?({Fleetms.Service.ServiceGroupSchedule, :update}, actor)
+      Ash.can?({Fleetms.VehicleMaintenance.ServiceGroupSchedule, :update}, actor)
 
     if can_perform_action? do
       service_group_schedule =
-        Fleetms.Service.ServiceGroupSchedule.get_by_id!(id, tenant: tenant, actor: actor)
+        Fleetms.VehicleMaintenance.ServiceGroupSchedule.get_by_id!(id, tenant: tenant, actor: actor)
 
       assign(socket, :service_group_schedule, service_group_schedule)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -126,7 +130,7 @@ defmodule FleetmsWeb.ServiceGroupLive.Detail do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     vehicles =
-      Fleetms.Vehicles.Vehicle.get_service_group_vehicles!(service_group.id,
+      Fleetms.VehicleManagement.Vehicle.get_service_group_vehicles!(service_group.id,
         tenant: tenant,
         actor: actor
       )

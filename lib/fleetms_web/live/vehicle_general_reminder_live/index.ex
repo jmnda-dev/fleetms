@@ -5,7 +5,11 @@ defmodule FleetmsWeb.VehicleGeneralReminderLive.Index do
     only: [calc_total_pages: 2, dates_in_map_to_string: 2, atom_list_to_options_for_select: 1]
 
   alias Fleetms.Common.PaginationSortParam
-  alias Fleetms.Vehicles
+  alias Fleetms.VehicleManagement
+
+  # alias FleetmsWeb.LiveUserAuth
+  #
+  # on_mount {LiveUserAuth, :vehicles_module}
 
   @per_page_opts [10, 20, 30, 50, 100, 250, 500]
   @sort_by_opts [
@@ -89,7 +93,6 @@ defmodule FleetmsWeb.VehicleGeneralReminderLive.Index do
       |> assign(:total, count)
       |> assign(:total_pages, calc_total_pages(count, per_page))
 
-
     {:noreply, socket}
   end
 
@@ -157,22 +160,22 @@ defmodule FleetmsWeb.VehicleGeneralReminderLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     can_perform_action? =
-      Ash.can?({Fleetms.Vehicles.VehicleGeneralReminder, :destroy}, actor)
+      Ash.can?({Fleetms.VehicleManagement.VehicleGeneralReminder, :destroy}, actor)
 
     if can_perform_action? do
       vehicle_general_reminder =
-        Fleetms.Vehicles.VehicleGeneralReminder.get_by_id!(id, tenant: tenant, actor: actor)
+        Fleetms.VehicleManagement.VehicleGeneralReminder.get_by_id!(id, tenant: tenant, actor: actor)
 
       Ash.destroy!(vehicle_general_reminder, tenant: tenant, actor: actor)
 
       socket =
         socket
         |> stream_delete(:vehicle_general_reminders, vehicle_general_reminder)
-        |> put_flash(:info, "Vehicle General Reminder was deleted successfully")
+        |> put_toast(:info, "Vehicle General Reminder was deleted successfully")
 
       {:noreply, socket}
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
 
       {:noreply, socket}
@@ -184,7 +187,7 @@ defmodule FleetmsWeb.VehicleGeneralReminderLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     vehicle_general_reminder =
-      Fleetms.Vehicles.VehicleGeneralReminder.get_by_id!(id, tenant: tenant, actor: actor)
+      Fleetms.VehicleManagement.VehicleGeneralReminder.get_by_id!(id, tenant: tenant, actor: actor)
 
     {:noreply, assign(socket, :vehicle_general_reminder, vehicle_general_reminder)}
   end
@@ -193,17 +196,17 @@ defmodule FleetmsWeb.VehicleGeneralReminderLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     can_perform_action? =
-      Ash.can?({Fleetms.Vehicles.VehicleGeneralReminder, :update}, actor)
+      Ash.can?({Fleetms.VehicleManagement.VehicleGeneralReminder, :update}, actor)
 
     if can_perform_action? do
       vehicle_general_reminder =
-        Fleetms.Vehicles.VehicleGeneralReminder.get_by_id!(id, tenant: tenant, actor: actor)
+        Fleetms.VehicleManagement.VehicleGeneralReminder.get_by_id!(id, tenant: tenant, actor: actor)
 
       socket
       |> assign(:page_title, "Edit Vehicle General Reminder Details")
       |> assign(:vehicle_general_reminder, vehicle_general_reminder)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -212,14 +215,14 @@ defmodule FleetmsWeb.VehicleGeneralReminderLive.Index do
     actor = socket.assigns.current_user
 
     can_perform_action? =
-      Ash.can?({Fleetms.Vehicles.VehicleGeneralReminder, :create}, actor)
+      Ash.can?({Fleetms.VehicleManagement.VehicleGeneralReminder, :create}, actor)
 
     if can_perform_action? do
       socket
       |> assign(:page_title, "Add Vehicle General Reminder")
       |> assign(:vehicle_general_reminder, nil)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -240,7 +243,7 @@ defmodule FleetmsWeb.VehicleGeneralReminderLive.Index do
   defp list_vehicle_general_reminders(paginate_sort_opts, search_query, filter_form_data, opts) do
     %{page: page, per_page: per_page} = paginate_sort_opts
 
-    Vehicles.list_vehicle_general_reminders!(paginate_sort_opts, search_query, filter_form_data,
+    VehicleManagement.list_vehicle_general_reminders!(paginate_sort_opts, search_query, filter_form_data,
       tenant: opts[:tenant],
       actor: opts[:actor],
       page: [limit: per_page, offset: (page - 1) * per_page, count: true]

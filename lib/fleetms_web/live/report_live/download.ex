@@ -1,6 +1,10 @@
 defmodule FleetmsWeb.ReportLive.Download do
   use FleetmsWeb, :live_view
 
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :reports}
+
   @impl true
   def mount(_params, _session, socket) do
     socket =

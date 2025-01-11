@@ -6,14 +6,14 @@ defmodule Fleetms.Reports.Download do
 
   def create_download_file("vehicles", tenant) do
     vehicles =
-      Fleetms.Vehicles.Vehicle
+      Fleetms.VehicleManagement.Vehicle
       |> Ash.Query.load([:model, :vehicle_make])
       |> Ash.read!(tenant: tenant)
 
     headers =
       Enum.concat(
-        Ash.Resource.Info.attributes(Fleetms.Vehicles.Vehicle),
-        Ash.Resource.Info.aggregates(Fleetms.Vehicles.Vehicle)
+        Ash.Resource.Info.attributes(Fleetms.VehicleManagement.Vehicle),
+        Ash.Resource.Info.aggregates(Fleetms.VehicleManagement.Vehicle)
       )
       |> Enum.map(fn %_struct{name: name} ->
         exclude = [:vehicle_group_id, :vehicle_model_id, :photo, :image_urk]

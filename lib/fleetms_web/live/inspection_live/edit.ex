@@ -13,7 +13,7 @@ defmodule FleetmsWeb.InspectionLive.Edit do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     inspection =
-      Fleetms.Inspection.InspectionSubmission.get_by_id!(id, tenant: tenant, actor: actor)
+      Fleetms.VehicleInspection.InspectionSubmission.get_by_id!(id, tenant: tenant, actor: actor)
 
     can_perform_action? =
       Ash.can?(
@@ -27,42 +27,42 @@ defmodule FleetmsWeb.InspectionLive.Edit do
         |> Enum.map(&{&1.user_profile.full_name, &1.id})
 
       vehicles =
-        Fleetms.Vehicles.Vehicle.get_all!(tenant: tenant, actor: actor)
+        Fleetms.VehicleManagement.Vehicle.get_all!(tenant: tenant, actor: actor)
         |> Enum.map(&{&1.name, &1.id})
 
       inspection_forms =
-        Fleetms.Inspection.InspectionForm.get_all!(tenant: tenant, actor: actor)
+        Fleetms.VehicleInspection.InspectionForm.get_all!(tenant: tenant, actor: actor)
         |> Enum.map(&{&1.title, &1.id})
 
       form =
         inspection
         |> AshPhoenix.Form.for_update(:update,
           as: "inspection_submission",
-          domain: Fleetms.Inspection,
+          domain: Fleetms.VehicleInspection,
           actor: socket.assigns.current_user,
           tenant: tenant,
           forms: [
             radio_input_values: [
               type: :list,
-              resource: Fleetms.Inspection.RadioInputValue,
+              resource: Fleetms.VehicleInspection.RadioInputValue,
               data: inspection.radio_input_values,
               update_action: :update
             ],
             dropdown_input_values: [
               type: :list,
-              resource: Fleetms.Inspection.DropdownInputValue,
+              resource: Fleetms.VehicleInspection.DropdownInputValue,
               data: inspection.dropdown_input_values,
               update_action: :update
             ],
             number_input_values: [
               type: :list,
-              resource: Fleetms.Inspection.NumberInputValue,
+              resource: Fleetms.VehicleInspection.NumberInputValue,
               data: inspection.number_input_values,
               update_action: :update
             ],
             signature_input_values: [
               type: :list,
-              resource: Fleetms.Inspection.SignatureInputValue,
+              resource: Fleetms.VehicleInspection.SignatureInputValue,
               data: inspection.signature_input_values,
               update_action: :update
             ]
@@ -79,7 +79,7 @@ defmodule FleetmsWeb.InspectionLive.Edit do
 
       {:noreply, socket}
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -101,7 +101,7 @@ defmodule FleetmsWeb.InspectionLive.Edit do
       {:ok, inspection} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Inspection was saved successfully")
+         |> put_toast(:info, "Inspection was saved successfully")
          |> push_navigate(to: ~p"/inspections/#{inspection}")}
 
       {:error, form} ->

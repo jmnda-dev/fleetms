@@ -40,11 +40,14 @@ RUN sudo install-packages inotify-tools
 RUN brew install asdf \
     && asdf plugin add erlang \
     && asdf plugin add elixir \
+    && asdf plugin add neovim \
     # && asdf plugin add nodejs \
     && asdf install erlang 26.2.4 \
     && asdf global erlang 26.2.4 \
     && asdf install elixir 1.16.2-otp-26 \
     && asdf global elixir 1.16.2-otp-26 \
+    && asdf install neovim stable \
+    && asdf global neovim stable \
     # && asdf install nodejs 20 \
     # && asdf global nodejs 20 \
     && bash -c ". $(brew --prefix asdf)/libexec/asdf.sh \

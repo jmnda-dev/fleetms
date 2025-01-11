@@ -4,6 +4,9 @@ defmodule FleetmsWeb.AuthLive.SignUp do
   """
   use FleetmsWeb, :live_view
   alias Fleetms.Accounts.{User, UserProfile, Organization}
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :user_registration}
 
   @impl true
   def mount(_params, _session, socket) do

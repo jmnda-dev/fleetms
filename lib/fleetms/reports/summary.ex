@@ -75,7 +75,7 @@ defmodule Fleetms.Reports.Summary do
 
   def get_vehicle_stats(tenant) do
     {:ok, ecto_query} =
-      Fleetms.Vehicles.Vehicle
+      Fleetms.VehicleManagement.Vehicle
       |> Ash.Query.new()
       |> Ash.Query.set_tenant(tenant)
       |> Ash.Query.data_layer_query()
@@ -96,7 +96,7 @@ defmodule Fleetms.Reports.Summary do
 
   def get_issue_stats(tenant) do
     {:ok, ecto_query} =
-      Fleetms.Issues.Issue
+      Fleetms.VehicleIssues.Issue
       |> Ash.Query.new()
       |> Ash.Query.set_tenant(tenant)
       |> Ash.Query.data_layer_query()
@@ -116,13 +116,13 @@ defmodule Fleetms.Reports.Summary do
 
   def get_service_reminder_stats(tenant) do
     {:ok, service_group_query} =
-      Fleetms.Service.ServiceGroup
+      Fleetms.VehicleMaintenance.ServiceGroup
       |> Ash.Query.new()
       |> Ash.Query.set_tenant(tenant)
       |> Ash.Query.data_layer_query()
 
     {:ok, service_reminder_query} =
-      Fleetms.Service.ServiceReminder
+      Fleetms.VehicleMaintenance.ServiceReminder
       |> Ash.Query.new()
       |> Ash.Query.set_tenant(tenant)
       |> Ash.Query.data_layer_query()
@@ -144,7 +144,7 @@ defmodule Fleetms.Reports.Summary do
 
   def get_work_order_stats(tenant) do
     {:ok, work_order_query} =
-      Fleetms.Service.WorkOrder
+      Fleetms.VehicleMaintenance.WorkOrder
       |> Ash.Query.new()
       |> Ash.Query.set_tenant(tenant)
       |> Ash.Query.data_layer_query()
@@ -197,7 +197,7 @@ defmodule Fleetms.Reports.Summary do
 
   def get_fuel_stats(tenant) do
     {:ok, fuel_histories_query} =
-      Fleetms.FuelTracking.FuelHistory
+      Fleetms.FuelManagement.FuelHistory
       |> Ash.Query.new()
       |> Ash.Query.set_tenant(tenant)
       |> Ash.Query.data_layer_query()
@@ -232,7 +232,7 @@ defmodule Fleetms.Reports.Summary do
 
   def get_maintenance_cost_stats(tenant) do
     {:ok, work_order_service_task_parts_query} =
-      Fleetms.Service.WorkOrderServiceTaskPart
+      Fleetms.VehicleMaintenance.WorkOrderServiceTaskPart
       |> Ash.Query.new()
       |> Ash.Query.set_tenant(tenant)
       |> Ash.Query.data_layer_query()
@@ -265,31 +265,31 @@ defmodule Fleetms.Reports.Summary do
 
   def get_inspection_stats(tenant) do
     {:ok, form_query} =
-      Fleetms.Inspection.InspectionForm
+      Fleetms.VehicleInspection.InspectionForm
       |> Ash.Query.new()
       |> Ash.Query.set_tenant(tenant)
       |> Ash.Query.data_layer_query()
 
     {:ok, submission_query} =
-      Fleetms.Inspection.InspectionSubmission
+      Fleetms.VehicleInspection.InspectionSubmission
       |> Ash.Query.new()
       |> Ash.Query.set_tenant(tenant)
       |> Ash.Query.data_layer_query()
 
     {:ok, radio_input_values_query} =
-      Fleetms.Inspection.RadioInputValue
+      Fleetms.VehicleInspection.RadioInputValue
       |> Ash.Query.new()
       |> Ash.Query.set_tenant(tenant)
       |> Ash.Query.data_layer_query()
 
     {:ok, dropdown_input_values_query} =
-      Fleetms.Inspection.DropdownInputValue
+      Fleetms.VehicleInspection.DropdownInputValue
       |> Ash.Query.new()
       |> Ash.Query.set_tenant(tenant)
       |> Ash.Query.data_layer_query()
 
     {:ok, number_input_values_query} =
-      Fleetms.Inspection.NumberInputValue
+      Fleetms.VehicleInspection.NumberInputValue
       |> Ash.Query.new()
       |> Ash.Query.set_tenant(tenant)
       |> Ash.Query.data_layer_query()

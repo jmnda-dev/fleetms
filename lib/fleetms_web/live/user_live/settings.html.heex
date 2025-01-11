@@ -190,58 +190,43 @@
 
 <div class="px-4 pt-6 dark:bg-gray-900">
   <div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 dark:bg-gray-800 mb-4">
-    <.badge kind={:warning} size={:lg} label="Feature not implemented yet!" />
     <h3 class="mb-4 text-xl font-bold dark:text-white">
       Password information
     </h3>
-    <form action="#">
+    <.simple_form
+      for={@change_password_form}
+      id="change_password_form"
+      phx-change="validate_change_password_form"
+      phx-submit="update_password"
+    >
       <div class="grid grid-cols-6 gap-6">
         <div class="col-span-6 sm:col-span-3">
-          <label
-            for="current-password"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          >
-            Current password
-          </label>
-          <input
-            type="text"
-            name="current-password"
-            id="current-password"
-            class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+          <.input
+            field={@change_password_form[:current_password]}
+            type="password"
+            label="Current Password"
             placeholder="••••••••"
+            phx-debounce="500"
             required
           />
         </div>
         <div class="col-span-6 sm:col-span-3">
-          <label
-            for="new-password"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          >
-            New
-            password
-          </label>
-          <input
-            type="text"
-            name="new-password"
-            id="new-password"
-            class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+          <.input
+            field={@change_password_form[:new_password]}
+            type="password"
+            label="New Password"
             placeholder="••••••••"
+            phx-debounce="500"
             required
           />
         </div>
         <div class="col-span-6 sm:col-span-3">
-          <label
-            for="confirm-password"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          >
-            Confirm password
-          </label>
-          <input
-            type="text"
-            name="confirm-password"
-            id="confirm-password"
-            class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+          <.input
+            field={@change_password_form[:new_password_confirmation]}
+            type="password"
+            label="Confirm New Password"
             placeholder="••••••••"
+            phx-debounce="500"
             required
           />
         </div>
@@ -253,24 +238,18 @@
           </div>
           <ul class="pl-4 space-y-1 text-gray-500 dark:text-gray-400">
             <li class="text-xs font-normal">
-              At least 10 characters (and up to 100 characters)
+              At least 10 characters (and up to 32 characters)
             </li>
             <li class="text-xs font-normal">At least one lowercase character</li>
             <li class="text-xs font-normal">
               Inclusion of at least one special character, e.g., ! @ # ?
             </li>
-            <li class="text-xs font-normal">Some text here zoltan</li>
           </ul>
         </div>
         <div class="col-span-6 sm:col-full">
-          <button
-            class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-            type="submit"
-          >
-            Save all
-          </button>
+          <.button type="submit" phx-submit="Updating ...">Update Password</.button>
         </div>
       </div>
-    </form>
+    </.simple_form>
   </div>
 </div>

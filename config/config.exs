@@ -59,8 +59,6 @@ config :logger, :console,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
-config :phoenix_live_view, debug_heex_annotations: true
-config :triplex, repo: Fleetms.Repo, tenant_prefix: "fleetms_org_"
 
 config :spark, :formatter,
   remove_parens?: true,
@@ -82,12 +80,12 @@ config :fleetms,
   ash_domains: [
     Fleetms.Accounts,
     Fleetms.Common,
-    Fleetms.Vehicles,
-    Fleetms.Inspection,
-    Fleetms.Issues,
+    Fleetms.VehicleManagement,
+    Fleetms.VehicleInspection,
+    Fleetms.VehicleIssues,
     Fleetms.Inventory,
-    Fleetms.Service,
-    Fleetms.FuelTracking
+    Fleetms.VehicleMaintenance,
+    Fleetms.FuelManagement
   ]
 
 config :waffle,
@@ -100,7 +98,35 @@ config :ex_cldr,
 config :ex_money,
   default_currency: :ZMW
 
+config :fun_with_flags, :persistence,
+  adapter: FunWithFlags.Store.Persistent.Ecto,
+  repo: Fleetms.Repo
+
+config :fun_with_flags, :cache_bust_notifications,
+  enabled: true,
+  adapter: FunWithFlags.Notifications.PhoenixPubSub,
+  client: Fleetms.PubSub
+
+config :fleetms, Oban,
+  engine: Oban.Engines.Basic,
+  queues: [default: 10, mailers: 20, vehicle_general_reminders: 50],
+  repo: Fleetms.Repo,
+  plugins: [
+    {Oban.Plugins.Cron,
+     crontab: [
+       # Runs Daily
+       {"0 0 * * *", Fleetms.VehicleManagement.Workers.UpdateVehicleGeneralReminderStatuses}
+     ]}
+  ]
+
+config :live_toast,
+  gettext_backend: FleetmsWeb.Gettext
 # config :ash, :policies, log_successful_policy_breakdowns: :error
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
+
+#config :phoenix_analytics,
+#  duckdb_path: System.get_env("DUCKDB_PATH") || "analytics.duckdb",
+#  app_domain: System.get_env("PHX_HOST") || "example.com"
+
 import_config "#{config_env()}.exs"

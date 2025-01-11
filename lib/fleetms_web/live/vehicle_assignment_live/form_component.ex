@@ -11,15 +11,15 @@ defmodule FleetmsWeb.VehicleAssignmentLive.FormComponent do
     form =
       if vehicle_assignment do
         AshPhoenix.Form.for_update(vehicle_assignment, :update,
-          domain: Fleetms.Vehicles,
+          domain: Fleetms.VehicleManagement,
           as: "vehicle_assignment",
           actor: actor,
           tenant: tenant,
           forms: [auto?: true]
         )
       else
-        AshPhoenix.Form.for_create(Fleetms.Vehicles.VehicleAssignment, :create,
-          domain: Fleetms.Vehicles,
+        AshPhoenix.Form.for_create(Fleetms.VehicleManagement.VehicleAssignment, :create,
+          domain: Fleetms.VehicleManagement,
           as: "vehicle_assignment",
           actor: actor,
           tenant: tenant,
@@ -28,7 +28,7 @@ defmodule FleetmsWeb.VehicleAssignmentLive.FormComponent do
       end
 
     vehicles =
-      Fleetms.Vehicles.Vehicle.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleManagement.Vehicle.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.full_name, &1.id})
 
     users =
@@ -63,7 +63,7 @@ defmodule FleetmsWeb.VehicleAssignmentLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Vehicle Assignment was updated successfully")
+         |> put_toast(:info, "Vehicle Assignment was updated successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -78,7 +78,7 @@ defmodule FleetmsWeb.VehicleAssignmentLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Vehicle Assignment was added successfully")
+         |> put_toast(:info, "Vehicle Assignment was added successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->

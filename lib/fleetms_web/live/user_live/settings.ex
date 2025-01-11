@@ -1,5 +1,6 @@
 defmodule FleetmsWeb.UserLive.Settings do
   use FleetmsWeb, :live_view
+  alias Fleetms.Accounts
 
   @photo_upload_ref :profile_photo
 
@@ -7,11 +8,17 @@ defmodule FleetmsWeb.UserLive.Settings do
   def mount(_params, _session, socket) do
     profile_update_form =
       socket.assigns.current_user.user_profile
-      |> AshPhoenix.Form.for_update(:update, as: "user_profile")
+      |> AshPhoenix.Form.for_update(:update, domain: Accounts, as: "user_profile")
+      |> to_form()
+
+    change_password_form =
+      socket.assigns.current_user
+      |> AshPhoenix.Form.for_update(:change_password, domain: Accounts, as: "change_password")
       |> to_form()
 
     socket =
       assign(socket, :profile_form, profile_update_form)
+      |> assign(:change_password_form, change_password_form)
       |> allow_upload(@photo_upload_ref,
         accept: ~w(.jpg .jpeg .png),
         max_entries: 1,
@@ -35,6 +42,17 @@ defmodule FleetmsWeb.UserLive.Settings do
   end
 
   @impl Phoenix.LiveView
+  def handle_event(
+        "validate_change_password_form",
+        %{"change_password" => change_password_params},
+        socket
+      ) do
+    form = AshPhoenix.Form.validate(socket.assigns.change_password_form, change_password_params)
+
+    {:noreply, assign(socket, :change_password_form, form)}
+  end
+
+  @impl Phoenix.LiveView
   def handle_event("save_profile", %{"user_profile" => user_profile_params}, socket) do
     case AshPhoenix.Form.submit(socket.assigns.profile_form, params: user_profile_params) do
       {:ok, user_profile} ->
@@ -42,11 +60,27 @@ defmodule FleetmsWeb.UserLive.Settings do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Profile information was updated successfully")
+         |> put_toast(:info, "Profile information was updated successfully")
          |> push_navigate(to: ~p"/settings")}
 
       {:error, form} ->
         {:noreply, assign(socket, :profile_form, form)}
+    end
+  end
+
+  @impl Phoenix.LiveView
+  def handle_event("update_password", %{"change_password" => change_password_params}, socket) do
+    case AshPhoenix.Form.submit(socket.assigns.change_password_form,
+           params: change_password_params
+         ) do
+      {:ok, _updated_user} ->
+        {:noreply,
+         socket
+         |> put_toast(:info, "Password was updated successfully")
+         |> push_navigate(to: ~p"/settings")}
+
+      {:error, form} ->
+        {:noreply, assign(socket, :change_password_form, form)}
     end
   end
 
@@ -61,7 +95,7 @@ defmodule FleetmsWeb.UserLive.Settings do
 
     {:noreply,
      socket
-     |> put_flash(:info, "Your Profile was removed")
+     |> put_toast(:info, "Your Profile was removed")
      |> push_navigate(to: ~p"/settings")}
   end
 

@@ -1,4 +1,5 @@
-<.flash_group flash={@flash} />
+<%# <.flash_group flash={@flash} /> %>
+<LiveToast.toast_group flash={@flash} connected={assigns[:socket] != nil} corner={:top_right} toast_class_fn={&toast_class_custom_fn/1} />
 <.navbar current_user={@current_user} />
 <div
   class="flex overflow-hidden pt-16 bg-gray-50 dark:bg-gray-900"

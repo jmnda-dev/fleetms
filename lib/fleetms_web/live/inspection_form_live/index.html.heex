@@ -97,7 +97,7 @@
           <div
             :if={
               Ash.can?(
-                {Fleetms.Inspection.InspectionForm, :create},
+                {Fleetms.VehicleInspection.InspectionForm, :create},
                 @current_user
               )
             }
@@ -175,7 +175,7 @@
               </li>
               <li :if={
                 Ash.can?(
-                  {Fleetms.Inspection.InspectionForm, :update},
+                  {Fleetms.VehicleInspection.InspectionForm, :update},
                   @current_user
                 )
               }>
@@ -190,7 +190,7 @@
             <div
               :if={
                 Ash.can?(
-                  {Fleetms.Inspection.InspectionForm, :destroy},
+                  {Fleetms.VehicleInspection.InspectionForm, :destroy},
                   @current_user
                 )
               }

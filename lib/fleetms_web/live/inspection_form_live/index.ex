@@ -1,5 +1,8 @@
 defmodule FleetmsWeb.InspectionFormLive.Index do
   use FleetmsWeb, :live_view
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :inspections_module}
 
   @impl true
   def mount(_params, _session, socket) do
@@ -36,24 +39,24 @@ defmodule FleetmsWeb.InspectionFormLive.Index do
 
     can_perform_action? =
       Ash.can?(
-        {Fleetms.Inspection.InspectionForm, :destroy},
+        {Fleetms.VehicleInspection.InspectionForm, :destroy},
         actor
       )
 
     if can_perform_action? do
       inspection_form =
-        Fleetms.Inspection.InspectionForm.get_by_id!(id, tenant: tenant, actor: actor)
+        Fleetms.VehicleInspection.InspectionForm.get_by_id!(id, tenant: tenant, actor: actor)
 
       Ash.destroy!(inspection_form, tenant: tenant, actor: actor)
 
       socket =
         socket
         |> stream_delete(:inspection_forms, inspection_form)
-        |> put_flash(:info, "#{inspection_form.title} was deleted successfully")
+        |> put_toast(:info, "#{inspection_form.title} was deleted successfully")
 
       {:noreply, socket}
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
 
       {:noreply, socket}
@@ -63,7 +66,7 @@ defmodule FleetmsWeb.InspectionFormLive.Index do
   defp save_inspection_form(socket, :new, inspection_form_params) do
     can_perform_action? =
       Ash.can?(
-        {Fleetms.Inspection.InspectionForm, :create},
+        {Fleetms.VehicleInspection.InspectionForm, :create},
         socket.assigns.current_user
       )
 
@@ -74,14 +77,14 @@ defmodule FleetmsWeb.InspectionFormLive.Index do
 
           {:noreply,
            stream_insert(socket, :inspection_forms, inspection_form)
-           |> put_flash(:info, "Inspection Form created successfully")
+           |> put_toast(:info, "Inspection Form created successfully")
            |> push_patch(to: ~p"/inspection_forms")}
 
         {:error, form} ->
           {:noreply, assign(socket, :form, form)}
       end
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -91,19 +94,19 @@ defmodule FleetmsWeb.InspectionFormLive.Index do
 
     can_perform_action? =
       Ash.can?(
-        {Fleetms.Inspection.InspectionForm, :update},
+        {Fleetms.VehicleInspection.InspectionForm, :update},
         actor
       )
 
     if can_perform_action? do
       inspection_form =
-        Fleetms.Inspection.InspectionForm.get_by_id!(id, tenant: tenant, actor: actor)
+        Fleetms.VehicleInspection.InspectionForm.get_by_id!(id, tenant: tenant, actor: actor)
 
       form =
         inspection_form
         |> AshPhoenix.Form.for_update(:update,
           as: "inspection_form",
-          domain: Fleetms.Inspection,
+          domain: Fleetms.VehicleInspection,
           forms: [auto?: true],
           actor: actor,
           tenant: tenant
@@ -114,7 +117,7 @@ defmodule FleetmsWeb.InspectionFormLive.Index do
       |> assign(:page_title, "Edit Inspection Form")
       |> assign(:form, form)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -124,16 +127,16 @@ defmodule FleetmsWeb.InspectionFormLive.Index do
 
     can_perform_action? =
       Ash.can?(
-        {Fleetms.Inspection.InspectionForm, :create},
+        {Fleetms.VehicleInspection.InspectionForm, :create},
         actor
       )
 
     if can_perform_action? do
       form =
-        Fleetms.Inspection.InspectionForm
+        Fleetms.VehicleInspection.InspectionForm
         |> AshPhoenix.Form.for_create(:create,
           as: "inspection_form",
-          domain: Fleetms.Inspection,
+          domain: Fleetms.VehicleInspection,
           forms: [auto?: true],
           actor: actor,
           tenant: tenant
@@ -144,7 +147,7 @@ defmodule FleetmsWeb.InspectionFormLive.Index do
       |> assign(:page_title, "New Inspection Form")
       |> assign(:form, form)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -156,7 +159,7 @@ defmodule FleetmsWeb.InspectionFormLive.Index do
   end
 
   defp list_inspection_forms(tenant, actor) do
-    Fleetms.Inspection.InspectionForm
+    Fleetms.VehicleInspection.InspectionForm
     |> Ash.Query.for_read(:list)
     |> Ash.read!(tenant: tenant, actor: actor)
   end

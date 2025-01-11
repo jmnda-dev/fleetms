@@ -9,6 +9,9 @@ defmodule FleetmsWeb.DashboardLive do
 
   require Logger
   @impl true
+
+  alias Fleetms.FeatureFlags
+
   def mount(_params, _session, socket) do
     socket =
       assign(socket, :active_link, :dashboard)

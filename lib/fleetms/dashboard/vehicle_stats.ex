@@ -7,7 +7,7 @@ defmodule Fleetms.Dashboard.VehicleStats do
       total: total,
       under_maintenance: under_maintenance,
       out_of_service: out_of_service
-    } = Fleetms.Vehicles.Vehicle.get_dashboard_stats!(tenant)
+    } = Fleetms.VehicleManagement.Vehicle.get_dashboard_stats!(tenant)
 
     series = [active, under_maintenance, out_of_service]
 

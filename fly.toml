@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for fleetms on 2024-06-20T15:01:29+02:00
+# fly.toml app configuration file generated for fleetms on 2024-12-24T15:53:13+02:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -20,7 +20,7 @@ kill_signal = 'SIGTERM'
   internal_port = 8080
   force_https = true
   auto_stop_machines = false
-  auto_start_machines = false
+  auto_start_machines = true
   min_machines_running = 0
   processes = ['app']
 

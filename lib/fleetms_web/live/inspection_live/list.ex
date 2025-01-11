@@ -1,6 +1,10 @@
 defmodule FleetmsWeb.InspectionLive.List do
   use FleetmsWeb, :live_view
 
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :inspections_module}
+
   @impl true
   def mount(_params, _session, socket) do
     {:ok, assign(socket, :active_link, :inspection_submissions)}
@@ -29,23 +33,23 @@ defmodule FleetmsWeb.InspectionLive.List do
 
     can_perform_action? =
       Ash.can?(
-        {Fleetms.Inspection.InspectionSubmission, :destroy},
+        {Fleetms.VehicleInspection.InspectionSubmission, :destroy},
         socket.assigns.current_user
       )
 
     if can_perform_action? do
-      inspection = Fleetms.Inspection.InspectionSubmission.for_delete!(id)
+      inspection = Fleetms.VehicleInspection.InspectionSubmission.for_delete!(id)
 
       Ash.destroy!(inspection, actor: actor, tenant: tenant)
 
       socket =
         socket
         |> stream_delete(:inspection_submissions, inspection)
-        |> put_flash(:info, "Inspection Submission was deleted successfully")
+        |> put_toast(:info, "Inspection Submission was deleted successfully")
 
       {:noreply, socket}
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
 
       {:noreply, socket}
@@ -53,7 +57,7 @@ defmodule FleetmsWeb.InspectionLive.List do
   end
 
   defp list_inspection_submissions(tenant, actor) do
-    Fleetms.Inspection.InspectionSubmission
+    Fleetms.VehicleInspection.InspectionSubmission
     |> Ash.Query.for_read(:list)
     |> Ash.read!(tenant: tenant, actor: actor)
   end

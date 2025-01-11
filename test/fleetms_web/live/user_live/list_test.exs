@@ -69,7 +69,7 @@ defmodule FleetmsWeb.UserLive.ListTest do
       assert html =~ user.full_name
       refute has_element?(user_list_live, "button", "Add User")
 
-      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      assert_raise FleetmsWeb.Exceptions.UnauthorizedError,
                    "You are not authorized to perform this action",
                    fn ->
                      conn
@@ -100,7 +100,7 @@ defmodule FleetmsWeb.UserLive.ListTest do
       assert html =~ user.full_name
       refute has_element?(user_list_live, ~s{[href="/users/#{admin_user.id}/edit"]}, "Edit User")
 
-      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      assert_raise FleetmsWeb.Exceptions.UnauthorizedError,
                    "You are not authorized to perform this action",
                    fn ->
                      conn
@@ -119,7 +119,7 @@ defmodule FleetmsWeb.UserLive.ListTest do
           roles: [:viewer]
         })
 
-      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      assert_raise FleetmsWeb.Exceptions.UnauthorizedError,
                    "You are not authorized to perform this action",
                    fn ->
                      conn
@@ -127,7 +127,7 @@ defmodule FleetmsWeb.UserLive.ListTest do
                      |> live(~p"/users")
                    end
 
-      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      assert_raise FleetmsWeb.Exceptions.UnauthorizedError,
                    "You are not authorized to perform this action",
                    fn ->
                      conn
@@ -135,7 +135,7 @@ defmodule FleetmsWeb.UserLive.ListTest do
                      |> live(~p"/users/new")
                    end
 
-      assert_raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      assert_raise FleetmsWeb.Exceptions.UnauthorizedError,
                    "You are not authorized to perform this action",
                    fn ->
                      conn

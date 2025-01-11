@@ -1,0 +1,75 @@
+services:
+  app:
+    build: .
+    container_name: fleetms 
+    env_file:
+      - prod.env
+    volumes:
+      - fleetms_data:/app
+    networks:
+      - app-network
+    depends_on:
+      - db
+    ports:
+      - "4000:4000"
+    restart: always
+
+  db:
+    image: postgres:15
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    env_file:
+      - prod.env
+    networks:
+      - app-network
+    ports:
+      - "5432:5432"
+    restart: always
+
+  # traefik:
+  #   image: traefik:v2.6
+  #   container_name: traefik
+  #   command:
+  #     - --api.dashboard=true
+  #     - --api.insecure=false
+  #     - --providers.docker=true
+  #     - --entrypoints.web.address=:80
+  #     - --entrypoints.websecure.address=:443
+  #     - --entrypoints.traefik.address=:8080
+  #     - --certificatesresolvers.fleetmsresolver.acme.httpChallenge.entryPoint=web
+  #     - --certificatesresolvers.fleetmsresolver.acme.email=kontazess_mas@outlook.com
+  #     - --certificatesresolvers.fleetmsresolver.acme.storage=/letsencrypt/acme.json
+  #   ports:
+  #     - "127.0.0.1:80:80"
+  #     - "127.0.0.1:443:443"
+  #     - "127.0.0.1:8080:8080"
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #     - ./letsencrypt:/letsencrypt
+  #   networks:
+  #     - app-network
+  #   labels:
+  #     - "traefik.http.routers.fleetms.rule=Host(`kontazess.com`)"
+  #     - "traefik.http.routers.fleetms.entrypoints=websecure"
+  #     - "traefik.http.routers.fleetms.tls.certresolver=fleetmsresolver"
+  #     - "traefik.http.routers.fleetms.service=fleetms"
+  #     - "traefik.http.services.fleetms.loadbalancer.server.port=4000"
+  #     # Dashboard route (access at `traefik.kontazess.com`)
+  #     - "traefik.http.routers.fleetms.service=traefik-dashboard"
+  #     - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.kontazess.com`)"
+  #     - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
+  #     - "traefik.http.routers.traefik-dashboard.tls.certresolver=fleetmsresolver"
+  #     - "traefik.http.services.traefik-dashboard.loadbalancer.server.port=8080"
+  #
+  #     # Secure Traefik dashboard with basic authentication
+  #     - "traefik.http.middlewares.auth.basicauth.users=admin:$apr1$QbAzvABY$YIPV9vPBpNbdDXJA8M/Ng."
+  #     - "traefik.http.routers.traefik-dashboard.middlewares=auth"
+  #   restart: always
+
+volumes:
+  pgdata:
+  fleetms_data:
+
+networks:
+  app-network:
+    driver: bridge

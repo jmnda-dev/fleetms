@@ -133,6 +133,7 @@
           class="flex flex-wrap -mb-px text-sm font-medium text-center"
           id="default-tab"
           data-tabs-toggle="#default-tab-content"
+          data-tabs-active-classes="text-primary-600 hover:text-primary-600 dark:text-primary-500 dark:hover:text-primary-500 border-primary-600 dark:border-primary-500"
           role="tablist"
         >
           <li class="me-2" role="presentation">
@@ -202,8 +203,16 @@
           role="tabpanel"
           aria-labelledby="documents-tab"
         >
+          <div class="w-full inline-flex justify-end">
+            <.link navigate={~p"/vehicles/#{@vehicle}/detail/documents"}>
+              <.button size={:sm}>View all</.button>
+            </.link>
+          </div>
           <div
-            :for={document <- @vehicle.documents}
+            :for={
+              # TODO: Work around, Query documents separately with limit of 5
+              document <- Enum.take(@vehicle.documents, 3)
+            }
             :if={not is_nil(@vehicle.documents) and @vehicle.documents != []}
             class="flex items-center p-3 mb-3.5 border border-gray-200 dark:border-gray-700 rounded-lg"
           >

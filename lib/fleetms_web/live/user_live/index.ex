@@ -7,6 +7,10 @@ defmodule FleetmsWeb.UserLive.Index do
   alias Fleetms.Accounts.User
   alias Fleetms.Common.PaginationSortParam
 
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :user_management}
+
   @per_page_opts [10, 20, 30, 50, 100, 250, 500]
   @sort_by_opts [
     :created_at,
@@ -25,7 +29,7 @@ defmodule FleetmsWeb.UserLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     if not Ash.can?({User, :list}, socket.assigns.current_user) do
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
 
@@ -86,7 +90,6 @@ defmodule FleetmsWeb.UserLive.Index do
       |> assign(has_more?: has_more?)
       |> assign(:total, count)
       |> assign(:total_pages, calc_total_pages(count, per_page))
-
 
     {:noreply, socket}
   end
@@ -159,7 +162,7 @@ defmodule FleetmsWeb.UserLive.Index do
     socket =
       socket
       |> stream_delete(:users, user)
-      |> put_flash(:info, "#{user.name} was deleted successfully")
+      |> put_toast(:info, "#{user.name} was deleted successfully")
 
     {:noreply, socket}
   end
@@ -179,7 +182,7 @@ defmodule FleetmsWeb.UserLive.Index do
       |> assign(:page_title, "Edit User")
       |> assign(:user, user)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -195,7 +198,7 @@ defmodule FleetmsWeb.UserLive.Index do
       |> assign(:page_title, "Add User ")
       |> assign(:user, nil)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end

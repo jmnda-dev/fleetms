@@ -3,6 +3,10 @@ defmodule FleetmsWeb.InventoryLocationLive.InventoryLocationPartTableComponent d
 
   require Ash.Query
 
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :inventory_module}
+
   import Fleetms.Utils, only: [calc_total_pages: 2]
   alias Fleetms.Common.PaginationSortParam
   @per_page_opts ["10", "20", "50", "75"]
@@ -152,7 +156,7 @@ defmodule FleetmsWeb.InventoryLocationLive.InventoryLocationPartTableComponent d
     socket =
       socket
       |> stream_delete(:parts, part)
-      |> put_flash(:info, "#{part.name} was deleted successfully")
+      |> put_toast(:info, "#{part.name} was deleted successfully")
 
     {:noreply, socket}
   end

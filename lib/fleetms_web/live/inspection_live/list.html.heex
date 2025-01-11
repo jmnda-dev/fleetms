@@ -97,7 +97,7 @@
           <div
             :if={
               Ash.can?(
-                {Fleetms.Inspection.InspectionSubmission, :create},
+                {Fleetms.VehicleInspection.InspectionSubmission, :create},
                 @current_user
               )
             }
@@ -178,7 +178,7 @@
             <div
               :if={
                 Ash.can?(
-                  {Fleetms.Inspection.InspectionSubmission, :destroy},
+                  {Fleetms.VehicleInspection.InspectionSubmission, :destroy},
                   @current_user
                 )
               }

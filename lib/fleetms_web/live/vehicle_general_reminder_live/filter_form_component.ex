@@ -156,11 +156,11 @@ defmodule FleetmsWeb.VehicleGeneralReminderLive.FilterFormComponent do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     vehicles =
-      Fleetms.Vehicles.Vehicle.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleManagement.Vehicle.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.full_name, &1.id})
 
     reminder_purposes =
-      Fleetms.Vehicles.VehicleReminderPurpose.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleManagement.VehicleReminderPurpose.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.name, &1.id})
 
     socket =

@@ -1,6 +1,10 @@
 defmodule FleetmsWeb.VehicleLive.Detail do
   use FleetmsWeb, :live_view
 
+  # alias FleetmsWeb.LiveUserAuth
+  #
+  # on_mount {LiveUserAuth, :vehicles_module}
+
   @impl true
   def handle_params(%{"id" => id} = _params, _uri, socket) do
     %{live_action: live_action, tenant: tenant, current_user: actor} = socket.assigns
@@ -8,17 +12,17 @@ defmodule FleetmsWeb.VehicleLive.Detail do
     if live_action == :edit do
       can_perform_action? =
         Ash.can?(
-          {Fleetms.Vehicles.Vehicle, :update},
+          {Fleetms.VehicleManagement.Vehicle, :update},
           actor
         )
 
       if not can_perform_action? do
-        raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+        raise FleetmsWeb.Exceptions.UnauthorizedError,
               "You are not authorized to perform this action"
       end
     end
 
-    vehicle = Fleetms.Vehicles.Vehicle.get_by_id!(id, tenant: tenant, actor: actor)
+    vehicle = Fleetms.VehicleManagement.Vehicle.get_by_id!(id, tenant: tenant, actor: actor)
 
     socket =
       assign(socket, :vehicle, vehicle)
@@ -37,7 +41,7 @@ defmodule FleetmsWeb.VehicleLive.Detail do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     vehicle_models =
-      Fleetms.Vehicles.VehicleModel.list_by_vehicle_make!(vehicle_make,
+      Fleetms.VehicleManagement.VehicleModel.list_by_vehicle_make!(vehicle_make,
         tenant: tenant,
         actor: actor
       )
@@ -57,7 +61,7 @@ defmodule FleetmsWeb.VehicleLive.Detail do
 
     socket =
       socket
-      |> put_flash(:info, "Vehicle was deleted successfully")
+      |> put_toast(:info, "Vehicle was deleted successfully")
       |> push_navigate(to: ~p"/vehicles")
 
     {:noreply, socket}

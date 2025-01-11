@@ -4,11 +4,12 @@
       %{label: "Home", to: ~p"/", link_type: :navigate},
       %{label: "My Profile", active: true}
     ]} />
-    <div class="flex items-center justify-end">
-      <.link navigate={~p"/settings"}>
-        <.button><.icon name="hero-pencil-square" class="w-5 h-5 mr-2" />Update Settings</.button>
-      </.link>
-    </div>
+  </div>
+  <div class="flex items-center justify-end">
+    <.link navigate={~p"/settings"}>
+      <.button>
+        <.icon name="hero-pencil-square" class="w-5 h-5 mr-2" />Update Settings</.button>
+    </.link>
   </div>
   <!-- Right Content -->
   <div class="col-span-full xl:col-auto">

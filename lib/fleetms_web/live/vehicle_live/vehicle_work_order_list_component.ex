@@ -134,7 +134,7 @@ defmodule FleetmsWeb.VehicleLive.VehicleWorkOrderListComponent do
   end
 
   defp load_issues(vehicle, tenant, actor) do
-    Fleetms.Service.WorkOrder
+    Fleetms.VehicleMaintenance.WorkOrder
     |> Ash.Query.new()
     |> Ash.Query.set_argument(:vehicle_id, vehicle.id)
     |> Ash.Query.for_read(:list_vehicle_work_orders)

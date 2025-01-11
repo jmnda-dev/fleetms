@@ -14,6 +14,10 @@ defmodule Fleetms.Accounts.Organization do
       Ash.Policy.Authorizer
     ]
 
+  defimpl FunWithFlags.Actor, for: __MODULE__ do
+    def id(%{id: id}), do: "organization:#{id}"
+  end
+
   alias __MODULE__
   @schema_prefix "fleetms_org_"
 

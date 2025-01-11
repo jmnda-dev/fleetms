@@ -11,16 +11,16 @@ defmodule FleetmsWeb.ServiceTaskLive.FormComponent do
         service_task
         |> AshPhoenix.Form.for_action(:update,
           as: "service_task",
-          domain: Fleetms.Service,
+          domain: Fleetms.VehicleMaintenance,
           actor: socket.assigns.current_user,
           tenant: socket.assigns.tenant,
           forms: [auto?: true]
         )
       else
-        Fleetms.Service.ServiceTask
+        Fleetms.VehicleMaintenance.ServiceTask
         |> AshPhoenix.Form.for_create(:create,
           as: "service_task",
-          domain: Fleetms.Service,
+          domain: Fleetms.VehicleMaintenance,
           actor: socket.assigns.current_user,
           tenant: socket.assigns.tenant,
           forms: [auto?: true]
@@ -49,7 +49,7 @@ defmodule FleetmsWeb.ServiceTaskLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Service Task updated successfully")
+         |> put_toast(:info, "Service Task updated successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -64,7 +64,7 @@ defmodule FleetmsWeb.ServiceTaskLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Service Task created successfully")
+         |> put_toast(:info, "Service Task created successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->

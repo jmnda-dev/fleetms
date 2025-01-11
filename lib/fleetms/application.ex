@@ -8,8 +8,10 @@ defmodule Fleetms.Application do
   @impl true
   def start(_type, _args) do
     :logger.add_handler(:my_sentry_handler, Sentry.LoggerHandler, %{
-        config: %{metadata: [:file, :line]}
-      })
+      config: %{metadata: [:file, :line]}
+    })
+
+    :ok = Oban.Telemetry.attach_default_logger()
 
     children = [
       # Start the Telemetry supervisor
@@ -24,6 +26,7 @@ defmodule Fleetms.Application do
       FleetmsWeb.Endpoint,
       # Start a worker by calling: Fleetms.Worker.start_link(arg)
       # {Fleetms.Worker, arg}
+      {Oban, Application.fetch_env!(:fleetms, Oban)},
       {AshAuthentication.Supervisor, otp_app: :fleetms}
     ]
 

@@ -138,7 +138,7 @@ defmodule FleetmsWeb.VehicleLive.VehicleIssueListComponent do
   end
 
   defp load_issues(vehicle, tenant, actor) do
-    Fleetms.Issues.Issue
+    Fleetms.VehicleIssues.Issue
     |> Ash.Query.new()
     |> Ash.Query.set_argument(:vehicle_id, vehicle.id)
     |> Ash.Query.for_read(:list_vehicle_issues)

@@ -1,5 +1,8 @@
 defmodule FleetmsWeb.PartLive.Index do
   use FleetmsWeb, :live_view
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :inventory_module}
 
   import Fleetms.Utils, only: [calc_total_pages: 2, atom_list_to_options_for_select: 1]
   alias Fleetms.Common.PaginationSortParam
@@ -84,7 +87,6 @@ defmodule FleetmsWeb.PartLive.Index do
       |> assign(:total, count)
       |> assign(:total_pages, calc_total_pages(count, per_page))
 
-
     {:noreply, socket}
   end
 
@@ -156,7 +158,7 @@ defmodule FleetmsWeb.PartLive.Index do
     socket =
       socket
       |> stream_delete(:parts, part)
-      |> put_flash(:info, "#{part.name} was deleted successfully")
+      |> put_toast(:info, "#{part.name} was deleted successfully")
 
     {:noreply, socket}
   end
@@ -182,7 +184,7 @@ defmodule FleetmsWeb.PartLive.Index do
       |> assign(:page_title, "Edit Part")
       |> assign(:part, part)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -204,7 +206,7 @@ defmodule FleetmsWeb.PartLive.Index do
       |> assign(:page_title, "New Part")
       |> assign(:part, nil)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end

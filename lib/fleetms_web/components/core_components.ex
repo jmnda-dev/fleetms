@@ -17,7 +17,7 @@ defmodule FleetmsWeb.CoreComponents do
   use Phoenix.Component
 
   alias Phoenix.LiveView.JS
-  import FleetmsWeb.Gettext
+  use Gettext, backend: FleetmsWeb.Gettext
 
   @doc """
   Renders a modal.
@@ -293,7 +293,8 @@ defmodule FleetmsWeb.CoreComponents do
     * For live file uploads, see `Phoenix.Component.live_file_input/1`
 
   See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
-  for more information.
+  for more information. Unsupported types, such as hidden and radio,
+  are best written directly in your templates.
 
   ## Examples
 
@@ -319,38 +320,42 @@ defmodule FleetmsWeb.CoreComponents do
   attr :prompt, :string, default: nil, doc: "the prompt for select inputs"
   attr :options, :list, doc: "the options to pass to Phoenix.HTML.Form.options_for_select/2"
   attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
+  attr :checkbox_div_class, :string, default: nil, doc: "whether the checkbox input should be hidden or shown"
 
   attr :rest, :global,
     include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
                 multiple pattern placeholder readonly required rows size step)
 
-  slot :inner_block
-
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
+    errors = if Phoenix.Component.used_input?(field), do: field.errors, else: []
+
     assigns
     |> assign(field: nil, id: assigns.id || field.id)
-    |> assign(:errors, Enum.map(field.errors, &translate_error(&1)))
+    |> assign(:errors, Enum.map(errors, &translate_error(&1)))
     |> assign_new(:name, fn -> if assigns.multiple, do: field.name <> "[]", else: field.name end)
     |> assign_new(:value, fn -> field.value end)
     |> input()
   end
 
-  def input(%{type: "checkbox", value: value} = assigns) do
+  def input(%{type: "checkbox"} = assigns) do
     assigns =
-      assign_new(assigns, :checked, fn -> Phoenix.HTML.Form.normalize_value("checkbox", value) end)
+      assign_new(assigns, :checked, fn ->
+        Phoenix.HTML.Form.normalize_value("checkbox", assigns[:value])
+      end)
 
     ~H"""
-    <div phx-feedback-for={@name}>
+    <div class={@checkbox_div_class}>
       <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-        <input type="hidden" name={@name} value="false" />
+        <input type="hidden" name={@name} value="false" disabled={@rest[:disabled]} />
         <input
           type="checkbox"
           id={@id}
           name={@name}
           value="true"
           checked={@checked}
+          class="rounded border-zinc-300 text-zinc-900 focus:ring-0"
           class={[
-            "w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600",
+            "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600",
             @class
           ]}
           {@rest}
@@ -364,7 +369,7 @@ defmodule FleetmsWeb.CoreComponents do
 
   def input(%{type: "radio"} = assigns) do
     ~H"""
-    <div phx-feedback-for={@name} class="flex items-center mb-4">
+    <div class="flex items-center mb-4">
       <input
         class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
         type="radio"
@@ -383,13 +388,15 @@ defmodule FleetmsWeb.CoreComponents do
 
   def input(%{type: "select"} = assigns) do
     ~H"""
-    <div phx-feedback-for={@name}>
+    <div>
       <.label for={@id}><%= @label %></.label>
       <select
         id={@id}
         name={@name}
         class={[
-          "bg-gray-50 border phx-no-feedback:border-gray-300 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:phx-no-feedback:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500",
+          "bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500",
+          @errors == [] && "border-gray-300 focus:border-primary-500 dark:border-gray-600 dark:focus:border-primary-500",
+          @errors != [] && "border-rose-400 focus:border-rose-400",
           @class
         ]}
         multiple={@multiple}
@@ -406,15 +413,16 @@ defmodule FleetmsWeb.CoreComponents do
 
   def input(%{type: "textarea"} = assigns) do
     ~H"""
-    <div phx-feedback-for={@name}>
+    <div>
       <.label for={@id}><%= @label %></.label>
       <textarea
         id={@id}
         name={@name}
         class={[
-          "block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg shadow-sm border phx-no-feedback:border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:phx-no-feedback:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500",
-          @class,
-          @errors != [] && "border-rose-400 focus:border-rose-400"
+          "block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg shadow-sm border focus:ring-primary-500 dark:bg-gray-700 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500",
+          @errors == [] && "border-gray-300 focus:border-primary-500 dark:border-gray-600 dark:focus:border-primary-500",
+          @errors != [] && "border-rose-400 focus:border-rose-400",
+          @class
         ]}
         {@rest}
       ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
@@ -426,7 +434,7 @@ defmodule FleetmsWeb.CoreComponents do
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
     ~H"""
-    <div phx-feedback-for={@name}>
+    <div>
       <.label for={@id}><%= @label %></.label>
       <input
         type={@type}
@@ -434,9 +442,10 @@ defmodule FleetmsWeb.CoreComponents do
         id={@id}
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
         class={[
-          "bg-gray-50 border phx-no-feedback:border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:phx-no-feedback:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500",
-          @class,
-          @errors != [] && "border-rose-400 focus:border-rose-400"
+          "bg-gray-50 border text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500",
+          @errors == [] && "border-gray-300 focus:border-primary-500 dark:border-gray-600 dark:focus:border-primary-500",
+          @errors != [] && "border-rose-400 focus:border-rose-400",
+          @class
         ]}
         {@rest}
       />
@@ -1111,5 +1120,23 @@ defmodule FleetmsWeb.CoreComponents do
   """
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
+  end
+
+
+  @doc """
+  Custom class for the :info LiveToast
+  """
+  def toast_class_custom_fn(assigns) do
+    [
+      # base classes
+      "group/toast z-100 pointer-events-auto relative w-full items-center justify-between origin-center overflow-hidden rounded-lg p-4 shadow-lg border col-start-1 col-end-1 row-start-1 row-end-2",
+      # start hidden if javascript is enabled
+      "[@media(scripting:enabled)]:opacity-0 [@media(scripting:enabled){[data-phx-main]_&}]:opacity-100",
+      # used to hide the disconnected flashes
+      if(assigns[:rest][:hidden] == true, do: "hidden", else: "flex"),
+      # override styles per severity
+      assigns[:kind] == :info && "!text-blue-800 !bg-blue-50 !dark:bg-gray-800 !dark:text-blue-400",
+      assigns[:kind] == :error && "!text-red-700 !bg-red-100 border-red-200"
+    ]
   end
 end

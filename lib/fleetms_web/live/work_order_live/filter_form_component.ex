@@ -187,7 +187,7 @@ defmodule FleetmsWeb.WorkOrderLive.FilterFormComponent do
       |> to_form(as: "filter_form")
 
     vehicles =
-      Fleetms.Vehicles.Vehicle.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleManagement.Vehicle.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.full_name, &1.id})
 
     users =

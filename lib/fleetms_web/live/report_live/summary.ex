@@ -1,6 +1,10 @@
 defmodule FleetmsWeb.ReportLive.Summary do
   use FleetmsWeb, :live_view
 
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :reports}
+
   def mount(_params, _session, socket) do
     socket = assign(socket, :active_link, :reports)
 

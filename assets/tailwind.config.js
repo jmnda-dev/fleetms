@@ -11,8 +11,8 @@ module.exports = {
     "../lib/*_web.ex",
     "../lib/*_web/**/*.*ex",
     "./node_modules/flowbite/**/*.js",
+    '../deps/live_toast/lib/**/*.*ex',
     // "./node_modules/sortablejs/**/*.js",
-    "./svelte/**/*.svelte"
   ],
   safelist: [
     'w-64',

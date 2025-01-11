@@ -17,16 +17,16 @@ defmodule FleetmsWeb.ServiceGroupLive.FormComponent do
         service_group
         |> AshPhoenix.Form.for_action(:update,
           as: "service_group",
-          domain: Fleetms.Service,
+          domain: Fleetms.VehicleMaintenance,
           actor: actor,
           tenant: tenant,
           forms: [auto?: true]
         )
       else
-        Fleetms.Service.ServiceGroup
+        Fleetms.VehicleMaintenance.ServiceGroup
         |> AshPhoenix.Form.for_create(:create,
           as: "service_group",
-          domain: Fleetms.Service,
+          domain: Fleetms.VehicleMaintenance,
           actor: actor,
           tenant: tenant,
           forms: [auto?: true]
@@ -34,7 +34,7 @@ defmodule FleetmsWeb.ServiceGroupLive.FormComponent do
       end
 
     vehicles =
-      Fleetms.Vehicles.Vehicle.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleManagement.Vehicle.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.full_name, &1.id})
 
     {:ok,
@@ -65,7 +65,7 @@ defmodule FleetmsWeb.ServiceGroupLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Service Group updated successfully")
+         |> put_toast(:info, "Service Group updated successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -84,7 +84,7 @@ defmodule FleetmsWeb.ServiceGroupLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Service Group created successfully")
+         |> put_toast(:info, "Service Group created successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->

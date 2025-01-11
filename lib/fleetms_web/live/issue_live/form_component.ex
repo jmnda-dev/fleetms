@@ -48,7 +48,7 @@ defmodule FleetmsWeb.IssueLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Issue updated successfully")
+         |> put_toast(:info, "Issue updated successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -65,7 +65,7 @@ defmodule FleetmsWeb.IssueLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Issue created successfully")
+         |> put_toast(:info, "Issue created successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -80,7 +80,7 @@ defmodule FleetmsWeb.IssueLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:success, "Issue ##{issue.issue_number} is resolved")
+         |> put_toast(:success, "Issue ##{issue.issue_number} is resolved")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -95,7 +95,7 @@ defmodule FleetmsWeb.IssueLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:warning, "Issue ##{issue.issue_number} is Closed")
+         |> put_toast(:warning, "Issue ##{issue.issue_number} is Closed")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -110,7 +110,7 @@ defmodule FleetmsWeb.IssueLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Issue ##{issue.issue_number} is Opened")
+         |> put_toast(:info, "Issue ##{issue.issue_number} is Opened")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -163,7 +163,7 @@ defmodule FleetmsWeb.IssueLive.FormComponent do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     if socket.assigns.action in [:new, :edit] do
-      vehicles = Fleetms.Vehicles.Vehicle.get_all!(tenant: tenant, actor: actor)
+      vehicles = Fleetms.VehicleManagement.Vehicle.get_all!(tenant: tenant, actor: actor)
 
       users =
         Accounts.get_all_users!(tenant: tenant, actor: actor)
@@ -186,7 +186,7 @@ defmodule FleetmsWeb.IssueLive.FormComponent do
           issue
           |> AshPhoenix.Form.for_action(:update,
             as: "issue",
-            domain: Fleetms.Issues,
+            domain: Fleetms.VehicleIssues,
             actor: actor,
             tenant: tenant,
             forms: [auto?: true]
@@ -196,7 +196,7 @@ defmodule FleetmsWeb.IssueLive.FormComponent do
           issue
           |> AshPhoenix.Form.for_action(:close_issue,
             as: "issue",
-            domain: Fleetms.Issues,
+            domain: Fleetms.VehicleIssues,
             actor: actor,
             tenant: tenant,
             forms: [auto?: true]
@@ -206,7 +206,7 @@ defmodule FleetmsWeb.IssueLive.FormComponent do
           issue
           |> AshPhoenix.Form.for_action(:resolve_issue_with_comment,
             as: "issue",
-            domain: Fleetms.Issues,
+            domain: Fleetms.VehicleIssues,
             actor: actor,
             tenant: tenant,
             forms: [auto?: true]
@@ -216,17 +216,17 @@ defmodule FleetmsWeb.IssueLive.FormComponent do
           issue
           |> AshPhoenix.Form.for_action(:reopen_issue,
             as: "issue",
-            domain: Fleetms.Issues,
+            domain: Fleetms.VehicleIssues,
             actor: actor,
             tenant: tenant,
             forms: [auto?: true]
           )
 
         true ->
-          Fleetms.Issues.Issue
+          Fleetms.VehicleIssues.Issue
           |> AshPhoenix.Form.for_create(:create,
             as: "issue",
-            domain: Fleetms.Issues,
+            domain: Fleetms.VehicleIssues,
             actor: actor,
             tenant: tenant,
             forms: [auto?: true]
@@ -238,10 +238,10 @@ defmodule FleetmsWeb.IssueLive.FormComponent do
 
   defp get_max_upload_entries(nil), do: @default_max_upload_entries
 
-  defp get_max_upload_entries(%Fleetms.Issues.Issue{issue_photos: nil}),
+  defp get_max_upload_entries(%Fleetms.VehicleIssues.Issue{issue_photos: nil}),
     do: @default_max_upload_entries
 
-  defp get_max_upload_entries(%Fleetms.Issues.Issue{issue_photos: photos}) do
+  defp get_max_upload_entries(%Fleetms.VehicleIssues.Issue{issue_photos: photos}) do
     total = Enum.count(photos)
     @default_max_upload_entries - total
   end
@@ -263,8 +263,8 @@ defmodule FleetmsWeb.IssueLive.FormComponent do
     end
   end
 
-  defp get_current_issue_photos(%Fleetms.Issues.Issue{issue_photos: photos}) when is_list(photos),
+  defp get_current_issue_photos(%Fleetms.VehicleIssues.Issue{issue_photos: photos}) when is_list(photos),
     do: photos
 
-  defp get_current_issue_photos(%Fleetms.Issues.Issue{issue_photos: _photos}), do: []
+  defp get_current_issue_photos(%Fleetms.VehicleIssues.Issue{issue_photos: _photos}), do: []
 end

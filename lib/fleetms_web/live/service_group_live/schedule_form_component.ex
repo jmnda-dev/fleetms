@@ -73,16 +73,16 @@ defmodule FleetmsWeb.ServiceGroupLive.ScheduleFormComponent do
         service_group_schedule
         |> AshPhoenix.Form.for_action(:update,
           as: "service_group_schedule",
-          domain: Fleetms.Service,
+          domain: Fleetms.VehicleMaintenance,
           actor: actor,
           tenant: tenant,
           forms: [auto?: true]
         )
       else
-        Fleetms.Service.ServiceGroupSchedule
+        Fleetms.VehicleMaintenance.ServiceGroupSchedule
         |> AshPhoenix.Form.for_create(:create,
           as: "service_group_schedule",
-          domain: Fleetms.Service,
+          domain: Fleetms.VehicleMaintenance,
           actor: actor,
           tenant: tenant,
           forms: [auto?: true]
@@ -90,7 +90,7 @@ defmodule FleetmsWeb.ServiceGroupLive.ScheduleFormComponent do
       end
 
     service_tasks =
-      Fleetms.Service.ServiceTask.get_all!(tenant: tenant, actor: actor)
+      Fleetms.VehicleMaintenance.ServiceTask.get_all!(tenant: tenant, actor: actor)
       |> Enum.map(&{&1.name, &1.id})
 
     {:ok,
@@ -130,7 +130,7 @@ defmodule FleetmsWeb.ServiceGroupLive.ScheduleFormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Service Group Schedule updated successfully")
+         |> put_toast(:info, "Service Group Schedule updated successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -159,7 +159,7 @@ defmodule FleetmsWeb.ServiceGroupLive.ScheduleFormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Service Group Schedule created successfully")
+         |> put_toast(:info, "Service Group Schedule created successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->

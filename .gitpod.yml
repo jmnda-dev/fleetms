@@ -14,8 +14,9 @@ ports:
 
 vscode:
   extensions:
-    - vscodevim.vim
-    - JakeBecker.elixir-ls
+    # - vscodevim.vim
+    - asvetliakov.vscode-neovim
+    - elixir-lsp.elixir-ls
     - elixir-tools.elixir-tools
     - pantajoe.vscode-elixir-credo
     - bradlc.vscode-tailwindcss

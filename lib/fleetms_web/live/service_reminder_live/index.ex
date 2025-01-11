@@ -5,7 +5,11 @@ defmodule FleetmsWeb.ServiceReminderLive.Index do
     only: [calc_total_pages: 2, dates_in_map_to_string: 2, atom_list_to_options_for_select: 1]
 
   alias Fleetms.Common.PaginationSortParam
-  alias Fleetms.Service
+  alias Fleetms.VehicleMaintenance
+
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :service_module}
 
   @per_page_opts [10, 20, 30, 50, 100, 250, 500]
   @sort_by_opts [
@@ -92,7 +96,6 @@ defmodule FleetmsWeb.ServiceReminderLive.Index do
       |> assign(:total, count)
       |> assign(:total_pages, calc_total_pages(count, per_page))
 
-
     {:noreply, socket}
   end
 
@@ -160,14 +163,14 @@ defmodule FleetmsWeb.ServiceReminderLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     service_reminder =
-      Fleetms.Service.ServiceReminder.get_by_id!(id, tenant: tenant, actor: actor)
+      Fleetms.VehicleMaintenance.ServiceReminder.get_by_id!(id, tenant: tenant, actor: actor)
 
     Ash.destroy!(service_reminder, tenant: tenant, actor: actor)
 
     socket =
       socket
       |> stream_delete(:service_reminders, service_reminder)
-      |> put_flash(
+      |> put_toast(
         :info,
         "Reminder was deleted successfully"
       )
@@ -179,17 +182,17 @@ defmodule FleetmsWeb.ServiceReminderLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     can_perform_action? =
-      Ash.can?({Fleetms.Service.ServiceReminder, :update}, actor)
+      Ash.can?({Fleetms.VehicleMaintenance.ServiceReminder, :update}, actor)
 
     if can_perform_action? do
       socket
       |> assign(:page_title, "Edit Service Reminder")
       |> assign(
         :service_reminder,
-        Fleetms.Service.ServiceReminder.get_for_form!(id, tenant: tenant, actor: actor)
+        Fleetms.VehicleMaintenance.ServiceReminder.get_for_form!(id, tenant: tenant, actor: actor)
       )
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -197,7 +200,7 @@ defmodule FleetmsWeb.ServiceReminderLive.Index do
   defp apply_action(socket, :new, _params) do
     can_perform_action? =
       Ash.can?(
-        {Fleetms.Service.ServiceReminder, :create},
+        {Fleetms.VehicleMaintenance.ServiceReminder, :create},
         socket.assigns.current_user
       )
 
@@ -206,7 +209,7 @@ defmodule FleetmsWeb.ServiceReminderLive.Index do
       |> assign(:page_title, "New Service Reminder")
       |> assign(:service_reminder, nil)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -233,7 +236,7 @@ defmodule FleetmsWeb.ServiceReminderLive.Index do
   defp list_service_reminders(paginate_sort_opts, search_query, filter_form_data, opts) do
     %{page: page, per_page: per_page} = paginate_sort_opts
 
-    Service.list_service_reminders!(paginate_sort_opts, search_query, filter_form_data,
+    VehicleMaintenance.list_service_reminders!(paginate_sort_opts, search_query, filter_form_data,
       tenant: opts[:tenant],
       actor: opts[:actor],
       page: [limit: per_page, offset: (page - 1) * per_page, count: true]

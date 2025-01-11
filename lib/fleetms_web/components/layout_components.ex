@@ -3,6 +3,7 @@ defmodule FleetmsWeb.LayoutComponents do
   import FleetmsWeb.CoreComponents, only: [button: 1]
   use FleetmsWeb, :verified_routes
   alias Fleetms.Accounts.User
+  alias Fleetms.FeatureFlags
 
   @doc """
   A Navbar component for public pages
@@ -126,13 +127,19 @@ defmodule FleetmsWeb.LayoutComponents do
                   </li>
                 </ul>
               </div>
+
             <% else %>
+              <.link navigate={~p"/demo/sign-in"}>
+                <.button>
+                  Demo
+                </.button>
+              </.link>
               <.link navigate={~p"/sign-in"}>
                 <.button kind={:light}>
                   Sign In
                 </.button>
               </.link>
-              <.link navigate={~p"/sign-up"}>
+              <.link :if={FeatureFlags.Accounts.user_registration_enabled?()} navigate={~p"/sign-up"}>
                 <.button>
                   Sign up
                 </.button>
@@ -696,7 +703,7 @@ defmodule FleetmsWeb.LayoutComponents do
                   </li>
                 </ul>
               </li>
-              <li>
+              <li :if={FeatureFlags.VehicleIssues.module_enabled?(@current_user.organization)}>
                 <.link
                   navigate={~p"/issues"}
                   class={[
@@ -712,7 +719,7 @@ defmodule FleetmsWeb.LayoutComponents do
                   <span class="ml-3" sidebar-toggle-item>Issues</span>
                 </.link>
               </li>
-              <li>
+              <li :if={FeatureFlags.VehicleMaintenance.module_enabled?(@current_user.organization)}>
                 <button
                   type="button"
                   class={[
@@ -812,7 +819,7 @@ defmodule FleetmsWeb.LayoutComponents do
                   </li>
                 </ul>
               </li>
-              <li>
+              <li :if={FeatureFlags.Accounts.user_management_enabled?(@current_user.organization)}>
                 <button
                   type="button"
                   class={[
@@ -854,7 +861,7 @@ defmodule FleetmsWeb.LayoutComponents do
                   </li>
                 </ul>
               </li>
-              <li>
+              <li :if={FeatureFlags.Inventory.module_enabled?(@current_user.organization)}>
                 <button
                   type="button"
                   class={[
@@ -911,7 +918,7 @@ defmodule FleetmsWeb.LayoutComponents do
                   </li>
                 </ul>
               </li>
-              <li>
+              <li :if={FeatureFlags.FuelManagement.module_enabled?(@current_user.organization)}>
                 <.link
                   navigate={~p"/fuel_histories"}
                   class={[
@@ -927,7 +934,7 @@ defmodule FleetmsWeb.LayoutComponents do
                   <span class="ml-3" sidebar-toggle-item>Fuel Tracking</span>
                 </.link>
               </li>
-              <li>
+              <li :if={FeatureFlags.Common.reports_enabled?(@current_user.organization)}>
                 <.link
                   navigate={~p"/reports"}
                   class={[

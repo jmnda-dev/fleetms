@@ -80,7 +80,7 @@ defmodule FleetmsWeb.PartLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Part updated successfully")
+         |> put_toast(:info, "Part updated successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -96,7 +96,7 @@ defmodule FleetmsWeb.PartLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Part created successfully")
+         |> put_toast(:info, "Part created successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->

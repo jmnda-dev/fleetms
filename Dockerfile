@@ -21,7 +21,7 @@ ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 FROM ${BUILDER_IMAGE} as builder
 
 # install build dependencies
-RUN apt-get update -y && apt-get install -y build-essential git \
+RUN apt-get update -y && apt-get install -y gcc build-essential git \
   && apt-get -y install curl gnupg \
   && curl -sL https://deb.nodesource.com/setup_20.x | bash - \
   && apt-get install nodejs -y \
@@ -73,7 +73,7 @@ FROM ${RUNNER_IMAGE}
 
 RUN apt-get update -y && \
   apt-get install -y libstdc++6 openssl libncurses5 locales ca-certificates \
-  && apt-get -y install imagemagick \
+  && apt-get -y install imagemagick postgresql-client \
   && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 # Set the locale
@@ -85,18 +85,17 @@ ENV LC_ALL en_US.UTF-8
 
 WORKDIR "/app"
 RUN chown nobody /app
-
 # set runner ENV
 ENV MIX_ENV="prod"
 
 # Only copy the final release from the build stage
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/fleetms ./
-
 USER nobody
 
+RUN chmod +x /app/bin/server
+RUN chmod +x /app/bin/migrate
 # If using an environment that doesn't automatically reap zombie processes, it is
 # advised to add an init process such as tini via `apt-get install`
 # above and adding an entrypoint. See https://github.com/krallin/tini for details
 # ENTRYPOINT ["/tini", "--"]
-
 CMD ["/app/bin/server"]

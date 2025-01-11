@@ -1,7 +1,7 @@
 defmodule FleetmsWeb.VehicleLive.FilterFormComponent do
   use FleetmsWeb, :live_component
-  alias Fleetms.Vehicles
-  alias Vehicles.{VehicleMake, VehicleModel, VehicleListFilter}
+  alias Fleetms.VehicleManagement
+  alias VehicleManagement.{VehicleMake, VehicleModel, VehicleListFilter}
 
   @impl true
   def render(assigns) do

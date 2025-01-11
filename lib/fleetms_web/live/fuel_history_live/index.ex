@@ -5,7 +5,11 @@ defmodule FleetmsWeb.FuelHistoryLive.Index do
     only: [calc_total_pages: 2, dates_in_map_to_string: 2, atom_list_to_options_for_select: 1]
 
   alias Fleetms.Common.PaginationSortParam
-  alias Fleetms.FuelTracking
+  alias Fleetms.FuelManagement
+
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :fuel_tracking_module}
 
   @per_page_opts [10, 20, 30, 50, 100, 250, 500]
   @sort_by_opts [
@@ -93,7 +97,6 @@ defmodule FleetmsWeb.FuelHistoryLive.Index do
       |> assign(:total, count)
       |> assign(:total_pages, calc_total_pages(count, per_page))
 
-
     {:noreply, socket}
   end
 
@@ -162,7 +165,7 @@ defmodule FleetmsWeb.FuelHistoryLive.Index do
 
     socket.assigns(
       fuel_history =
-        Fleetms.FuelTracking.FuelHistory.get_by_id!(id, tenant: tenant, actor: actor)
+        Fleetms.FuelManagement.FuelHistory.get_by_id!(id, tenant: tenant, actor: actor)
     )
 
     Ash.destroy!(fuel_history, tenant: tenant, actor: actor)
@@ -170,7 +173,7 @@ defmodule FleetmsWeb.FuelHistoryLive.Index do
     socket =
       socket
       |> stream_delete(:fuel_histories, fuel_history)
-      |> put_flash(:info, "Fuel History was deleted successfully")
+      |> put_toast(:info, "Fuel History was deleted successfully")
 
     {:noreply, socket}
   end
@@ -180,7 +183,7 @@ defmodule FleetmsWeb.FuelHistoryLive.Index do
 
     can_perform_action? =
       Ash.can?(
-        {Fleetms.FuelTracking.FuelHistory, :update},
+        {Fleetms.FuelManagement.FuelHistory, :update},
         actor
       )
 
@@ -189,10 +192,10 @@ defmodule FleetmsWeb.FuelHistoryLive.Index do
       |> assign(:page_title, "Edit Fuel History")
       |> assign(
         :fuel_history,
-        Fleetms.FuelTracking.FuelHistory.get_by_id!(id, tenant: tenant, actor: actor)
+        Fleetms.FuelManagement.FuelHistory.get_by_id!(id, tenant: tenant, actor: actor)
       )
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -205,7 +208,7 @@ defmodule FleetmsWeb.FuelHistoryLive.Index do
   defp apply_action(socket, :new, _params) do
     can_perform_action? =
       Ash.can?(
-        {Fleetms.FuelTracking.FuelHistory, :create},
+        {Fleetms.FuelManagement.FuelHistory, :create},
         socket.assigns.current_user
       )
 
@@ -214,7 +217,7 @@ defmodule FleetmsWeb.FuelHistoryLive.Index do
       |> assign(:page_title, "New Fuel History")
       |> assign(:fuel_history, nil)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -233,7 +236,7 @@ defmodule FleetmsWeb.FuelHistoryLive.Index do
   defp list_fuel_histories(paginate_sort_opts, search_query, filter_form_data, opts) do
     %{page: page, per_page: per_page} = paginate_sort_opts
 
-    FuelTracking.list_fuel_histories!(paginate_sort_opts, search_query, filter_form_data,
+    FuelManagement.list_fuel_histories!(paginate_sort_opts, search_query, filter_form_data,
       tenant: opts[:tenant],
       actor: opts[:actor],
       page: [limit: per_page, offset: (page - 1) * per_page, count: true]

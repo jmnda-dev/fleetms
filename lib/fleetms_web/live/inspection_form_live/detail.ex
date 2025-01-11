@@ -1,6 +1,10 @@
 defmodule FleetmsWeb.InspectionFormLive.Detail do
   use FleetmsWeb, :live_view
 
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :inspections_module}
+
   @impl true
   def mount(_params, _session, socket) do
     {:ok, assign(socket, :show, false) |> assign(:active_link, :inspection_forms)}
@@ -11,7 +15,7 @@ defmodule FleetmsWeb.InspectionFormLive.Detail do
     %{tenant: tenant, current_user: actor, live_action: live_action} = socket.assigns
 
     inspection_form =
-      Ash.get!(Fleetms.Inspection.InspectionForm, id, tenant: tenant, actor: actor)
+      Ash.get!(Fleetms.VehicleInspection.InspectionForm, id, tenant: tenant, actor: actor)
       |> Ash.load!(
         [
           :radio_inputs,
@@ -27,20 +31,20 @@ defmodule FleetmsWeb.InspectionFormLive.Detail do
       inspection_form
       |> AshPhoenix.Form.for_action(:update,
         as: "inspection_form",
-        domain: Fleetms.Inspection,
+        domain: Fleetms.VehicleInspection,
         actor: actor,
         tenant: tenant,
         forms: [
           radio_inputs: [
             type: :list,
-            resource: Fleetms.Inspection.Form.RadioInput,
+            resource: Fleetms.VehicleInspection.Form.RadioInput,
             data: inspection_form.radio_inputs,
             create_action: :create,
             update_action: :update
           ],
           dropdown_inputs: [
             type: :list,
-            resource: Fleetms.Inspection.Form.DropdownInput,
+            resource: Fleetms.VehicleInspection.Form.DropdownInput,
             data: inspection_form.dropdown_inputs,
             create_action: :create,
             update_action: :update,
@@ -48,7 +52,7 @@ defmodule FleetmsWeb.InspectionFormLive.Detail do
               options: [
                 type: :list,
                 as: "options",
-                resource: Fleetms.Inspection.Form.InputChoice,
+                resource: Fleetms.VehicleInspection.Form.InputChoice,
                 data: & &1.options,
                 create_action: :create,
                 update_action: :update
@@ -57,14 +61,14 @@ defmodule FleetmsWeb.InspectionFormLive.Detail do
           ],
           number_inputs: [
             type: :list,
-            resource: Fleetms.Inspection.Form.NumberInput,
+            resource: Fleetms.VehicleInspection.Form.NumberInput,
             data: inspection_form.number_inputs,
             create_action: :create,
             update_action: :update
           ],
           signature_inputs: [
             type: :list,
-            resource: Fleetms.Inspection.Form.SignatureInput,
+            resource: Fleetms.VehicleInspection.Form.SignatureInput,
             data: inspection_form.signature_inputs,
             create_action: :create,
             update_action: :update
@@ -115,7 +119,7 @@ defmodule FleetmsWeb.InspectionFormLive.Detail do
   def handle_event("save", %{"inspection_form" => inspection_form_params}, socket) do
     can_perform_action? =
       Ash.can?(
-        {Fleetms.Inspection.InspectionForm, :update},
+        {Fleetms.VehicleInspection.InspectionForm, :update},
         socket.assigns.current_user
       )
 
@@ -124,14 +128,14 @@ defmodule FleetmsWeb.InspectionFormLive.Detail do
         {:ok, inspection_form} ->
           {:noreply,
            socket
-           |> put_flash(:info, "Inspection Form updated successfully")
+           |> put_toast(:info, "Inspection Form updated successfully")
            |> push_patch(to: ~p"/inspection_forms/#{inspection_form}")}
 
         {:error, form} ->
           case AshPhoenix.Form.errors(form, format: :simple) do
             [name: "has already been taken"] ->
               socket =
-                put_flash(
+                put_toast(
                   socket,
                   :error,
                   "An error occured. Ensure there are no fields with the same name."
@@ -145,7 +149,7 @@ defmodule FleetmsWeb.InspectionFormLive.Detail do
           end
       end
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end

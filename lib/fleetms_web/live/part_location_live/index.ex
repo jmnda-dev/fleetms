@@ -1,6 +1,10 @@
 defmodule FleetmsWeb.InventoryLocationLive.Index do
   use FleetmsWeb, :live_view
 
+  alias FleetmsWeb.LiveUserAuth
+
+  on_mount {LiveUserAuth, :inventory_module}
+
   import Fleetms.Utils, only: [calc_total_pages: 2, atom_list_to_options_for_select: 1]
   alias Fleetms.Common.PaginationSortParam
   alias Fleetms.Inventory
@@ -76,7 +80,6 @@ defmodule FleetmsWeb.InventoryLocationLive.Index do
       |> assign(:total, count)
       |> assign(:total_pages, calc_total_pages(count, per_page))
 
-
     {:noreply, socket}
   end
 
@@ -144,7 +147,7 @@ defmodule FleetmsWeb.InventoryLocationLive.Index do
     socket =
       socket
       |> stream_delete(:inventory_locations, inventory_location)
-      |> put_flash(:info, "#{inventory_location.name} was deleted successfully")
+      |> put_toast(:info, "#{inventory_location.name} was deleted successfully")
 
     {:noreply, socket}
   end
@@ -174,7 +177,7 @@ defmodule FleetmsWeb.InventoryLocationLive.Index do
       |> assign(:page_title, "Edit Inventory Location ")
       |> assign(:inventory_location, inventory_location)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -196,7 +199,7 @@ defmodule FleetmsWeb.InventoryLocationLive.Index do
       |> assign(:page_title, "New Inventory Location ")
       |> assign(:inventory_location, nil)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end

@@ -5,8 +5,12 @@ defmodule FleetmsWeb.VehicleAssignmentLive.Index do
     only: [calc_total_pages: 2, dates_in_map_to_string: 2, atom_list_to_options_for_select: 1]
 
   alias Fleetms.Common.PaginationSortParam
-  alias Fleetms.Vehicles
+  alias Fleetms.VehicleManagement
 
+  # alias FleetmsWeb.LiveUserAuth
+  #
+  # on_mount {LiveUserAuth, :vehicles_module}
+  #
   @per_page_opts [10, 20, 30, 50, 100, 250, 500]
   @sort_by_opts [
     :start_datetime,
@@ -90,7 +94,6 @@ defmodule FleetmsWeb.VehicleAssignmentLive.Index do
       |> assign(:total, count)
       |> assign(:total_pages, calc_total_pages(count, per_page))
 
-
     {:noreply, socket}
   end
 
@@ -158,22 +161,22 @@ defmodule FleetmsWeb.VehicleAssignmentLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     can_perform_action? =
-      Ash.can?({Fleetms.Vehicles.VehicleAssignment, :destroy}, actor)
+      Ash.can?({Fleetms.VehicleManagement.VehicleAssignment, :destroy}, actor)
 
     if can_perform_action? do
       vehicle_assignment =
-        Fleetms.Vehicles.VehicleAssignment.get_by_id!(id, tenant: tenant, actor: actor)
+        Fleetms.VehicleManagement.VehicleAssignment.get_by_id!(id, tenant: tenant, actor: actor)
 
       Ash.destroy!(vehicle_assignment, tenant: tenant, actor: actor)
 
       socket =
         socket
         |> stream_delete(:vehicle_assignments, vehicle_assignment)
-        |> put_flash(:info, "Vehicle Assignment was deleted successfully")
+        |> put_toast(:info, "Vehicle Assignment was deleted successfully")
 
       {:noreply, socket}
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
 
       {:noreply, socket}
@@ -185,7 +188,7 @@ defmodule FleetmsWeb.VehicleAssignmentLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     vehicle_assignment =
-      Fleetms.Vehicles.VehicleAssignment.get_by_id!(id, tenant: tenant, actor: actor)
+      Fleetms.VehicleManagement.VehicleAssignment.get_by_id!(id, tenant: tenant, actor: actor)
 
     {:noreply, assign(socket, :vehicle_assignment, vehicle_assignment)}
   end
@@ -194,17 +197,17 @@ defmodule FleetmsWeb.VehicleAssignmentLive.Index do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     can_perform_action? =
-      Ash.can?({Fleetms.Vehicles.VehicleAssignment, :update}, actor)
+      Ash.can?({Fleetms.VehicleManagement.VehicleAssignment, :update}, actor)
 
     if can_perform_action? do
       vehicle_assignment =
-        Fleetms.Vehicles.VehicleAssignment.get_by_id!(id, tenant: tenant, actor: actor)
+        Fleetms.VehicleManagement.VehicleAssignment.get_by_id!(id, tenant: tenant, actor: actor)
 
       socket
       |> assign(:page_title, "Edit Vehicle Assignment Details")
       |> assign(:vehicle_assignment, vehicle_assignment)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -212,7 +215,7 @@ defmodule FleetmsWeb.VehicleAssignmentLive.Index do
   defp apply_action(socket, :new, _params) do
     can_perform_action? =
       Ash.can?(
-        {Fleetms.Vehicles.VehicleAssignment, :create},
+        {Fleetms.VehicleManagement.VehicleAssignment, :create},
         socket.assigns.current_user
       )
 
@@ -221,7 +224,7 @@ defmodule FleetmsWeb.VehicleAssignmentLive.Index do
       |> assign(:page_title, "Add Vehicle Assignment")
       |> assign(:vehicle_assignment, nil)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -242,7 +245,7 @@ defmodule FleetmsWeb.VehicleAssignmentLive.Index do
   defp list_vehicle_assignments(paginate_sort_opts, search_query, filter_form_data, opts) do
     %{page: page, per_page: per_page} = paginate_sort_opts
 
-    Vehicles.list_vehicle_assignments!(paginate_sort_opts, search_query, filter_form_data,
+    VehicleManagement.list_vehicle_assignments!(paginate_sort_opts, search_query, filter_form_data,
       tenant: opts[:tenant],
       actor: opts[:actor],
       page: [limit: per_page, offset: (page - 1) * per_page, count: true]

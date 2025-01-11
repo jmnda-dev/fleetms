@@ -361,46 +361,48 @@
         </dl>
       </div>
     </section>
+    <.link navigate={~p"/reports/fuel_costs"}>
+      <section class="bg-white dark:bg-gray-800 shadow-md rounded-md hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
+        <h3 class="mx-2 my-2 text-lg md:text-xl text-primary-600 dark:text-primary-300 font-semibold">
+          <i class="fa-solid fa-gas-pump" /> Fuel Costs
+        </h3>
+        <div class="py-2 px-4 mx-auto max-w-2xl flex flex-col items-center">
+          <h2 class="mb-2 px-2 text-sm text-center font-normal leading-none text-gray-700 md:text-xl dark:text-gray-200 bg-gray-50 dark:bg-gray-700 rounded-md">
+            This Year
+            <p><%= @summary_stats.fuel_stats.total_costs_current_year %></p>
+          </h2>
+          <dl class="flex items-center justify-center space-x-6">
+            <div>
+              <dt class="mb-2 font-bold leading-none text-primary-600 dark:text-primary-200">
+                This Month
+              </dt>
+              <dd class="mb-4 font-semibold text-center text-primary-500 sm:mb-5 dark:text-primary-300">
+                <%= @summary_stats.fuel_stats.total_costs_current_month %>
+              </dd>
+            </div>
+            <div>
+              <dt class="mb-2 font-bold leading-none text-teal-600 dark:text-teal-200">
+                This Week
+              </dt>
+              <dd class="mb-4 font-semibold text-center text-teal-500 sm:mb-5 dark:text-teal-300">
+                <%= @summary_stats.fuel_stats.total_costs_current_week %>
+              </dd>
+            </div>
+            <div>
+              <dt class="mb-2 font-bold leading-none text-sky-600 dark:text-sky-200">
+                Today
+              </dt>
+              <dd class="mb-4 font-semibold text-center text-sky-500 sm:mb-5 dark:text-sky-300">
+                <%= @summary_stats.fuel_stats.total_costs_today %>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+    </.link>
     <section class="bg-white dark:bg-gray-800 shadow-md rounded-md">
       <h3 class="mx-2 my-2 text-lg md:text-xl text-primary-600 dark:text-primary-300 font-semibold">
-        <i class="fa-solid fa-warehouse" /> Fuel Costs
-      </h3>
-      <div class="py-2 px-4 mx-auto max-w-2xl flex flex-col items-center">
-        <h2 class="mb-2 px-2 text-sm text-center font-normal leading-none text-gray-700 md:text-xl dark:text-gray-200 bg-gray-50 dark:bg-gray-700 rounded-md">
-          This Year
-          <p><%= @summary_stats.fuel_stats.total_costs_current_year %></p>
-        </h2>
-        <dl class="flex items-center justify-center space-x-6">
-          <div>
-            <dt class="mb-2 font-bold leading-none text-primary-600 dark:text-primary-200">
-              This Month
-            </dt>
-            <dd class="mb-4 font-semibold text-center text-primary-500 sm:mb-5 dark:text-primary-300">
-              <%= @summary_stats.fuel_stats.total_costs_current_month %>
-            </dd>
-          </div>
-          <div>
-            <dt class="mb-2 font-bold leading-none text-teal-600 dark:text-teal-200">
-              This Week
-            </dt>
-            <dd class="mb-4 font-semibold text-center text-teal-500 sm:mb-5 dark:text-teal-300">
-              <%= @summary_stats.fuel_stats.total_costs_current_week %>
-            </dd>
-          </div>
-          <div>
-            <dt class="mb-2 font-bold leading-none text-sky-600 dark:text-sky-200">
-              Today
-            </dt>
-            <dd class="mb-4 font-semibold text-center text-sky-500 sm:mb-5 dark:text-sky-300">
-              <%= @summary_stats.fuel_stats.total_costs_today %>
-            </dd>
-          </div>
-        </dl>
-      </div>
-    </section>
-    <section class="bg-white dark:bg-gray-800 shadow-md rounded-md">
-      <h3 class="mx-2 my-2 text-lg md:text-xl text-primary-600 dark:text-primary-300 font-semibold">
-        <i class="fa-solid fa-warehouse" /> Maintenance Costs
+        <i class="fa-solid fa-money-bills" /> Maintenance Costs
       </h3>
       <div class="py-2 px-4 mx-auto max-w-2xl flex flex-col items-center">
         <h2 class="mb-2 px-2 text-sm text-center font-normal leading-none text-gray-700 md:text-xl dark:text-gray-200 bg-gray-50 dark:bg-gray-700 rounded-md">

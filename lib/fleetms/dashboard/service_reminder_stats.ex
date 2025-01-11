@@ -13,7 +13,7 @@ defmodule Fleetms.Dashboard.ServiceReminderStats do
       due_soon_service_task_count: due_soon_service_task_count,
       overdue_service_task_count: overdue_service_task_count
     } =
-      Fleetms.Service.ServiceReminder.get_dashboard_stats!(tenant)
+      Fleetms.VehicleMaintenance.ServiceReminder.get_dashboard_stats!(tenant)
 
     %{
       upcoming: upcoming,

@@ -1,4 +1,25 @@
 import Config
+import Dotenvy
+
+source!(["#{config_env()}.env", System.get_env()])
+
+swoosh_adapter = env!("SWOOSH_ADAPTER", :module, Swoosh.Adapters.Local)
+
+swoosh_configs =
+  if swoosh_adapter == Swoosh.Adapters.Local do
+    [
+      adapter: swoosh_adapter
+    ]
+  else
+    [
+      adapter: swoosh_adapter,
+      api_key: env!("MAILER_API_KEY"),
+      domain: env!("MAILER_DOMAIN")
+    ]
+  end
+
+config :fleetms, Fleetms.Mailer, swoosh_configs
+config :swoosh, :api_client, Swoosh.ApiClient.Req
 
 # config/runtime.exs is executed for all environments, including
 # during releases. It is executed after compilation and before the
@@ -19,6 +40,9 @@ import Config
 if System.get_env("PHX_SERVER") do
   config :fleetms, FleetmsWeb.Endpoint, server: true
 end
+
+# config :phoenix_analytics,
+#   app_domain: env!("PHX_HOST", :string, "example.com")
 
 if config_env() == :prod do
   database_url =
@@ -64,6 +88,16 @@ if config_env() == :prod do
     secret_key_base: secret_key_base
 
   config :fleetms, :token_signing_secret, secret_key_base
+
+  # config :sentry,
+  #   dsn: System.get_env("SENTRY_DSN"),
+  #   environment_name: config_env(),
+  #   enable_source_code_context: true
+
+  config :fleetms,
+         :token_signing_secret,
+         env!("TOKEN_SIGNING_SECRET")
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

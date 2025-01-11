@@ -1,9 +1,13 @@
 defmodule FleetmsWeb.VehicleLive.List do
-  alias Fleetms.Vehicles.VehicleListFilter
+  alias Fleetms.VehicleManagement.VehicleListFilter
   use FleetmsWeb, :live_view
   import Fleetms.Utils, only: [calc_total_pages: 2, atom_list_to_options_for_select: 1]
   alias Fleetms.Common.PaginationSortParam
-  alias Fleetms.Vehicles
+  alias Fleetms.VehicleManagement
+
+  # alias FleetmsWeb.LiveUserAuth
+  #
+  # on_mount {LiveUserAuth, :vehicles_module}
 
   @per_page_opts [10, 20, 30, 50, 100, 250, 500]
   @sort_by_opts [
@@ -50,11 +54,11 @@ defmodule FleetmsWeb.VehicleLive.List do
     {socket, filters} =
       with query_params <- get_applied_filters(params),
            {:ok, %VehicleListFilter{} = filters_struct} <-
-             Vehicles.VehicleListFilter.validate(query_params) do
+             VehicleManagement.VehicleListFilter.validate(query_params) do
         {socket, VehicleListFilter.to_params!(filters_struct)}
       else
         {:error, _changeset} ->
-          {put_flash(socket, :error, "URL contains invalid filters, no filters applied!"), %{}}
+          {put_toast(socket, :error, "URL contains invalid filters, no filters applied!"), %{}}
       end
 
     %{page: page, per_page: per_page} = paginate_sort_opts
@@ -66,7 +70,7 @@ defmodule FleetmsWeb.VehicleLive.List do
       |> assign(:search_params, %{search_query: search_query})
       |> assign(:applied_filters, filters)
       |> start_async(:get_vehicles, fn ->
-        Vehicles.list_vehicles!(paginate_sort_opts, search_query, filters,
+        VehicleManagement.list_vehicles!(paginate_sort_opts, search_query, filters,
           tenant: tenant,
           actor: actor,
           page: [limit: per_page, offset: (page - 1) * per_page, count: true]
@@ -110,7 +114,7 @@ defmodule FleetmsWeb.VehicleLive.List do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     vehicle_models =
-      Fleetms.Vehicles.VehicleModel.list_by_vehicle_make!(vehicle_make,
+      Fleetms.VehicleManagement.VehicleModel.list_by_vehicle_make!(vehicle_make,
         tenant: tenant,
         actor: actor
       )
@@ -182,21 +186,21 @@ defmodule FleetmsWeb.VehicleLive.List do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     can_perform_action? =
-      Ash.can?({Fleetms.Vehicles.Vehicle, :destroy}, actor)
+      Ash.can?({Fleetms.VehicleManagement.Vehicle, :destroy}, actor)
 
     if can_perform_action? do
-      vehicle = Fleetms.Vehicles.Vehicle.get_by_id!(id, tenant: tenant, actor: actor)
+      vehicle = Fleetms.VehicleManagement.Vehicle.get_by_id!(id, tenant: tenant, actor: actor)
 
       Ash.destroy!(vehicle, tenant: tenant, actor: actor)
 
       socket =
         socket
         |> stream_delete(:vehicles, vehicle)
-        |> put_flash(:info, "Vehicle was deleted successfully")
+        |> put_toast(:info, "Vehicle was deleted successfully")
 
       {:noreply, socket}
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
 
       {:noreply, socket}
@@ -207,16 +211,16 @@ defmodule FleetmsWeb.VehicleLive.List do
     %{tenant: tenant, current_user: actor} = socket.assigns
 
     can_perform_action? =
-      Ash.can?({Fleetms.Vehicles.Vehicle, :update}, actor)
+      Ash.can?({Fleetms.VehicleManagement.Vehicle, :update}, actor)
 
     if can_perform_action? do
-      vehicle = Fleetms.Vehicles.Vehicle.get_by_id!(id, tenant: tenant, actor: actor)
+      vehicle = Fleetms.VehicleManagement.Vehicle.get_by_id!(id, tenant: tenant, actor: actor)
 
       socket
       |> assign(:page_title, "Edit Vehicle Details")
       |> assign(:vehicle, vehicle)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
@@ -225,14 +229,14 @@ defmodule FleetmsWeb.VehicleLive.List do
     actor = socket.assigns.current_user
 
     can_perform_action? =
-      Ash.can?({Fleetms.Vehicles.Vehicle, :create}, actor)
+      Ash.can?({Fleetms.VehicleManagement.Vehicle, :create}, actor)
 
     if can_perform_action? do
       socket
       |> assign(:page_title, "Add Vehicle")
       |> assign(:vehicle, nil)
     else
-      raise FleetmsWeb.Plug.Exceptions.UnauthorizedError,
+      raise FleetmsWeb.Exceptions.UnauthorizedError,
             "You are not authorized to perform this action"
     end
   end
