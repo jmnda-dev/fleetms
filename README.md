@@ -51,11 +51,13 @@ This project is a work in progress, and more details about the project will be a
 - [**Tailwind CSS**](https://tailwindcss.com/) and [**Flowbite**](https://flowbite.com/)
 
 ### Installation
+You need to have PostgreSQL installed, then update the `config/dev.exs` file to use your database credentials.
 Clone this repository
 ```bash
 git clone https://github.com/jmnda-dev/fleetms.git
 cd fleetms
 ```
+You can run this project in Dev Containers locally or GitHub Codespaces.
 
 To start your Phoenix server:
 
@@ -64,6 +66,6 @@ To start your Phoenix server:
 
 To reset database and seed sample data, run `mix seed`
 
-If the sample data was seeded successfully, you can login with these credentials ***Email***: `user@example.com`, ***Password***: `passWORD1234@`
+If the sample data was seeded successfully, you can login with these credentials ***Email***: `demo_user@fleetms.com`, ***Password***: `passWORD1234@`
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
