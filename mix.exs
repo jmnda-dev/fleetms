@@ -8,6 +8,7 @@ defmodule Fleetms.MixProject do
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
+      consolidate_protocols: Mix.env() != :dev,
       aliases: aliases(),
       deps: deps()
     ]
@@ -19,7 +20,7 @@ defmodule Fleetms.MixProject do
   def application do
     [
       mod: {Fleetms.Application, []},
-      extra_applications: [:logger, :runtime_tools, :os_mon]
+      extra_applications: [:logger, :runtime_tools]
     ]
   end
 
@@ -32,49 +33,56 @@ defmodule Fleetms.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.7"},
-      {:phoenix_ecto, "~> 4.4"},
+      {:ex_money_sql, "~> 1.0"},
+      {:bcrypt_elixir, "~> 3.0"},
+      {:picosat_elixir, "~> 0.2"},
+      {:open_api_spex, "~> 3.0"},
+      {:oban, "~> 2.0"},
+      {:beacon_live_admin, "~> 0.4"},
+      {:beacon, "~> 0.5"},
+      {:ash_money, "~> 0.1"},
+      {:ash_cloak, "~> 0.1"},
+      {:cloak, "~> 1.0"},
+      {:ash_paper_trail, "~> 0.5"},
+      {:ash_archival, "~> 1.0"},
+      {:ash_state_machine, "~> 0.2"},
+      {:ash_oban, "~> 0.4"},
+      {:ash_admin, "~> 0.13"},
+      {:ash_authentication_phoenix, "~> 2.0"},
+      {:ash_authentication, "~> 4.0"},
+      {:ash_postgres, "~> 2.0"},
+      {:ash_json_api, "~> 1.0"},
+      {:ash_phoenix, "~> 2.0"},
+      {:sourceror, "~> 1.7", only: [:dev, :test]},
+      {:ash, "~> 3.0"},
+      {:igniter, "~> 0.5", only: [:dev, :test]},
+      {:phoenix, "~> 1.7.20"},
+      {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
-      {:phoenix_html, "~> 4.0"},
+      {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 1.0-rc.1", override: true},
-      {:floki, ">= 0.30.0", only: :test},
-      {:phoenix_live_dashboard, "~> 0.8.2"},
-      {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
-      {:tailwind, "~> 0.2.0", runtime: Mix.env() == :dev},
-      {:swoosh, "~> 1.3"},
+      {:phoenix_live_view, "~> 1.0.0"},
+      {:floki, ">= 0.30.0"},
+      {:phoenix_live_dashboard, "~> 0.8.3"},
+      {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
+      {:heroicons,
+       github: "tailwindlabs/heroicons",
+       tag: "v2.1.1",
+       sparse: "optimized",
+       app: false,
+       compile: false,
+       depth: 1},
+      {:swoosh, "~> 1.5"},
       {:finch, "~> 0.13"},
-      {:telemetry_metrics, "~> 0.6"},
+      {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
-      {:gettext, "~> 0.20"},
+      {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"},
-      {:ash, "~> 3.4.0"},
-      {:picosat_elixir, "~> 0.2"},
-      {:ash_postgres, "~> 2.4"},
-      {:ash_phoenix, "~> 2.0"},
-      {:ash_authentication, "~> 4.0"},
-      {:ash_authentication_phoenix, "~> 2.0"},
-      {:timex, "~> 3.7"},
-      {:waffle, "~> 1.1"},
-      {:ash_admin, "~> 0.11"},
-      {:ash_money, "~> 0.1"},
-      {:ex_money_sql, "~> 1.0"},
-      {:ex_cldr_units, "~> 3.16"},
-      {:benchee, "~> 1.0", only: :dev},
-      {:nimble_csv, "~> 1.2"},
-      {:sentry, "~> 10.2.0"},
-      {:hackney, "~> 1.8"},
-      {:ecto_psql_extras, "~> 0.6"},
-      {:fun_with_flags, "~> 1.12.0"},
-      {:fun_with_flags_ui, "~> 0.8"},
-      {:dotenvy, "~> 0.8.0"},
-      {:multipart, "~> 0.4.0"},
-      {:oban, "~> 2.17"},
-      {:req, "~> 0.5.6"},
-      {:faker, "~> 0.18"},
-      {:live_toast, "~> 0.6.4"},
+      {:dns_cluster, "~> 0.1.1"},
+      {:bandit, "~> 1.5"},
+      {:git_hooks, "~> 0.8.0", only: [:dev], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
@@ -87,28 +95,18 @@ defmodule Fleetms.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: [
-        "deps.get",
-        "compile",
-        "assets.setup",
-        "assets.build",
-        "ash.reset",
-        "run priv/repo/seeds.exs"
-      ],
+      setup: ["deps.get", "ash.setup", "assets.setup", "assets.build", "run priv/repo/seeds.exs"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      seed: [
-        "ash.reset",
-        "run priv/repo/seeds.exs"
-      ],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      test: ["ash.setup --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind default", "esbuild default"],
+      "assets.build": ["tailwind fleetms", "esbuild fleetms"],
       "assets.deploy": [
-        "tailwind default --minify",
-        "esbuild default --minify",
+        "tailwind fleetms --minify",
+        "esbuild fleetms --minify",
         "phx.digest"
-      ]
+      ],
+      "phx.routes": ["phx.routes", "ash_json_api.routes", "ash_authentication.phoenix.routes"]
     ]
   end
 end

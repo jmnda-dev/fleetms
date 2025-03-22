@@ -7,27 +7,26 @@ defmodule Fleetms.Application do
 
   @impl true
   def start(_type, _args) do
-    :logger.add_handler(:my_sentry_handler, Sentry.LoggerHandler, %{
-      config: %{metadata: [:file, :line]}
-    })
-
-    :ok = Oban.Telemetry.attach_default_logger()
-
     children = [
-      # Start the Telemetry supervisor
       FleetmsWeb.Telemetry,
-      # Start the Ecto repository
       Fleetms.Repo,
-      # Start the PubSub system
+      {DNSCluster, query: Application.get_env(:fleetms, :dns_cluster_query) || :ignore},
+      {Beacon, [sites: [Application.fetch_env!(:beacon, :cms)]]},
+      {Oban,
+       AshOban.config(
+         Application.fetch_env!(:fleetms, :ash_domains),
+         Application.fetch_env!(:fleetms, Oban)
+       )},
       {Phoenix.PubSub, name: Fleetms.PubSub},
-      # Start Finch
+      # Start the Finch HTTP client for sending emails
       {Finch, name: Fleetms.Finch},
-      # Start the Endpoint (http/https)
-      FleetmsWeb.Endpoint,
+      FleetmsWeb.CmsEndpoint,
       # Start a worker by calling: Fleetms.Worker.start_link(arg)
-      # {Fleetms.Worker, arg}
-      {Oban, Application.fetch_env!(:fleetms, Oban)},
-      {AshAuthentication.Supervisor, otp_app: :fleetms}
+      # {Fleetms.Worker, arg},
+      # Start to serve requests, typically the last entry
+      FleetmsWeb.Endpoint,
+      {AshAuthentication.Supervisor, [otp_app: :fleetms]},
+      FleetmsWeb.ProxyEndpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

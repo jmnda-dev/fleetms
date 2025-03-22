@@ -2,29 +2,46 @@ defmodule FleetmsWeb.AuthController do
   use FleetmsWeb, :controller
   use AshAuthentication.Phoenix.Controller
 
-  def success(conn, _activity, user, _token) do
+  def success(conn, activity, user, _token) do
     return_to = get_session(conn, :return_to) || ~p"/"
-    user = Ash.load!(user, :organization)
+
+    message =
+      case activity do
+        {:confirm_new_user, :confirm} -> "Your email address has now been confirmed"
+        {:password, :reset} -> "Your password has successfully been reset"
+        _ -> "You are now signed in"
+      end
 
     conn
     |> delete_session(:return_to)
     |> store_in_session(user)
-    |> maybe_put_tenant_in_session(user)
+    # If your resource has a different name, update the assign name here (i.e :current_admin)
     |> assign(:current_user, user)
+    |> put_flash(:info, message)
     |> redirect(to: return_to)
   end
 
-  def failure(
-        conn,
-        _activity,
-        _reason
-      ) do
+  def failure(conn, activity, reason) do
+    message =
+      case {activity, reason} do
+        {_,
+         %AshAuthentication.Errors.AuthenticationFailed{
+           caused_by: %Ash.Error.Forbidden{
+             errors: [%AshAuthentication.Errors.CannotConfirmUnconfirmedUser{}]
+           }
+         }} ->
+          """
+          You have already signed in another way, but have not confirmed your account.
+          You can confirm your account using the link we sent to you, or by resetting your password.
+          """
+
+        _ ->
+          "Incorrect email or password"
+      end
+
     conn
-    |> LiveToast.put_toast(
-      :error,
-      "Email or password is incorrect"
-    )
-    |> redirect(to: "/sign-in")
+    |> put_flash(:error, message)
+    |> redirect(to: ~p"/sign-in")
   end
 
   def sign_out(conn, _params) do
@@ -32,12 +49,7 @@ defmodule FleetmsWeb.AuthController do
 
     conn
     |> clear_session()
+    |> put_flash(:info, "You are now signed out")
     |> redirect(to: return_to)
-  end
-
-  defp maybe_put_tenant_in_session(conn, nil), do: conn
-
-  defp maybe_put_tenant_in_session(conn, user) do
-    put_session(conn, :tenant, Ash.ToTenant.to_tenant(user.organization, user.organization))
   end
 end

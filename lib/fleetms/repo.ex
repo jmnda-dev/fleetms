@@ -1,18 +1,19 @@
 defmodule Fleetms.Repo do
-  use AshPostgres.Repo, otp_app: :fleetms
-  alias Fleetms.Accounts
+  use AshPostgres.Repo,
+    otp_app: :fleetms
 
   def installed_extensions do
-    ["ash-functions", "uuid-ossp", "citext", "pg_trgm", AshMoney.AshPostgresExtension]
+    # Add extensions here, and the migration generator will install them.
+    ["ash-functions", "citext", AshMoney.AshPostgresExtension]
   end
 
-  def all_tenants do
-    for org <- Accounts.get_all_tenants!() do
-      Ash.ToTenant.to_tenant(org, org)
-    end
+  # Don't open unnecessary transactions
+  # will default to `false` in 4.0
+  def prefer_transaction? do
+    false
   end
 
   def min_pg_version do
-    %Version{major: 14, minor: 0, patch: 0}
+    %Version{major: 16, minor: 3, patch: 0}
   end
 end

@@ -1,20 +1,32 @@
-<%# <.flash_group flash={@flash} /> %>
-<LiveToast.toast_group flash={@flash} connected={assigns[:socket] != nil} corner={:top_right} toast_class_fn={&toast_class_custom_fn/1} />
-<.navbar current_user={@current_user} />
-<div
-  class="flex overflow-hidden pt-16 bg-gray-50 dark:bg-gray-900"
-  phx-hook="dispatchPhxLoadingStopEvent"
-  id="outer-container"
->
-  <.sidebar active_link={@active_link} current_user={@current_user} />
-  <div
-    id="main-content"
-    class="overflow-y-auto relative w-full h-full bg-gray-50 lg:ml-64 dark:bg-gray-900"
-  >
-    <main>
-      <%= @inner_content %>
-
-      <.footer />
-    </main>
+<header class="px-4 sm:px-6 lg:px-8">
+  <div class="flex items-center justify-between border-b border-zinc-100 py-3 text-sm">
+    <div class="flex items-center gap-4">
+      <a href="/">
+        <img src={~p"/images/logo.svg"} width="36" />
+      </a>
+      <p class="bg-brand/5 text-brand rounded-full px-2 font-medium leading-6">
+        v{Application.spec(:phoenix, :vsn)}
+      </p>
+    </div>
+    <div class="flex items-center gap-4 font-semibold leading-6 text-zinc-900">
+      <a href="https://twitter.com/elixirphoenix" class="hover:text-zinc-700">
+        @elixirphoenix
+      </a>
+      <a href="https://github.com/phoenixframework/phoenix" class="hover:text-zinc-700">
+        GitHub
+      </a>
+      <a
+        href="https://hexdocs.pm/phoenix/overview.html"
+        class="rounded-lg bg-zinc-100 px-2 py-1 hover:bg-zinc-200/80"
+      >
+        Get Started <span aria-hidden="true">&rarr;</span>
+      </a>
+    </div>
   </div>
-</div>
+</header>
+<main class="px-4 py-20 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-2xl">
+    <.flash_group flash={@flash} />
+    {@inner_content}
+  </div>
+</main>

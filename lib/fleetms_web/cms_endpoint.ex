@@ -1,6 +1,11 @@
-defmodule FleetmsWeb.Endpoint do
+defmodule FleetmsWeb.CmsEndpoint do
   use Phoenix.Endpoint, otp_app: :fleetms
+
   @session_options Application.compile_env!(:fleetms, :session_options)
+
+  def proxy_endpoint, do: FleetmsWeb.ProxyEndpoint
+
+  # socket /live must be in the proxy endpoint
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -10,7 +15,8 @@ defmodule FleetmsWeb.Endpoint do
     at: "/",
     from: :fleetms,
     gzip: false,
-    only: FleetmsWeb.static_paths()
+    # robots.txt is served by Beacon
+    only: ~w(assets fonts images favicon.ico)
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
@@ -21,15 +27,11 @@ defmodule FleetmsWeb.Endpoint do
     plug Phoenix.Ecto.CheckRepoStatus, otp_app: :fleetms
   end
 
-  plug Phoenix.LiveDashboard.RequestLogger,
-    param_key: "request_logger",
-    cookie_key: "request_logger"
-
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
   plug Plug.Parsers,
-    parsers: [:urlencoded, :multipart, :json, AshJsonApi.Plug.Parser],
+    parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
     json_decoder: Phoenix.json_library()
 

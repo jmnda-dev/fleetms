@@ -17,11 +17,11 @@ defmodule FleetmsWeb do
   those modules here.
   """
 
-  def static_paths, do: ~w(assets fonts webfonts images uploads favicon.ico robots.txt)
+  def static_paths, do: ~w(assets fonts images favicon.ico robots.txt)
 
   def router do
     quote do
-      use Phoenix.Router, helpers: true
+      use Phoenix.Router, helpers: false
 
       # Import common connection and controller functions to use in pipelines
       import Plug.Conn
@@ -42,8 +42,9 @@ defmodule FleetmsWeb do
         formats: [:html, :json],
         layouts: [html: FleetmsWeb.Layouts]
 
-      import Plug.Conn
       use Gettext, backend: FleetmsWeb.Gettext
+
+      import Plug.Conn
 
       unquote(verified_routes())
     end
@@ -68,7 +69,7 @@ defmodule FleetmsWeb do
 
   def html do
     quote do
-      use Phoenix.Component, global_prefixes: ~w(data-)
+      use Phoenix.Component
 
       # Import convenience functions from controllers
       import Phoenix.Controller,
@@ -81,16 +82,16 @@ defmodule FleetmsWeb do
 
   defp html_helpers do
     quote do
+      # Translation
+      use Gettext, backend: FleetmsWeb.Gettext
+
       # HTML escaping functionality
       import Phoenix.HTML
-      # Core UI components and translation
+      # Core UI components
       import FleetmsWeb.CoreComponents
-      import FleetmsWeb.LayoutComponents
-      import FleetmsWeb.LiveHelpers
-      use Gettext, backend: FleetmsWeb.Gettext
+
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
-      import LiveToast
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())
@@ -107,7 +108,7 @@ defmodule FleetmsWeb do
   end
 
   @doc """
-  When used, dispatch to the appropriate controller/view/etc.
+  When used, dispatch to the appropriate controller/live_view/etc.
   """
   defmacro __using__(which) when is_atom(which) do
     apply(__MODULE__, which, [])

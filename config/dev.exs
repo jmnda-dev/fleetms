@@ -1,6 +1,21 @@
 import Config
+secret_key_base = "rUvRaHYu/0sNvblBgji8odv7EymjSPkD/51j/XJFzfQL3nFGTgwXaMZufJ2bxdhl"
 
-config :phoenix_live_view, debug_heex_annotations: true
+config :fleetms,
+       FleetmsWeb.CmsEndpoint,
+       http: [ip: {127, 0, 0, 1}, port: 4973],
+       check_origin: false,
+       code_reloader: true,
+       debug_errors: true,
+       secret_key_base: secret_key_base
+
+config :fleetms,
+       FleetmsWeb.ProxyEndpoint,
+       http: [ip: {127, 0, 0, 1}, port: 4000],
+       check_origin: false,
+       debug_errors: true,
+       secret_key_base: secret_key_base
+
 # Configure your database
 config :fleetms, Fleetms.Repo,
   username: "postgres",
@@ -9,11 +24,7 @@ config :fleetms, Fleetms.Repo,
   database: "fleetms_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
-  pool_size: 15,
-  # Default is 50ms, increase to 5000ms (5 seconds)
-  queue_target: 5000,
-  # Default is 1000ms
-  queue_interval: 1000
+  pool_size: 10
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
@@ -21,22 +32,18 @@ config :fleetms, Fleetms.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
+# Binding to loopback ipv4 address prevents access from other machines.
 config :fleetms, FleetmsWeb.Endpoint,
-  # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {127, 0, 0, 1}, port: 4000],
+  http: [ip: {127, 0, 0, 1}, port: 4100],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "SDFOULbu+UdvREQlC3RiEejAVLkv/XDGfLKARryJeP50LokewrrrsKmqxU7btPpo",
+  secret_key_base: secret_key_base,
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
+    esbuild: {Esbuild, :install_and_run, [:fleetms, ~w(--sourcemap=inline --watch)]},
+    tailwind: {Tailwind, :install_and_run, [:fleetms, ~w(--watch)]}
   ]
-
-config :fleetms,
-       :token_signing_secret,
-       "SDFOULbu+UdvREQlC3RiEejAVLkv/XDGfLKARryJeP50LokewrrrsKmqxU7btPpo"
 
 # ## SSL Support
 #
@@ -65,14 +72,14 @@ config :fleetms,
 config :fleetms, FleetmsWeb.Endpoint,
   live_reload: [
     patterns: [
-      ~r"priv/static/(?!uploads).*(js|css|png|jpeg|jpg|gif|svg)$",
+      ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/fleetms_web/(controllers|live|components)/.*(ex|heex)$"
     ]
   ]
 
 # Enable dev routes for dashboard and mailbox
-config :fleetms, dev_routes: true
+config :fleetms, dev_routes: true, token_signing_secret: "QeWkyny+RCza5CB4Ulgm4Ei0jicQyHdC"
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
@@ -84,5 +91,33 @@ config :phoenix, :stacktrace_depth, 20
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
 
+config :phoenix_live_view,
+  # Include HEEx debug annotations as HTML comments in rendered markup
+  debug_heex_annotations: true,
+  # Enable helpful, but potentially expensive runtime checks
+  enable_expensive_runtime_checks: true
+
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+# In config/dev.exs
+config :git_hooks,
+  auto_install: true,
+  verbose: true,
+  hooks: [
+    pre_commit: [
+      tasks: [
+        {:cmd, "mix format --check-formatted"},
+        # {:cmd, "mix credo --strict"},
+        {:cmd, "mix test"}
+      ]
+    ],
+    pre_push: [
+      tasks: [
+        {:cmd, "mix deps.get"},
+        {:cmd, "mix compile --warnings-as-errors"},
+        {:cmd, "mix test"},
+        {:cmd, "mix dialyzer"}
+      ]
+    ]
+  ]

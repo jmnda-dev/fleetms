@@ -3,6 +3,6 @@ defmodule FleetmsWeb.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")
-    assert html_response(conn, 200) =~ "Fleet Maintenance and Management"
+    assert html_response(conn, 200) =~ "Performance without compromising productivity"
   end
 end

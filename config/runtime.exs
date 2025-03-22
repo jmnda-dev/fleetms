@@ -1,25 +1,12 @@
 import Config
-import Dotenvy
 
-source!(["#{config_env()}.env", System.get_env()])
-
-swoosh_adapter = env!("SWOOSH_ADAPTER", :module, Swoosh.Adapters.Local)
-
-swoosh_configs =
-  if swoosh_adapter == Swoosh.Adapters.Local do
-    [
-      adapter: swoosh_adapter
-    ]
-  else
-    [
-      adapter: swoosh_adapter,
-      api_key: env!("MAILER_API_KEY"),
-      domain: env!("MAILER_DOMAIN")
-    ]
-  end
-
-config :fleetms, Fleetms.Mailer, swoosh_configs
-config :swoosh, :api_client, Swoosh.ApiClient.Req
+config :beacon,
+  cms: [
+    site: :cms,
+    repo: Fleetms.Repo,
+    endpoint: FleetmsWeb.CmsEndpoint,
+    router: FleetmsWeb.Router
+  ]
 
 # config/runtime.exs is executed for all environments, including
 # during releases. It is executed after compilation and before the
@@ -40,9 +27,6 @@ config :swoosh, :api_client, Swoosh.ApiClient.Req
 if System.get_env("PHX_SERVER") do
   config :fleetms, FleetmsWeb.Endpoint, server: true
 end
-
-# config :phoenix_analytics,
-#   app_domain: env!("PHX_HOST", :string, "example.com")
 
 if config_env() == :prod do
   database_url =
@@ -75,28 +59,30 @@ if config_env() == :prod do
   host = System.get_env("PHX_HOST") || "example.com"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
+  config :fleetms, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
+
   config :fleetms, FleetmsWeb.Endpoint,
-    url: [host: host, port: 443, scheme: "https"],
-    http: [
-      # Enable IPv6 and bind on all interfaces.
-      # Set it to  {0, 0, 0, 0, 0, 0, 0, 1} for local network only access.
-      # See the documentation on https://hexdocs.pm/plug_cowboy/Plug.Cowboy.html
-      # for details about using IPv6 vs IPv4 and loopback vs public addresses.
-      ip: {0, 0, 0, 0, 0, 0, 0, 0},
-      port: port
-    ],
+    url: [host: host, port: 8443, scheme: "https"],
+    http: [ip: {0, 0, 0, 0, 0, 0, 0, 0}, port: 4100],
     secret_key_base: secret_key_base
 
-  config :fleetms, :token_signing_secret, secret_key_base
-
-  # config :sentry,
-  #   dsn: System.get_env("SENTRY_DSN"),
-  #   environment_name: config_env(),
-  #   enable_source_code_context: true
-
   config :fleetms,
-         :token_signing_secret,
-         env!("TOKEN_SIGNING_SECRET")
+    token_signing_secret:
+      System.get_env("TOKEN_SIGNING_SECRET") ||
+        raise("Missing environment variable `TOKEN_SIGNING_SECRET`!")
+
+  config :fleetms, FleetmsWeb.ProxyEndpoint,
+    check_origin: {FleetmsWeb.ProxyEndpoint, :check_origin, []},
+    url: [port: 443, scheme: "https"],
+    http: [ip: {0, 0, 0, 0, 0, 0, 0, 0}, port: port],
+    secret_key_base: secret_key_base,
+    server: !!System.get_env("PHX_SERVER")
+
+  config :fleetms, FleetmsWeb.CmsEndpoint,
+    url: [host: host, port: 8799, scheme: "https"],
+    http: [ip: {0, 0, 0, 0, 0, 0, 0, 0}, port: 4973],
+    secret_key_base: secret_key_base,
+    server: !!System.get_env("PHX_SERVER")
 
   # ## SSL Support
   #
@@ -122,8 +108,8 @@ if config_env() == :prod do
   # "priv/ssl/server.key". For all supported SSL configuration
   # options, see https://hexdocs.pm/plug/Plug.SSL.html#configure/1
   #
-  # We also recommend setting `force_ssl` in your endpoint, ensuring
-  # no data is ever sent via http, always redirecting to https:
+  # We also recommend setting `force_ssl` in your config/prod.exs,
+  # ensuring no data is ever sent via http, always redirecting to https:
   #
   #     config :fleetms, FleetmsWeb.Endpoint,
   #       force_ssl: [hsts: true]
