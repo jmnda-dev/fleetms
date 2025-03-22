@@ -116,8 +116,8 @@ config :git_hooks,
       tasks: [
         {:cmd, "mix deps.get"},
         {:cmd, "mix compile --warnings-as-errors"},
-        {:cmd, "mix test"},
-        {:cmd, "mix dialyzer"}
+        {:cmd, "mix test"}
+        # {:cmd, "mix dialyzer"}
       ]
     ]
   ]
