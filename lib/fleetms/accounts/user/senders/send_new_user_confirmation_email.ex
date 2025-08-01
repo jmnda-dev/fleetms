@@ -22,7 +22,7 @@ defmodule Fleetms.Accounts.User.Senders.SendNewUserConfirmationEmail do
   end
 
   defp body(params) do
-    url = url(~p"/auth/user/confirm_new_user?#{[confirm: params[:token]]}")
+    url = url(~p"/confirm_new_user/#{params[:token]}")
 
     """
     <p>Click this link to confirm your email:</p>

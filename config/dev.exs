@@ -1,20 +1,5 @@
 import Config
-secret_key_base = "rUvRaHYu/0sNvblBgji8odv7EymjSPkD/51j/XJFzfQL3nFGTgwXaMZufJ2bxdhl"
-
-config :fleetms,
-       FleetmsWeb.CmsEndpoint,
-       http: [ip: {127, 0, 0, 1}, port: 4973],
-       check_origin: false,
-       code_reloader: true,
-       debug_errors: true,
-       secret_key_base: secret_key_base
-
-config :fleetms,
-       FleetmsWeb.ProxyEndpoint,
-       http: [ip: {127, 0, 0, 1}, port: 4000],
-       check_origin: false,
-       debug_errors: true,
-       secret_key_base: secret_key_base
+config :ash, policies: [show_policy_breakdowns?: true]
 
 # Configure your database
 config :fleetms, Fleetms.Repo,
@@ -32,14 +17,14 @@ config :fleetms, Fleetms.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-# Binding to loopback ipv4 address prevents access from other machines.
 config :fleetms, FleetmsWeb.Endpoint,
+  # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {127, 0, 0, 1}, port: 4100],
+  http: [ip: {127, 0, 0, 1}, port: String.to_integer(System.get_env("PORT") || "4000")],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: secret_key_base,
+  secret_key_base: "vymqRpweBwf+nGX7xYtPAEEi/7MqyxfSrKSZzNvJCVKdpl65OkHDX8cQFqJJZWop",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:fleetms, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:fleetms, ~w(--watch)]}
@@ -71,18 +56,19 @@ config :fleetms, FleetmsWeb.Endpoint,
 # Watch static and templates for browser reloading.
 config :fleetms, FleetmsWeb.Endpoint,
   live_reload: [
+    web_console_logger: true,
     patterns: [
       ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/fleetms_web/(controllers|live|components)/.*(ex|heex)$"
+      ~r"lib/fleetms_web/(?:controllers|live|components|router)/?.*\.(ex|heex)$"
     ]
   ]
 
 # Enable dev routes for dashboard and mailbox
-config :fleetms, dev_routes: true, token_signing_secret: "QeWkyny+RCza5CB4Ulgm4Ei0jicQyHdC"
+config :fleetms, dev_routes: true, token_signing_secret: "U71/dHulZZ4ypnWUteYlu1bgd8zp2oZw"
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n"
+config :logger, :default_formatter, format: "[$level] $message\n"
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
@@ -92,32 +78,12 @@ config :phoenix, :stacktrace_depth, 20
 config :phoenix, :plug_init_mode, :runtime
 
 config :phoenix_live_view,
-  # Include HEEx debug annotations as HTML comments in rendered markup
+  # Include debug annotations and locations in rendered markup.
+  # Changing this configuration will require mix clean and a full recompile.
   debug_heex_annotations: true,
+  debug_tags_location: true,
   # Enable helpful, but potentially expensive runtime checks
   enable_expensive_runtime_checks: true
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
-
-# In config/dev.exs
-config :git_hooks,
-  auto_install: true,
-  verbose: true,
-  hooks: [
-    pre_commit: [
-      tasks: [
-        {:cmd, "mix format --check-formatted"},
-        # {:cmd, "mix credo --strict"},
-        {:cmd, "mix test"}
-      ]
-    ],
-    pre_push: [
-      tasks: [
-        {:cmd, "mix deps.get"},
-        {:cmd, "mix compile --warnings-as-errors"},
-        {:cmd, "mix test"}
-        # {:cmd, "mix dialyzer"}
-      ]
-    ]
-  ]

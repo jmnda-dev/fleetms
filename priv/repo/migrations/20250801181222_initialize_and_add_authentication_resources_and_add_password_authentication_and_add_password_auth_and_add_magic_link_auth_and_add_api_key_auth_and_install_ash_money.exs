@@ -1,4 +1,4 @@
-defmodule Fleetms.Repo.Migrations.InitializeAndAddAuthenticationResourcesAndAddPasswordAuthenticationAndAddPasswordAuthAndAddMagicLinkAuthAndInstallAshMoney do
+defmodule Fleetms.Repo.Migrations.InitializeAndAddAuthenticationResourcesAndAddPasswordAuthenticationAndAddPasswordAuthAndAddMagicLinkAuthAndAddApiKeyAuthAndInstallAshMoney do
   @moduledoc """
   Updates resources based on their most recent snapshots.
 
@@ -9,10 +9,10 @@ defmodule Fleetms.Repo.Migrations.InitializeAndAddAuthenticationResourcesAndAddP
 
   def up do
     create table(:users, primary_key: false) do
-      add :confirmed_at, :utc_datetime_usec
       add :id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true
       add :email, :citext, null: false
       add :hashed_password, :text
+      add :confirmed_at, :utc_datetime_usec
     end
 
     create unique_index(:users, [:email], name: "users_unique_email_index")
@@ -32,9 +32,31 @@ defmodule Fleetms.Repo.Migrations.InitializeAndAddAuthenticationResourcesAndAddP
         null: false,
         default: fragment("(now() AT TIME ZONE 'utc')")
     end
+
+    create table(:api_keys, primary_key: false) do
+      add :id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true
+      add :api_key_hash, :binary, null: false
+      add :expires_at, :utc_datetime_usec, null: false
+
+      add :user_id,
+          references(:users,
+            column: :id,
+            name: "api_keys_user_id_fkey",
+            type: :uuid,
+            prefix: "public"
+          )
+    end
+
+    create unique_index(:api_keys, [:api_key_hash], name: "api_keys_unique_api_key_index")
   end
 
   def down do
+    drop_if_exists unique_index(:api_keys, [:api_key_hash], name: "api_keys_unique_api_key_index")
+
+    drop constraint(:api_keys, "api_keys_user_id_fkey")
+
+    drop table(:api_keys)
+
     drop table(:tokens)
 
     drop_if_exists unique_index(:users, [:email], name: "users_unique_email_index")

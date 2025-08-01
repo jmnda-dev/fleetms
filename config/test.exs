@@ -1,7 +1,8 @@
 import Config
-config :fleetms, token_signing_secret: "F2ednEsZnzlrRbRPy4LTFrJaDnKQTZ+R"
-config :bcrypt_elixir, log_rounds: 1
 config :fleetms, Oban, testing: :manual
+config :fleetms, token_signing_secret: "tC+xOp9U+OOmeW9MEd41FMQ43pPEsJeF"
+config :bcrypt_elixir, log_rounds: 1
+config :ash, policies: [show_policy_breakdowns?: true]
 
 # Configure your database
 #
@@ -20,7 +21,7 @@ config :fleetms, Fleetms.Repo,
 # you can enable the server option below.
 config :fleetms, FleetmsWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
-  secret_key_base: "nQ5qB/EedZIvkAuwXYt5EKideCP9BnbE42ihsmYwoGM2mgv3hJ8/Y5JdWK/AteCe",
+  secret_key_base: "cIemd8n20IMnnQnsKZP2HHIUYwTFgLnWKAastbEu+o0Q69jGYMsUB8ETO5E/m+qE",
   server: false
 
 # In test we don't send emails

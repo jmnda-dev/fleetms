@@ -1,19 +1,10 @@
 defmodule FleetmsWeb.Router do
   use FleetmsWeb, :router
 
-  use Beacon.LiveAdmin.Router
-  use Beacon.Router
+  import Oban.Web.Router
   use AshAuthentication.Phoenix.Router
 
   import AshAuthentication.Plug.Helpers
-
-  pipeline :beacon_admin do
-    plug Beacon.LiveAdmin.Plug
-  end
-
-  pipeline :beacon do
-    plug Beacon.Plug
-  end
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -27,6 +18,12 @@ defmodule FleetmsWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+
+    plug AshAuthentication.Strategy.ApiKey.Plug,
+      resource: Fleetms.Accounts.User,
+      # if you want to require an api key to be supplied, set `required?` to true
+      required?: false
+
     plug :load_from_bearer
     plug :set_actor, :user
   end
@@ -48,26 +45,20 @@ defmodule FleetmsWeb.Router do
     end
   end
 
-  scope "/" do
-    pipe_through [:browser, :beacon_admin]
-    beacon_live_admin "/cms/admin"
-  end
-
   scope "/api/json" do
     pipe_through [:api]
 
-    forward "/swaggerui",
-            OpenApiSpex.Plug.SwaggerUI,
-            path: "/api/json/open_api",
-            default_model_expand_depth: 4
+    forward "/swaggerui", OpenApiSpex.Plug.SwaggerUI,
+      path: "/api/json/open_api",
+      default_model_expand_depth: 4
 
     forward "/", FleetmsWeb.AshJsonApiRouter
   end
 
   scope "/", FleetmsWeb do
     pipe_through :browser
-    # removed by beacon.gen.site due to a conflict with beacon_site "/"
-    get "/removed", PageController, :home
+
+    get "/", PageController, :home
     auth_routes AuthController, Fleetms.Accounts.User, path: "/auth"
     sign_out_route AuthController
 
@@ -84,6 +75,17 @@ defmodule FleetmsWeb.Router do
     # Remove this if you do not want to use the reset password feature
     reset_route auth_routes_prefix: "/auth",
                 overrides: [FleetmsWeb.AuthOverrides, AshAuthentication.Phoenix.Overrides.Default]
+
+    # Remove this if you do not use the confirmation strategy
+    confirm_route Fleetms.Accounts.User, :confirm_new_user,
+      auth_routes_prefix: "/auth",
+      overrides: [FleetmsWeb.AuthOverrides, AshAuthentication.Phoenix.Overrides.Default]
+
+    # Remove this if you do not use the magic link strategy.
+    magic_sign_in_route(Fleetms.Accounts.User, :magic_link,
+      auth_routes_prefix: "/auth",
+      overrides: [FleetmsWeb.AuthOverrides, AshAuthentication.Phoenix.Overrides.Default]
+    )
   end
 
   # Other scopes may use custom stacks.
@@ -106,6 +108,12 @@ defmodule FleetmsWeb.Router do
       live_dashboard "/dashboard", metrics: FleetmsWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
+
+    scope "/" do
+      pipe_through :browser
+
+      oban_dashboard("/oban")
+    end
   end
 
   if Application.compile_env(:fleetms, :dev_routes) do
@@ -116,10 +124,5 @@ defmodule FleetmsWeb.Router do
 
       ash_admin "/"
     end
-  end
-
-  scope "/", alias: FleetmsWeb do
-    pipe_through [:browser, :beacon]
-    beacon_site "/", site: :cms
   end
 end

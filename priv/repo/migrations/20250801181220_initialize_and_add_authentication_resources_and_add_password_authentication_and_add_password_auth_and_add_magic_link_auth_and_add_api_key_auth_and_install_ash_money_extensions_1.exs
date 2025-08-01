@@ -1,4 +1,4 @@
-defmodule Fleetms.Repo.Migrations.InitializeAndAddAuthenticationResourcesAndAddPasswordAuthenticationAndAddPasswordAuthAndAddMagicLinkAuthAndInstallAshMoneyExtensions1 do
+defmodule Fleetms.Repo.Migrations.InitializeAndAddAuthenticationResourcesAndAddPasswordAuthenticationAndAddPasswordAuthAndAddMagicLinkAuthAndAddApiKeyAuthAndInstallAshMoneyExtensions1 do
   @moduledoc """
   Installs any extensions that are mentioned in the repo's `installed_extensions/0` callback
 
@@ -143,7 +143,7 @@ defmodule Fleetms.Repo.Migrations.InitializeAndAddAuthenticationResourcesAndAddP
     execute "CREATE TYPE public.money_with_currency AS (currency_code varchar, amount numeric);"
 
     execute """
-    CREATE OR REPLACE FUNCTION money_gt(money_1 money_with_currency, money_2 money_with_currency)
+    CREATE OR REPLACE FUNCTION money_gt(money_1 public.money_with_currency, money_2 public.money_with_currency)
     RETURNS BOOLEAN
     IMMUTABLE
     STRICT
@@ -168,7 +168,7 @@ defmodule Fleetms.Repo.Migrations.InitializeAndAddAuthenticationResourcesAndAddP
     """
 
     execute """
-    CREATE OR REPLACE FUNCTION money_gt(money_1 money_with_currency, amount numeric)
+    CREATE OR REPLACE FUNCTION money_gt(money_1 public.money_with_currency, amount numeric)
     RETURNS BOOLEAN
     IMMUTABLE
     STRICT
@@ -187,22 +187,22 @@ defmodule Fleetms.Repo.Migrations.InitializeAndAddAuthenticationResourcesAndAddP
 
     execute """
     CREATE OPERATOR > (
-        leftarg = money_with_currency,
-        rightarg = money_with_currency,
+        leftarg = public.money_with_currency,
+        rightarg = public.money_with_currency,
         procedure = money_gt
     );
     """
 
     execute """
     CREATE OPERATOR > (
-        leftarg = money_with_currency,
+        leftarg = public.money_with_currency,
         rightarg = numeric,
         procedure = money_gt
     );
     """
 
     execute """
-    CREATE OR REPLACE FUNCTION money_gte(money_1 money_with_currency, money_2 money_with_currency)
+    CREATE OR REPLACE FUNCTION money_gte(money_1 public.money_with_currency, money_2 public.money_with_currency)
     RETURNS BOOLEAN
     IMMUTABLE
     STRICT
@@ -227,7 +227,7 @@ defmodule Fleetms.Repo.Migrations.InitializeAndAddAuthenticationResourcesAndAddP
     """
 
     execute """
-    CREATE OR REPLACE FUNCTION money_gte(money_1 money_with_currency, amount numeric)
+    CREATE OR REPLACE FUNCTION money_gte(money_1 public.money_with_currency, amount numeric)
     RETURNS BOOLEAN
     IMMUTABLE
     STRICT
@@ -246,15 +246,15 @@ defmodule Fleetms.Repo.Migrations.InitializeAndAddAuthenticationResourcesAndAddP
 
     execute """
     CREATE OPERATOR >= (
-        leftarg = money_with_currency,
-        rightarg = money_with_currency,
+        leftarg = public.money_with_currency,
+        rightarg = public.money_with_currency,
         procedure = money_gte
     );
     """
 
     execute """
     CREATE OPERATOR >= (
-        leftarg = money_with_currency,
+        leftarg = public.money_with_currency,
         rightarg = numeric,
         procedure = money_gte
     );
@@ -738,13 +738,13 @@ defmodule Fleetms.Repo.Migrations.InitializeAndAddAuthenticationResourcesAndAddP
     )
 
     # execute("DROP EXTENSION IF EXISTS \"citext\"")
-    execute "DROP OPERATOR >=(money_with_currency, money_with_currency);"
-    execute "DROP OPERATOR >=(money_with_currency, numeric);"
+    execute "DROP OPERATOR >=(public.money_with_currency, public.money_with_currency);"
+    execute "DROP OPERATOR >=(public.money_with_currency, numeric);"
 
     execute """
     CREATE OPERATOR >= (
-        leftarg = money_with_currency,
-        rightarg = money_with_currency,
+        leftarg = public.money_with_currency,
+        rightarg = public.money_with_currency,
         procedure = money_gt
     );
     """

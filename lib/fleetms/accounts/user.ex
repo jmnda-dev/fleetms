@@ -2,9 +2,9 @@ defmodule Fleetms.Accounts.User do
   use Ash.Resource,
     otp_app: :fleetms,
     domain: Fleetms.Accounts,
+    data_layer: AshPostgres.DataLayer,
     authorizers: [Ash.Policy.Authorizer],
-    extensions: [AshAuthentication],
-    data_layer: AshPostgres.DataLayer
+    extensions: [AshAuthentication]
 
   authentication do
     add_ons do
@@ -16,6 +16,8 @@ defmodule Fleetms.Accounts.User do
         monitor_fields [:email]
         confirm_on_create? true
         confirm_on_update? false
+        require_interaction? true
+        confirmed_at_field :confirmed_at
         auto_confirm_actions [:sign_in_with_magic_link, :reset_password_with_token]
         sender Fleetms.Accounts.User.Senders.SendNewUserConfirmationEmail
       end
@@ -32,6 +34,7 @@ defmodule Fleetms.Accounts.User do
     strategies do
       password :password do
         identity_field :email
+        hash_provider AshAuthentication.BcryptProvider
 
         resettable do
           sender Fleetms.Accounts.User.Senders.SendPasswordResetEmail
@@ -44,8 +47,14 @@ defmodule Fleetms.Accounts.User do
       magic_link do
         identity_field :email
         registration_enabled? true
+        require_interaction? true
 
         sender Fleetms.Accounts.User.Senders.SendMagicLinkEmail
+      end
+
+      api_key :api_key do
+        api_key_relationship :valid_api_keys
+        api_key_hash_attribute :api_key_hash
       end
     end
   end
@@ -258,6 +267,11 @@ defmodule Fleetms.Accounts.User do
 
       run AshAuthentication.Strategy.MagicLink.Request
     end
+
+    read :sign_in_with_api_key do
+      argument :api_key, :string, allow_nil?: false
+      prepare AshAuthentication.Strategy.ApiKey.SignInPreparation
+    end
   end
 
   policies do
@@ -280,6 +294,14 @@ defmodule Fleetms.Accounts.User do
 
     attribute :hashed_password, :string do
       sensitive? true
+    end
+
+    attribute :confirmed_at, :utc_datetime_usec
+  end
+
+  relationships do
+    has_many :valid_api_keys, Fleetms.Accounts.ApiKey do
+      filter expr(valid)
     end
   end
 

@@ -8,5 +8,6 @@ defmodule Fleetms.Accounts do
   resources do
     resource Fleetms.Accounts.Token
     resource Fleetms.Accounts.User
+    resource Fleetms.Accounts.ApiKey
   end
 end
