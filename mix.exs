@@ -75,7 +75,8 @@ defmodule Fleetms.MixProject do
       {:req, "~> 0.5.6"},
       {:faker, "~> 0.18"},
       {:live_toast, "~> 0.6.4"},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:igniter, "~> 0.7.9"}
     ]
   end
 
