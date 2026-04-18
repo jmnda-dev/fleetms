@@ -1,4 +1,7 @@
 # Fleetms
+## NOTE
+The code on this branch is old. It contains code for the first prototype I built. If you want to see the current development of this project, go to the `develop` branch [HERE](https://github.com/jmnda-dev/fleetms/tree/develop)
+
 ### About
 Fleetms is a Fleet Maintenance and Management software. Fleet in this context means Vehicles, that a company or person owns, and oversees the maintenance of such. This application is a free and open source and an alternative to other Fleet Management solutions out there. It is designed to streamline and optimize the operations of vehicle fleets, enhancing overall efficiency and improve resource allocation and reduce maintenance expenses. This software is a work in progress. I am are actively improving the code and adding new features.
 
@@ -40,9 +43,6 @@ This Fleet Management Software is created to solve the following problems:
 - Vehicle Tracking Module (Future Implementation)
   - Integration with third-party solutions for real-time vehicle tracking.
 
-
-### NOTE
-This project is a work in progress, and more details about the project will be added here. You can also take a look [HERE](https://github.com/users/jmnda-dev/projects/15/views/1)
 
 ## Technologies Used
 - [**Ash Framework**](https://ash-hq.org/)
