@@ -2,6 +2,10 @@
    https://tailwindcss.com/docs/configuration */
 
 @import "tailwindcss" source(none);
+@import "../vendor/fontawesome/css/brands.min.css";
+@import "../vendor/fontawesome/css/regular.min.css";
+@import "../vendor/fontawesome/css/solid.min.css";
+@import "../vendor/fontawesome/css/fontawesome.min.css";
 @source "../../deps/ash_authentication_phoenix";
 @source "../css";
 @source "../js";
