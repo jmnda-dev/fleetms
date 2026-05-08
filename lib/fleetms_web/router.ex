@@ -57,6 +57,7 @@ defmodule FleetmsWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    live "/component-showcase", ComponentShowcaseLive
     auth_routes AuthController, Fleetms.Accounts.User, path: "/auth"
     sign_out_route AuthController
 

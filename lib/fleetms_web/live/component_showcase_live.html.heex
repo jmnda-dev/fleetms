@@ -1,0 +1,658 @@
+<%!-- Flash toasts rendered via @flash (these are the real dismissable toasts) --%>
+<.flash kind={:info} flash={@flash} />
+<.flash kind={:error} flash={@flash} />
+
+<div class="max-w-5xl mx-auto px-6 py-10">
+  <%!-- ================================================================== --%>
+  <%!-- Page header & TOC                                                   --%>
+  <%!-- ================================================================== --%>
+  <div class="mb-14 pb-6 border-b">
+    <h1 class="text-3xl font-bold tracking-tight">Core Components Showcase</h1>
+    <p class="mt-2 text-sm text-base-content/60">
+      Visual reference for every component in <code class="font-mono bg-base-200 px-1 py-0.5 rounded text-xs">core_components.ex</code>.
+      Designed for iterative Flowbite migration — change a component style, reload, verify here.
+    </p>
+    <nav class="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-medium">
+      <a href="#flash" class="link link-hover">Flash</a><span class="text-base-content/25">·</span>
+      <a href="#buttons" class="link link-hover">Buttons</a><span class="text-base-content/25">·</span>
+      <a href="#header" class="link link-hover">Header</a><span class="text-base-content/25">·</span>
+      <a href="#inputs" class="link link-hover">Inputs</a><span class="text-base-content/25">·</span>
+      <a href="#form" class="link link-hover">Form (live)</a><span class="text-base-content/25">·</span>
+      <a href="#table" class="link link-hover">Table</a><span class="text-base-content/25">·</span>
+      <a href="#list" class="link link-hover">List</a><span class="text-base-content/25">·</span>
+      <a href="#icons" class="link link-hover">Icons</a>
+    </nav>
+  </div>
+
+  <%!-- ================================================================== --%>
+  <%!-- 1. Flash                                                            --%>
+  <%!-- ================================================================== --%>
+  <section id="flash" class="mb-16 scroll-mt-6">
+    <h2 class="text-xl font-bold mb-1">1 · Flash Messages</h2>
+    <p class="text-sm text-base-content/60 mb-6">
+      <code>flash/1</code>
+      — fixed-position toast (top-right).
+      Supports <code>kind={:info}</code>
+      and <code>kind={:error}</code>,
+      an optional <code>title</code>
+      attribute, and an <code>inner_block</code>
+      for static content. Dismisses on click.
+    </p>
+
+    <%!-- Trigger buttons --%>
+    <div class="mb-6">
+      <p class="text-xs font-semibold uppercase tracking-wide text-base-content/40 mb-3">
+        Dynamic (triggered via <code>put_flash/3</code>)
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <.button phx-click="show_flash_info">Trigger info flash</.button>
+        <.button phx-click="show_flash_error">Trigger error flash</.button>
+      </div>
+    </div>
+
+    <%!-- Static previews using inner_block — these render in the top-right corner --%>
+    <p class="text-xs font-semibold uppercase tracking-wide text-base-content/40 mb-3">
+      Static (inner_block — will appear top-right like a normal toast)
+    </p>
+    <.flash kind={:info} id="static-info-flash">
+      Info: Fleet sync completed for 42 vehicles.
+    </.flash>
+    <.flash kind={:info} id="static-info-title-flash" title="Driver added">
+      John Driver was created successfully.
+    </.flash>
+    <.flash kind={:error} id="static-error-flash">
+      Error: Could not connect to tracking service.
+    </.flash>
+    <.flash kind={:error} id="static-error-title-flash" title="Validation failed">
+      Please fix the errors in the form below.
+    </.flash>
+  </section>
+
+  <%!-- ================================================================== --%>
+  <%!-- 2. Buttons                                                          --%>
+  <%!-- ================================================================== --%>
+  <section id="buttons" class="mb-16 scroll-mt-6">
+    <h2 class="text-xl font-bold mb-1">2 · Buttons</h2>
+    <p class="text-sm text-base-content/60 mb-6">
+      <code>button/1</code>
+      — default renders as soft-primary. <code>variant="primary"</code>
+      renders as a solid primary button.
+      Pass <code>navigate</code>, <code>patch</code>, or <code>href</code>
+      to render as a <code>&lt;.link&gt;</code>
+      instead of a <code>&lt;button&gt;</code>.
+    </p>
+
+    <div class="border rounded-box p-6 space-y-6">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-base-content/40 mb-3">
+          Variants
+        </p>
+        <div class="flex flex-wrap items-center gap-3">
+          <.button>Default (soft)</.button>
+          <.button variant="primary">Primary</.button>
+        </div>
+      </div>
+
+      <div class="divider my-0" />
+
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-base-content/40 mb-3">
+          States
+        </p>
+        <div class="flex flex-wrap items-center gap-3">
+          <.button>Normal</.button>
+          <.button disabled>Disabled</.button>
+          <.button variant="primary" disabled>Primary disabled</.button>
+        </div>
+      </div>
+
+      <div class="divider my-0" />
+
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-base-content/40 mb-3">
+          As link (<code>navigate</code> / <code>href</code>)
+        </p>
+        <div class="flex flex-wrap items-center gap-3">
+          <.button navigate={~p"/"}>navigate={~p"/"}</.button>
+          <.button variant="primary" navigate={~p"/"}>Primary + navigate</.button>
+          <.button href="#buttons">href="#buttons"</.button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <%!-- ================================================================== --%>
+  <%!-- 3. Header                                                           --%>
+  <%!-- ================================================================== --%>
+  <section id="header" class="mb-16 scroll-mt-6">
+    <h2 class="text-xl font-bold mb-1">3 · Header</h2>
+    <p class="text-sm text-base-content/60 mb-6">
+      <code>header/1</code> — three slots: required <code>inner_block</code> (title),
+      optional <code>subtitle</code>, and optional <code>actions</code>.
+      When <code>actions</code> is present the header uses flexbox to push actions to the right.
+    </p>
+
+    <div class="border rounded-box divide-y">
+      <div class="p-6">
+        <p class="text-xs font-semibold uppercase tracking-wide text-base-content/40 mb-4">
+          Title only
+        </p>
+        <.header>Fleet Management</.header>
+      </div>
+
+      <div class="p-6">
+        <p class="text-xs font-semibold uppercase tracking-wide text-base-content/40 mb-4">
+          With subtitle
+        </p>
+        <.header>
+          Fleet Management
+          <:subtitle>Manage vehicles, drivers, and service jobs in one place.</:subtitle>
+        </.header>
+      </div>
+
+      <div class="p-6">
+        <p class="text-xs font-semibold uppercase tracking-wide text-base-content/40 mb-4">
+          With subtitle and actions
+        </p>
+        <.header>
+          Fleet Management
+          <:subtitle>Manage vehicles, drivers, and service jobs in one place.</:subtitle>
+          <:actions>
+            <.button variant="primary">
+              <.icon name="hero-plus" class="size-4 mr-1" /> Add Vehicle
+            </.button>
+          </:actions>
+        </.header>
+      </div>
+
+      <div class="p-6">
+        <p class="text-xs font-semibold uppercase tracking-wide text-base-content/40 mb-4">
+          Multiple actions
+        </p>
+        <.header>
+          Vehicles
+          <:subtitle>42 registered vehicles across all depots.</:subtitle>
+          <:actions>
+            <div class="flex gap-2">
+              <.button>Export CSV</.button>
+              <.button variant="primary">
+                <.icon name="hero-plus" class="size-4 mr-1" /> Add Vehicle
+              </.button>
+            </div>
+          </:actions>
+        </.header>
+      </div>
+    </div>
+  </section>
+
+  <%!-- ================================================================== --%>
+  <%!-- 4. Inputs (static – no live form)                                  --%>
+  <%!-- ================================================================== --%>
+  <section id="inputs" class="mb-16 scroll-mt-6">
+    <h2 class="text-xl font-bold mb-1">4 · Inputs</h2>
+    <p class="text-sm text-base-content/60 mb-6">
+      <code>input/1</code>
+      — every supported type rendered twice: clean (left) and
+      with injected errors (right). Accepts both a <code>field=@form[:x]</code>
+      struct and bare <code>name</code>/<code>value</code> attributes.
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <%!-- ---- Clean inputs ---- --%>
+      <div class="border rounded-box p-6">
+        <p class="text-xs font-semibold uppercase tracking-wide text-base-content/40 mb-5">
+          Clean state (no errors)
+        </p>
+
+        <.input type="text" name="c_text" id="c_text" label="Text" value="Toyota Hilux" />
+
+        <.input type="email" name="c_email" id="c_email" label="Email" value="driver@fleetms.com" />
+
+        <.input type="password" name="c_pass" id="c_pass" label="Password" value="hunter2" />
+
+        <.input type="number" name="c_num" id="c_num" label="Number" value={42} />
+
+        <.input type="date" name="c_date" id="c_date" label="Date" value="2024-06-15" />
+
+        <.input
+          type="datetime-local"
+          name="c_dt"
+          id="c_dt"
+          label="Datetime local"
+          value="2024-06-15T09:00"
+        />
+
+        <.input
+          type="url"
+          name="c_url"
+          id="c_url"
+          label="URL"
+          value="https://fleetms.example.com"
+        />
+
+        <.input type="tel" name="c_tel" id="c_tel" label="Phone" value="+260 97 1234567" />
+
+        <.input type="search" name="c_search" id="c_search" label="Search" value="Toyota" />
+
+        <.input type="color" name="c_color" id="c_color" label="Colour" value="#1d4ed8" />
+
+        <.input
+          type="select"
+          name="c_select"
+          id="c_select"
+          label="Select"
+          options={[{"Driver", "driver"}, {"Mechanic", "mechanic"}, {"Manager", "manager"}]}
+          value="mechanic"
+        />
+
+        <.input
+          type="textarea"
+          name="c_textarea"
+          id="c_textarea"
+          label="Textarea"
+          value="Vehicle in good condition. Minor scratch on rear bumper noted at last inspection."
+        />
+
+        <.input
+          type="checkbox"
+          name="c_checkbox"
+          id="c_checkbox"
+          label="Mark as active"
+          value={true}
+        />
+      </div>
+
+      <%!-- ---- Inputs with errors ---- --%>
+      <div class="border rounded-box p-6">
+        <p class="text-xs font-semibold uppercase tracking-wide text-base-content/40 mb-5">
+          Error state
+        </p>
+
+        <.input
+          type="text"
+          name="e_text"
+          id="e_text"
+          label="Text"
+          value="A"
+          errors={["must be at least 2 characters"]}
+        />
+
+        <.input
+          type="email"
+          name="e_email"
+          id="e_email"
+          label="Email"
+          value="not-an-email"
+          errors={["must include @"]}
+        />
+
+        <.input
+          type="password"
+          name="e_pass"
+          id="e_pass"
+          label="Password"
+          value=""
+          errors={["is required"]}
+        />
+
+        <.input
+          type="number"
+          name="e_num"
+          id="e_num"
+          label="Number"
+          value={999}
+          errors={["must be between 18 and 99"]}
+        />
+
+        <.input
+          type="date"
+          name="e_date"
+          id="e_date"
+          label="Date"
+          value=""
+          errors={["is required"]}
+        />
+
+        <.input
+          type="datetime-local"
+          name="e_dt"
+          id="e_dt"
+          label="Datetime local"
+          value=""
+          errors={["is required"]}
+        />
+
+        <.input
+          type="url"
+          name="e_url"
+          id="e_url"
+          label="URL"
+          value="not-a-url"
+          errors={["must be a valid URL"]}
+        />
+
+        <.input
+          type="tel"
+          name="e_tel"
+          id="e_tel"
+          label="Phone"
+          value="123"
+          errors={["invalid phone number format"]}
+        />
+
+        <.input
+          type="search"
+          name="e_search"
+          id="e_search"
+          label="Search"
+          value=""
+          errors={["can't be blank"]}
+        />
+
+        <.input
+          type="color"
+          name="e_color"
+          id="e_color"
+          label="Colour"
+          value=""
+          errors={["is required"]}
+        />
+
+
+        <.input
+          type="select"
+          name="e_select"
+          id="e_select"
+          label="Select"
+          options={[{"— pick one —", ""}, {"Driver", "driver"}, {"Mechanic", "mechanic"}]}
+          value=""
+          errors={["is required"]}
+        />
+
+        <.input
+          type="textarea"
+          name="e_textarea"
+          id="e_textarea"
+          label="Textarea"
+          value=""
+          errors={["is required"]}
+        />
+
+        <.input
+          type="checkbox"
+          name="e_checkbox"
+          id="e_checkbox"
+          label="Mark as active"
+          value={false}
+          errors={["must be accepted before saving"]}
+        />
+      </div>
+    </div>
+  </section>
+
+  <%!-- ================================================================== --%>
+  <%!-- 5. Live Form (with real-time validation)                            --%>
+  <%!-- ================================================================== --%>
+  <section id="form" class="mb-16 scroll-mt-6">
+    <h2 class="text-xl font-bold mb-1">5 · Form (live-validated)</h2>
+    <p class="text-sm text-base-content/60 mb-6">
+      A full form backed by an Ecto embedded schema. Uses <code>phx-change="validate"</code>
+      for real-time error feedback and <code>phx-submit="submit_form"</code>. Try submitting with empty fields or
+      with <em>Age = 200</em>
+      to see error styling.
+      A successful submission triggers an info flash and resets the form.
+    </p>
+
+    <div class="border rounded-box p-6 max-w-lg">
+      <.form :let={f} for={@live_form} phx-change="validate" phx-submit="submit_form">
+        <.input
+          field={f[:full_name]}
+          label="Full name"
+          placeholder="e.g. John Driver"
+        />
+
+        <.input
+          field={f[:email]}
+          type="email"
+          label="Email address"
+          placeholder="john@fleetms.com"
+        />
+
+        <.input
+          field={f[:password]}
+          type="password"
+          label="Password"
+          placeholder="••••••••"
+        />
+
+        <.input
+          field={f[:age]}
+          type="number"
+          label="Age"
+          placeholder="25"
+        />
+
+        <.input
+          field={f[:role]}
+          type="select"
+          label="Role"
+          options={FleetmsWeb.ComponentShowcaseLive.ShowcaseForm.role_options()}
+        />
+
+        <.input
+          field={f[:start_date]}
+          type="date"
+          label="Start date"
+        />
+
+        <.input
+          field={f[:bio]}
+          type="textarea"
+          label="Bio (optional)"
+          placeholder="A short note about this person…"
+        />
+
+        <.input
+          field={f[:agreed]}
+          type="checkbox"
+          label="I agree to the terms of service"
+        />
+
+        <div class="mt-6 flex flex-wrap gap-3">
+          <.button type="submit" variant="primary">Submit form</.button>
+          <.button type="reset">Reset</.button>
+        </div>
+      </.form>
+    </div>
+  </section>
+
+  <%!-- ================================================================== --%>
+  <%!-- 6. Table                                                            --%>
+  <%!-- ================================================================== --%>
+  <section id="table" class="mb-16 scroll-mt-6">
+    <h2 class="text-xl font-bold mb-1">6 · Table</h2>
+    <p class="text-sm text-base-content/60 mb-6">
+      <code>table/1</code>
+      — click any data row to see the <code>row_click</code>
+      handler fire (triggers an info flash).
+      The last column demonstrates the <code>:action</code>
+      slot with two action buttons.
+    </p>
+
+    <.table
+      id="vehicles-table"
+      rows={@vehicles}
+      row_id={fn row -> "vehicle-#{row.id}" end}
+      row_click={fn row -> JS.push("row_click", value: %{"vehicle-id" => row.id}) end}
+    >
+      <:col :let={v} label="Plate">
+        <span class="font-mono text-sm">{v.plate}</span>
+      </:col>
+      <:col :let={v} label="Make">{v.make}</:col>
+      <:col :let={v} label="Model">{v.model}</:col>
+      <:col :let={v} label="Year">{v.year}</:col>
+      <:col :let={v} label="Status">
+        <span class={[
+          "badge badge-sm",
+          v.status == "Active" && "badge-success",
+          v.status == "In Service" && "badge-warning",
+          v.status == "Inactive" && "badge-ghost"
+        ]}>
+          {v.status}
+        </span>
+      </:col>
+      <:action :let={v}>
+        <.button phx-click={JS.push("row_click", value: %{"vehicle-id" => v.id})}>
+          View
+        </.button>
+      </:action>
+      <:action :let={_v}>
+        <.button variant="primary">Edit</.button>
+      </:action>
+    </.table>
+  </section>
+
+  <%!-- ================================================================== --%>
+  <%!-- 7. List                                                             --%>
+  <%!-- ================================================================== --%>
+  <section id="list" class="mb-16 scroll-mt-6">
+    <h2 class="text-xl font-bold mb-1">7 · List</h2>
+    <p class="text-sm text-base-content/60 mb-6">
+      <code>list/1</code>
+      — a data list. Each <code>:item</code>
+      slot requires a <code>title</code>
+      attribute; the slot body is the value.
+    </p>
+
+    <div class="max-w-lg">
+      <.list>
+        <:item :for={item <- @fleet_summary} title={item.title}>
+          {item.value}
+        </:item>
+      </.list>
+    </div>
+  </section>
+
+  <%!-- ================================================================== --%>
+  <%!-- 8. Icons                                                            --%>
+  <%!-- ================================================================== --%>
+  <section id="icons" class="mb-16 scroll-mt-6">
+    <h2 class="text-xl font-bold mb-1">8 · Icons</h2>
+    <p class="text-sm text-base-content/60 mb-6">
+      <code>icon/1</code>
+      — sourced from <a href="https://heroicons.com" target="_blank" class="link">Heroicons</a>.
+      Three style suffixes: outline (default, <code>hero-*</code>),
+      solid (<code>hero-*-solid</code>), mini (<code>hero-*-mini</code>).
+      Control size and colour with the <code>class</code>
+      attribute.
+    </p>
+
+    <%!-- Outline --%>
+    <h3 class="text-sm font-semibold mb-3 mt-6">
+      Outline
+      <span class="font-normal text-base-content/50">(default — <code>hero-NAME</code>)</span>
+    </h3>
+    <div class="flex flex-wrap gap-5 mb-10">
+      <%= for icon_name <- ~w(
+          hero-home hero-user hero-users hero-truck hero-wrench-screwdriver
+          hero-cog-6-tooth hero-bell hero-magnifying-glass hero-plus hero-pencil
+          hero-trash hero-check hero-x-mark hero-arrow-path hero-information-circle
+          hero-exclamation-circle hero-exclamation-triangle hero-check-circle
+          hero-eye hero-eye-slash hero-document-text hero-folder hero-calendar-days
+          hero-clock hero-map-pin hero-phone hero-envelope hero-link hero-bars-3
+          hero-chevron-right hero-chevron-down hero-arrow-left hero-arrow-right
+          hero-funnel hero-cloud-arrow-up hero-shield-check hero-key
+          hero-lock-closed hero-lock-open hero-chart-bar hero-table-cells
+        ) do %>
+        <div class="flex flex-col items-center gap-1.5 w-14 text-center" title={icon_name}>
+          <.icon name={icon_name} class="size-6" />
+          <span class="text-[10px] text-base-content/50 break-all leading-tight">
+            {String.replace_prefix(icon_name, "hero-", "")}
+          </span>
+        </div>
+      <% end %>
+    </div>
+
+    <%!-- Solid --%>
+    <h3 class="text-sm font-semibold mb-3">
+      Solid <span class="font-normal text-base-content/50">(<code>hero-NAME-solid</code>)</span>
+    </h3>
+    <div class="flex flex-wrap gap-5 mb-10">
+      <%= for icon_name <- ~w(
+          hero-home-solid hero-user-solid hero-truck-solid hero-bell-solid
+          hero-check-circle-solid hero-exclamation-circle-solid hero-x-circle-solid
+          hero-star-solid hero-shield-check-solid hero-lock-closed-solid
+          hero-magnifying-glass-solid hero-funnel-solid hero-chart-bar-solid
+        ) do %>
+        <div class="flex flex-col items-center gap-1.5 w-14 text-center" title={icon_name}>
+          <.icon name={icon_name} class="size-6" />
+          <span class="text-[10px] text-base-content/50 break-all leading-tight">
+            {String.replace_prefix(icon_name, "hero-", "")}
+          </span>
+        </div>
+      <% end %>
+    </div>
+
+    <%!-- Mini --%>
+    <h3 class="text-sm font-semibold mb-3">
+      Mini <span class="font-normal text-base-content/50">(<code>hero-NAME-mini</code>)</span>
+    </h3>
+    <div class="flex flex-wrap gap-5 mb-10">
+      <%= for icon_name <- ~w(
+          hero-home-mini hero-user-mini hero-truck-mini hero-bell-mini
+          hero-plus-mini hero-x-mark-mini hero-check-mini hero-pencil-mini
+          hero-trash-mini hero-magnifying-glass-mini hero-arrow-path-mini
+          hero-funnel-mini hero-chevron-right-mini hero-chevron-down-mini
+        ) do %>
+        <div class="flex flex-col items-center gap-1.5 w-14 text-center" title={icon_name}>
+          <.icon name={icon_name} class="size-5" />
+          <span class="text-[10px] text-base-content/50 break-all leading-tight">
+            {String.replace_prefix(icon_name, "hero-", "")}
+          </span>
+        </div>
+      <% end %>
+    </div>
+
+    <%!-- Size variants --%>
+    <h3 class="text-sm font-semibold mb-3">Size variants</h3>
+    <div class="flex items-end gap-6">
+      <%= for {size_class, label} <- [
+            {"size-3",  "size-3"},
+            {"size-4",  "size-4 (default)"},
+            {"size-5",  "size-5"},
+            {"size-6",  "size-6"},
+            {"size-8",  "size-8"},
+            {"size-10", "size-10"},
+            {"size-14", "size-14"}
+          ] do %>
+        <div class="flex flex-col items-center gap-1.5">
+          <.icon name="hero-truck" class={size_class} />
+          <span class="text-[10px] text-base-content/50 whitespace-nowrap">{label}</span>
+        </div>
+      <% end %>
+    </div>
+
+    <%!-- Colour variants --%>
+    <h3 class="text-sm font-semibold mt-8 mb-3">Colour via Tailwind text-* classes</h3>
+    <div class="flex flex-wrap items-center gap-4">
+      <%= for {colour_class, label} <- [
+            {"text-base-content",   "base-content (default)"},
+            {"text-primary",        "text-primary"},
+            {"text-secondary",      "text-secondary"},
+            {"text-accent",         "text-accent"},
+            {"text-success",        "text-success"},
+            {"text-warning",        "text-warning"},
+            {"text-error",          "text-error"},
+            {"text-info",           "text-info"}
+          ] do %>
+        <div class="flex flex-col items-center gap-1.5">
+          <.icon name="hero-truck-solid" class={["size-7", colour_class]} />
+          <span class="text-[10px] text-base-content/50 whitespace-nowrap">{label}</span>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <%!-- Bottom spacer --%>
+  <div class="h-24" />
+</div>
