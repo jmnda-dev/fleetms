@@ -12,7 +12,7 @@ defmodule Fleetms.VehicleManagement.RenewalDigest do
 
   import Swoosh.Email
 
-  alias Fleetms.{Accounts, Mailer}
+  alias Fleetms.{Accounts, Emails, Mailer}
   alias Fleetms.VehicleManagement.VehicleRenewal
 
   @due_statuses ["Due Soon", "Overdue"]
@@ -77,16 +77,16 @@ defmodule Fleetms.VehicleManagement.RenewalDigest do
       Enum.map_join(renewals, "", fn renewal ->
         """
         <tr>
-          <td>#{renewal.vehicle.name}</td>
-          <td>#{renewal.renewal_type.name}</td>
-          <td>#{renewal.due_date}</td>
-          <td>#{renewal.status}</td>
+          <td>#{Emails.escape(renewal.vehicle.name)}</td>
+          <td>#{Emails.escape(renewal.renewal_type.name)}</td>
+          <td>#{Emails.escape(renewal.due_date)}</td>
+          <td>#{Emails.escape(renewal.status)}</td>
         </tr>
         """
       end)
 
     """
-    <h2>Renewals due for #{org.name}</h2>
+    <h2>Renewals due for #{Emails.escape(org.name)}</h2>
     <p>The following vehicle renewals are due soon or overdue:</p>
     <table>
       <thead>

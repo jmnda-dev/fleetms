@@ -15,6 +15,7 @@ defmodule Fleetms.Inventory.LowStockDigest do
   import Swoosh.Email
 
   alias Fleetms.Accounts
+  alias Fleetms.Emails
   alias Fleetms.Inventory.Part
   alias Fleetms.Mailer
 
@@ -81,17 +82,17 @@ defmodule Fleetms.Inventory.LowStockDigest do
       Enum.map_join(parts, "", fn part ->
         """
         <tr>
-          <td>#{part.part_number}</td>
-          <td>#{part.name}</td>
-          <td>#{qty(part.total_stock)}</td>
-          <td>#{qty(part.quantity_threshold)}</td>
-          <td>#{part.stock_status}</td>
+          <td>#{Emails.escape(part.part_number)}</td>
+          <td>#{Emails.escape(part.name)}</td>
+          <td>#{Emails.escape(qty(part.total_stock))}</td>
+          <td>#{Emails.escape(qty(part.quantity_threshold))}</td>
+          <td>#{Emails.escape(part.stock_status)}</td>
         </tr>
         """
       end)
 
     """
-    <h2>Low stock for #{org.name}</h2>
+    <h2>Low stock for #{Emails.escape(org.name)}</h2>
     <p>The following parts are at or below their reorder threshold:</p>
     <table>
       <thead>

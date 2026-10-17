@@ -102,6 +102,13 @@ defmodule Fleetms.Emails do
     """
   end
 
-  defp esc(nil), do: ""
-  defp esc(value), do: value |> to_string() |> Plug.HTML.html_escape()
+  @doc """
+  HTML-escapes a value for safe interpolation into an email HTML body. Use this for
+  any user-supplied text (vehicle/part/org names, titles, assignee names, etc.) in
+  the hand-built HTML digests, the same way `action_email/1` escapes its own inputs.
+  """
+  def escape(nil), do: ""
+  def escape(value), do: value |> to_string() |> Plug.HTML.html_escape()
+
+  defp esc(value), do: escape(value)
 end

@@ -14,7 +14,7 @@ defmodule Fleetms.Maintenance.ReminderDigest do
 
   import Swoosh.Email
 
-  alias Fleetms.{Accounts, Mailer}
+  alias Fleetms.{Accounts, Emails, Mailer}
   alias Fleetms.Maintenance.ServiceReminder
 
   @due_statuses [:due_soon, :overdue]
@@ -79,16 +79,16 @@ defmodule Fleetms.Maintenance.ReminderDigest do
       Enum.map_join(reminders, "", fn reminder ->
         """
         <tr>
-          <td>#{reminder.vehicle_name}</td>
-          <td>#{reminder.service_task_name}</td>
-          <td>#{next_due(reminder)}</td>
-          <td>#{humanize(reminder.due_status)}</td>
+          <td>#{Emails.escape(reminder.vehicle_name)}</td>
+          <td>#{Emails.escape(reminder.service_task_name)}</td>
+          <td>#{Emails.escape(next_due(reminder))}</td>
+          <td>#{Emails.escape(humanize(reminder.due_status))}</td>
         </tr>
         """
       end)
 
     """
-    <h2>Service due for #{org.name}</h2>
+    <h2>Service due for #{Emails.escape(org.name)}</h2>
     <p>The following vehicle service tasks are due soon or overdue:</p>
     <table>
       <thead>

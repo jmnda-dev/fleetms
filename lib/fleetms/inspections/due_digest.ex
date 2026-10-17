@@ -13,7 +13,7 @@ defmodule Fleetms.Inspections.DueDigest do
 
   import Swoosh.Email
 
-  alias Fleetms.{Accounts, Mailer}
+  alias Fleetms.{Accounts, Emails, Mailer}
   alias Fleetms.Inspections.InspectionAssignment
 
   # How far ahead of the due date an open assignment starts appearing in the digest.
@@ -86,17 +86,17 @@ defmodule Fleetms.Inspections.DueDigest do
       Enum.map_join(assignments, "", fn assignment ->
         """
         <tr>
-          <td>#{assignment.vehicle.name}</td>
-          <td>#{assignment.inspection_form.title}</td>
-          <td>#{assignment.due_on}</td>
-          <td>#{status_label(assignment.status)}</td>
-          <td>#{assignee_name(assignment)}</td>
+          <td>#{Emails.escape(assignment.vehicle.name)}</td>
+          <td>#{Emails.escape(assignment.inspection_form.title)}</td>
+          <td>#{Emails.escape(assignment.due_on)}</td>
+          <td>#{Emails.escape(status_label(assignment.status))}</td>
+          <td>#{Emails.escape(assignee_name(assignment))}</td>
         </tr>
         """
       end)
 
     """
-    <h2>Inspections due for #{org.name}</h2>
+    <h2>Inspections due for #{Emails.escape(org.name)}</h2>
     <p>The following inspections are due soon or overdue:</p>
     <table>
       <thead>
