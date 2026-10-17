@@ -176,9 +176,9 @@ notifications. It has not yet been used by a real fleet in production.
 
 ## License
 
-> **To be decided.** This repository is currently published without a license, which
-> means default copyright applies (all rights reserved) until one is added. A license
-> will be chosen before this is promoted for wider use.
+Released under the [MIT License](LICENSE) — you are free to use, copy, modify, and
+distribute it, including commercially. It is provided "as is", with no warranty; see
+the "About this project" note near the top before relying on it for anything real.
 
 ---
 

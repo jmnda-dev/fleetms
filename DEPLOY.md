@@ -165,6 +165,18 @@ Sign in with the seeded accounts:
   512 MB; `fly.toml` sets the app VM to 1 GB, which is comfortable. The **Postgres**
   machine also needs 1 GB — its `shared-cpu-1x` default of 256 MB OOM-kills
   `postgres-flex` (see step 2).
+- **Metrics endpoint (`/metrics`).** PromEx serves Prometheus metrics at `/metrics`
+  for scraping. These contain operational data (request rates, route names, VM and
+  job stats), so the endpoint should not be publicly reachable. Lock it down one of
+  two ways:
+  1. **Firewall/proxy** — the usual setup: only let your Prometheus scraper reach
+     `/metrics` (private network, or block the path at the reverse proxy). Nothing to
+     configure in the app.
+  2. **Scrape token** — set `PROMETHEUS_METRICS_TOKEN` (e.g.
+     `fly secrets set PROMETHEUS_METRICS_TOKEN=$(openssl rand -hex 32)`) and the app
+     requires `Authorization: Bearer <token>` on `/metrics`; configure the same
+     bearer token on the Prometheus scrape job. Left unset, `/metrics` stays open
+     (handy in local dev), so rely on option 1 if you don't set a token.
 - **Health check:** Fly polls `GET /health` (a dependency-free 200).
 - **Logs / console:** `fly logs` and `fly ssh console`.
 - **If the `release_command` migrate fails with `:nxdomain`** resolving the DB

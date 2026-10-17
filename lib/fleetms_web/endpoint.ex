@@ -65,9 +65,11 @@ defmodule FleetmsWeb.Endpoint do
   plug Plug.Head
   plug Plug.Session, @session_options
 
-  # Serve Prometheus metrics at /metrics (see Fleetms.PromEx). This endpoint is
-  # unauthenticated, so keep it internal-only / firewalled in production
-  # (e.g. block /metrics at the reverse proxy, or scrape it over a private network).
+  # Serve Prometheus metrics at /metrics (see Fleetms.PromEx). PromEx.Plug does no
+  # auth of its own, so MetricsAuth runs first: set PROMETHEUS_METRICS_TOKEN to
+  # require `Authorization: Bearer <token>` on /metrics, or leave it unset and lock
+  # the endpoint down at the firewall/proxy instead (standard for a scrape target).
+  plug FleetmsWeb.Plugs.MetricsAuth
   plug PromEx.Plug, prom_ex_module: Fleetms.PromEx
 
   plug FleetmsWeb.Router

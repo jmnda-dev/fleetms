@@ -41,6 +41,13 @@ end
 config :fleetms, FleetmsWeb.Endpoint,
   http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
+# Optional scrape token for the Prometheus /metrics endpoint (any env). When set,
+# FleetmsWeb.Plugs.MetricsAuth requires `Authorization: Bearer <token>` on /metrics.
+# When unset, /metrics stays open and should be locked down at the firewall/proxy.
+if metrics_token = System.get_env("PROMETHEUS_METRICS_TOKEN") do
+  config :fleetms, :prometheus_metrics_token, metrics_token
+end
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
