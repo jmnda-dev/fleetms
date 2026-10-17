@@ -1,0 +1,25 @@
+meta {
+  name: issue: restore
+  type: http
+  seq: 9
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/issues/:id/restore
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "issue",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

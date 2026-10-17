@@ -1,0 +1,20 @@
+meta {
+  name: Create service group
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/service-groups
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "data": {
+      "type": "service-group",
+      "attributes": {}
+    }
+  }
+}

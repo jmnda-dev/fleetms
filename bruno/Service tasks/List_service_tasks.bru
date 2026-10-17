@@ -1,0 +1,11 @@
+meta {
+  name: List service tasks
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/service-tasks
+  body: none
+  auth: inherit
+}

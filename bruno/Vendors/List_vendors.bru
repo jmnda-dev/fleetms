@@ -1,0 +1,11 @@
+meta {
+  name: List vendors
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/vendors
+  body: none
+  auth: inherit
+}

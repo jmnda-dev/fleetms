@@ -1,0 +1,20 @@
+meta {
+  name: Create contact
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/contacts
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "data": {
+      "type": "contact",
+      "attributes": {}
+    }
+  }
+}

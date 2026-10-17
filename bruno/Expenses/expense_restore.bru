@@ -1,0 +1,25 @@
+meta {
+  name: expense: restore
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/expenses/:id/restore
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "expense",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

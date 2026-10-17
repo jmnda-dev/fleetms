@@ -1,0 +1,25 @@
+meta {
+  name: inventory location: restore
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/inventory-locations/:id/restore
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "inventory-location",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

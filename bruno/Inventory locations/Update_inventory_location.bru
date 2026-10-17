@@ -1,0 +1,25 @@
+meta {
+  name: Update inventory location
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/inventory-locations/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "inventory-location",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

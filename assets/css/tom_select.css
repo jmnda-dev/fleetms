@@ -1,0 +1,121 @@
+/* Tom Select theming.
+   Structural rules (flex layout, dropdown positioning, etc.) come from the
+   imported base `tom-select/dist/css/tom-select.css`. This file only restyles
+   colours, borders, radius, focus and dark mode so every searchable select
+   matches the Flowbite `<.input>` controls and dropdowns — in both modes. */
+
+.ts-wrapper {
+  @apply text-sm;
+}
+
+/* The control box mirrors the native <.input type="select"> styling, including its
+   `py-2.5` height so searchable selects line up with the other form controls. */
+.ts-control {
+  @apply block w-full px-3 py-2.5 gap-1 bg-neutral-secondary-medium border border-default-medium text-heading rounded-base shadow-xs;
+}
+
+/* Tom Select adds `.full` to the wrapper once a value is selected, and the base
+   package CSS then forces `.full .ts-control { background-color: #fff }`. That
+   selector outranks our plain `.ts-control` rule, so a filled control rendered
+   white in dark mode. Re-assert our token at higher specificity. */
+.ts-wrapper.full .ts-control {
+  @apply bg-neutral-secondary-medium;
+}
+
+/* While typing (the control is `input-active`, e.g. focused with the dropdown
+   open) the base package forces `.ts-wrapper.single.input-active .ts-control {
+   background: #fff }`, which in dark mode painted the control white while the
+   typed text stayed light — invisible. Re-assert our token at matching
+   specificity so the field stays readable in both modes. */
+.ts-wrapper.single.input-active .ts-control {
+  @apply bg-neutral-secondary-medium;
+}
+
+.ts-wrapper.focus .ts-control {
+  @apply ring-1 ring-brand border-brand;
+}
+
+.ts-control input {
+  @apply text-heading;
+}
+
+.ts-control input::placeholder,
+.ts-control .ts-placeholder {
+  @apply text-body;
+}
+
+/* Invalid state, driven by the component's data-invalid wrapper attribute.
+   The error text below is rendered server-side outside the ignored container. */
+[data-invalid="true"] .ts-control {
+  @apply border-danger;
+}
+
+[data-invalid="true"] .ts-wrapper.focus .ts-control {
+  @apply ring-danger border-danger;
+}
+
+/* Single-select chosen value. */
+.ts-wrapper.single .ts-control .item {
+  @apply text-heading;
+}
+
+/* Multi-select chips. */
+.ts-wrapper.multi .ts-control > .item {
+  @apply inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-base bg-brand-softer text-fg-brand;
+}
+
+.ts-wrapper.multi .ts-control > .item.active {
+  @apply bg-brand text-white;
+}
+
+.ts-wrapper.multi .ts-control > .item .remove {
+  @apply ml-1 border-0 text-fg-brand hover:text-fg-brand-strong;
+}
+
+.ts-wrapper.multi .ts-control > .item.active .remove {
+  @apply text-white;
+}
+
+/* Dropdown panel — matches the Flowbite dropdown surface. */
+.ts-dropdown {
+  @apply mt-1 bg-white dark:bg-gray-800 border border-default rounded-base shadow-lg text-sm text-body;
+}
+
+.ts-dropdown .option {
+  @apply px-3 py-2 cursor-pointer text-body;
+}
+
+.ts-dropdown .option.active {
+  @apply bg-gray-50 dark:bg-gray-700 text-heading;
+}
+
+.ts-dropdown .option[aria-selected="true"] {
+  @apply font-medium text-heading;
+}
+
+.ts-dropdown .create {
+  @apply px-3 py-2 text-brand;
+}
+
+.ts-dropdown .create.active {
+  @apply bg-gray-50 dark:bg-gray-700;
+}
+
+.ts-dropdown .no-results,
+.ts-dropdown .optgroup-header {
+  @apply px-3 py-2 text-body;
+}
+
+/* Disabled. */
+.ts-wrapper.disabled .ts-control {
+  @apply opacity-60 cursor-not-allowed;
+}
+
+/* Rich two-line options (name + muted subtitle), used by <.search_select rich>. */
+.ts-rich-title {
+  @apply text-sm font-medium text-heading;
+}
+
+.ts-rich-sub {
+  @apply text-xs text-body;
+}

@@ -1,0 +1,25 @@
+meta {
+  name: part: restore
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/parts/:id/restore
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "part",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

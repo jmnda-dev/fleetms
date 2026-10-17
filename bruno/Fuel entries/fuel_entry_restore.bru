@@ -1,0 +1,25 @@
+meta {
+  name: fuel entry: restore
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/fuel-entries/:id/restore
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "fuel-entry",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

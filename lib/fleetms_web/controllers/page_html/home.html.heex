@@ -1,0 +1,253 @@
+<div class="min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
+  <Layouts.flash_group flash={@flash} />
+
+  <%!-- Header --%>
+  <header class="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-700 dark:bg-gray-900/90">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+      <.link navigate={~p"/"} class="flex items-center">
+        <img src={~p"/images/logo_light.svg"} class="h-10 dark:hidden" alt={gettext("FleetMS")} />
+        <img
+          src={~p"/images/logo_dark.svg"}
+          class="hidden h-10 dark:block"
+          alt={gettext("FleetMS")}
+        />
+      </.link>
+
+      <div class="flex items-center gap-1">
+        <a
+          href="#features"
+          class="hidden rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white sm:block"
+        >
+          {gettext("Features")}
+        </a>
+
+        <%!-- Dark mode toggle (handled by layout.js) --%>
+        <button
+          id="theme-toggle"
+          type="button"
+          class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-800 dark:focus:ring-gray-700"
+        >
+          <span class="sr-only">{gettext("Toggle dark mode")}</span>
+          <i id="theme-toggle-dark-icon" class="fa-solid fa-moon hidden text-xl"></i>
+          <i id="theme-toggle-light-icon" class="fa-solid fa-sun hidden text-xl"></i>
+        </button>
+
+        <Layouts.theme_selector />
+
+        <.link
+          navigate={@dashboard_path || ~p"/sign-in"}
+          class="ml-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white dark:text-primary-900 hover:bg-brand-strong focus:outline-none focus:ring-2 focus:ring-primary-300 dark:focus:ring-primary-800"
+        >
+          {if @dashboard_path, do: gettext("Go to dashboard"), else: gettext("Sign in")}
+        </.link>
+      </div>
+    </nav>
+  </header>
+
+  <%!-- Hero --%>
+  <section class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+    <div class="mx-auto max-w-3xl text-center">
+      <span class="inline-flex items-center gap-2 rounded-full bg-primary-50 px-3 py-1 text-sm font-medium text-primary-700 dark:bg-gray-800 dark:text-brand">
+        <i class="fa-solid fa-truck-fast"></i>
+        {gettext("Free and open source fleet software")}
+      </span>
+
+      <h1 class="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
+        {gettext("Keep your vehicles running, without the spreadsheets")}
+      </h1>
+
+      <p class="mx-auto mt-6 max-w-2xl text-lg text-gray-600 dark:text-gray-300">
+        {gettext(
+          "FleetMS helps you manage the vehicles you own and stay on top of their upkeep. Track inspections, maintenance, repairs, parts and fuel in one place, so nothing slips through the cracks."
+        )}
+      </p>
+
+      <div class="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <.link
+          :if={@dashboard_path}
+          navigate={@dashboard_path}
+          class="w-full rounded-lg bg-brand px-6 py-3 text-center font-medium text-white dark:text-primary-900 hover:bg-brand-strong focus:outline-none focus:ring-2 focus:ring-primary-300 dark:focus:ring-primary-800 sm:w-auto"
+        >
+          {gettext("Go to dashboard")}
+        </.link>
+        <.link
+          :if={is_nil(@dashboard_path) and Fleetms.FeatureFlags.user_registration?()}
+          navigate={~p"/register"}
+          class="w-full rounded-lg bg-brand px-6 py-3 text-center font-medium text-white dark:text-primary-900 hover:bg-brand-strong focus:outline-none focus:ring-2 focus:ring-primary-300 dark:focus:ring-primary-800 sm:w-auto"
+        >
+          {gettext("Get started")}
+        </.link>
+        <.link
+          :if={is_nil(@dashboard_path)}
+          navigate={~p"/sign-in"}
+          class="w-full rounded-lg border border-gray-300 px-6 py-3 text-center font-medium text-gray-900 hover:bg-gray-100 dark:border-gray-600 dark:text-white dark:hover:bg-gray-800 sm:w-auto"
+        >
+          {gettext("Sign in")}
+        </.link>
+      </div>
+    </div>
+  </section>
+
+  <%!-- Problems it solves --%>
+  <section class="border-y border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50">
+    <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-2xl text-center">
+        <h2 class="text-3xl font-bold tracking-tight">{gettext("What it helps with")}</h2>
+        <p class="mt-4 text-gray-600 dark:text-gray-300">
+          {gettext(
+            "Running a fleet means a lot of moving parts. FleetMS gives you one tidy place for the work that keeps vehicles on the road."
+          )}
+        </p>
+      </div>
+
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <.problem_card icon="fa-list-check" title={gettext("Stay organised")}>
+          {gettext(
+            "Keep every vehicle, document and record in one system instead of scattered spreadsheets and folders."
+          )}
+        </.problem_card>
+        <.problem_card icon="fa-bell" title={gettext("Never miss a renewal")}>
+          {gettext(
+            "Set reminders for insurance, inspections and services, and get a heads-up before they are due."
+          )}
+        </.problem_card>
+        <.problem_card icon="fa-screwdriver-wrench" title={gettext("Track maintenance")}>
+          {gettext(
+            "Log issues, plan services and record repair work so you always know each vehicle's history."
+          )}
+        </.problem_card>
+        <.problem_card icon="fa-warehouse" title={gettext("Control parts and stock")}>
+          {gettext(
+            "Know which parts you have, where they are stored, and what gets used on each job."
+          )}
+        </.problem_card>
+        <.problem_card icon="fa-gas-pump" title={gettext("Watch fuel costs")}>
+          {gettext(
+            "Record fuel entries to spot trends in spending and efficiency across your fleet."
+          )}
+        </.problem_card>
+        <.problem_card icon="fa-chart-area" title={gettext("Make better decisions")}>
+          {gettext(
+            "Turn your day-to-day records into reports that show where time and money are going."
+          )}
+        </.problem_card>
+      </div>
+    </div>
+  </section>
+
+  <%!-- Feature modules --%>
+  <section id="features" class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center">
+      <h2 class="text-3xl font-bold tracking-tight">{gettext("Everything in one place")}</h2>
+      <p class="mt-4 text-gray-600 dark:text-gray-300">
+        {gettext("FleetMS is organised into modules that cover the whole life of a vehicle.")}
+      </p>
+    </div>
+
+    <div class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <.feature_card icon="fa-truck" title={gettext("Vehicles")}>
+        {gettext(
+          "Add and manage your vehicles, store photos and documents, and assign drivers for clearer tracking."
+        )}
+      </.feature_card>
+      <.feature_card icon="fa-clipboard-check" title={gettext("Inspections")}>
+        {gettext(
+          "Build inspection forms (like DVIR checklists) and record submissions so checks are consistent."
+        )}
+      </.feature_card>
+      <.feature_card icon="fa-circle-exclamation" title={gettext("Issues")}>
+        {gettext("Report and follow up on vehicle problems before they turn into bigger repairs.")}
+      </.feature_card>
+      <.feature_card icon="fa-calendar-check" title={gettext("Service reminders")}>
+        {gettext(
+          "Group vehicles by service needs and get automatic reminders so maintenance happens on time."
+        )}
+      </.feature_card>
+      <.feature_card icon="fa-file-invoice" title={gettext("Work orders")}>
+        {gettext(
+          "Record all maintenance and repair work, including what was done and what it cost."
+        )}
+      </.feature_card>
+      <.feature_card icon="fa-boxes-stacked" title={gettext("Parts and inventory")}>
+        {gettext("Manage your parts and stock levels across one or more storage locations.")}
+      </.feature_card>
+      <.feature_card icon="fa-gas-pump" title={gettext("Fuel tracking")}>
+        {gettext("Log fuel-ups and costs to get a clear picture of fuel use across the fleet.")}
+      </.feature_card>
+      <.feature_card icon="fa-chart-pie" title={gettext("Reports")}>
+        {gettext("See the numbers behind your fleet to plan budgets and spot problems early.")}
+      </.feature_card>
+      <.feature_card icon="fa-location-dot" title={gettext("Vehicle tracking")}>
+        {gettext(
+          "Real-time location tracking through third-party integrations is planned for the future."
+        )}
+      </.feature_card>
+    </div>
+  </section>
+
+  <%!-- Open source / tech --%>
+  <section class="border-t border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50">
+    <div class="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold tracking-tight">{gettext("Open source and yours to run")}</h2>
+      <p class="mt-4 text-gray-600 dark:text-gray-300">
+        {gettext(
+          "FleetMS is free and open source — a community alternative to closed fleet management tools. Run it yourself and keep your data under your control."
+        )}
+      </p>
+      <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+        {gettext(
+          "Built with Elixir, the Ash and Phoenix frameworks, PostgreSQL, Tailwind CSS and Flowbite UI components."
+        )}
+      </p>
+      <div class="mt-8 flex justify-center gap-3">
+        <.link
+          :if={Fleetms.FeatureFlags.user_registration?()}
+          navigate={~p"/register"}
+          class="rounded-lg bg-brand px-6 py-3 font-medium text-white dark:text-primary-900 hover:bg-brand-strong focus:outline-none focus:ring-2 focus:ring-primary-300 dark:focus:ring-primary-800"
+        >
+          {gettext("Create an account")}
+        </.link>
+        <a
+          href="https://github.com/jmnda-dev/fleetms"
+          target="_blank"
+          class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-6 py-3 font-medium text-gray-900 hover:bg-gray-100 dark:border-gray-600 dark:text-white dark:hover:bg-gray-800"
+        >
+          <i class="fa-brands fa-github"></i> {gettext("View on GitHub")}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <%!-- Footer --%>
+  <footer class="border-t border-gray-200 dark:border-gray-700">
+    <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6 lg:px-8">
+      <div class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400 sm:items-start">
+        <div class="flex items-center gap-2">
+          <img src={~p"/images/logo_light.svg"} class="h-6 dark:hidden" alt={gettext("FleetMS")} />
+          <img
+            src={~p"/images/logo_dark.svg"}
+            class="hidden h-6 dark:block"
+            alt={gettext("FleetMS")}
+          />
+          <span class="text-sm">{gettext("Fleet Maintenance & Management")}</span>
+        </div>
+        <a
+          href="https://flowbite.com"
+          target="_blank"
+          rel="noopener"
+          class="text-xs hover:text-gray-700 dark:hover:text-gray-200"
+        >
+          {gettext("UI built with Flowbite components")}
+        </a>
+      </div>
+      <a
+        href="https://github.com/jmnda-dev/fleetms"
+        target="_blank"
+        class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+      >
+        <span class="sr-only">{gettext("GitHub repository")}</span>
+        <i class="fa-brands fa-github text-xl"></i>
+      </a>
+    </div>
+  </footer>
+</div>

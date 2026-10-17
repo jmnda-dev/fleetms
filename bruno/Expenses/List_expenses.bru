@@ -1,0 +1,11 @@
+meta {
+  name: List expenses
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/expenses
+  body: none
+  auth: inherit
+}

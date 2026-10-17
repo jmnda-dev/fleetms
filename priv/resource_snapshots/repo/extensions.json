@@ -1,0 +1,9 @@
+{
+  "ash_functions_version": 6,
+  "installed": [
+    "ash-functions",
+    "citext",
+    "pg_trgm",
+    "ash_money_v5"
+  ]
+}

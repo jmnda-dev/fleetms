@@ -1,0 +1,25 @@
+meta {
+  name: driver: restore
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/drivers/:id/restore
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "driver",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

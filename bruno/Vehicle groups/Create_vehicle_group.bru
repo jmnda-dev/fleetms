@@ -1,0 +1,20 @@
+meta {
+  name: Create vehicle group
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/vehicle-groups
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "data": {
+      "type": "vehicle-group",
+      "attributes": {}
+    }
+  }
+}

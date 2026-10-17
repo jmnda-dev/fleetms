@@ -1,0 +1,20 @@
+meta {
+  name: Create driver
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/drivers
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "data": {
+      "type": "driver",
+      "attributes": {}
+    }
+  }
+}

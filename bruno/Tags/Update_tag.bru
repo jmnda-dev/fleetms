@@ -1,0 +1,25 @@
+meta {
+  name: Update tag
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/tags/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "tag",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

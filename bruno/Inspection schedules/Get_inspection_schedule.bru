@@ -1,0 +1,15 @@
+meta {
+  name: Get inspection schedule
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/inspection-schedules/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id:
+}

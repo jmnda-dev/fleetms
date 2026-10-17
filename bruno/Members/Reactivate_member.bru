@@ -1,0 +1,21 @@
+meta {
+  name: Reactivate member
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/v1/members/:id/reactivate
+  body: none
+  auth: inherit
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+  x-organization: {{orgPublicId}}
+}
+
+params:path {
+  id:
+}

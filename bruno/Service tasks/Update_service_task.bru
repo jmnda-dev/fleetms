@@ -1,0 +1,25 @@
+meta {
+  name: Update service task
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/service-tasks/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "service-task",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

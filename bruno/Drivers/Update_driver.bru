@@ -1,0 +1,25 @@
+meta {
+  name: Update driver
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/drivers/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "driver",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

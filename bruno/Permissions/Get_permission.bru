@@ -1,0 +1,15 @@
+meta {
+  name: Get permission
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/permissions/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id:
+}

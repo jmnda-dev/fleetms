@@ -1,0 +1,25 @@
+meta {
+  name: Update service reminder
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/service-reminders/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "service-reminder",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

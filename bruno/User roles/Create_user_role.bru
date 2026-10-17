@@ -1,0 +1,20 @@
+meta {
+  name: Create user role
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/user-roles
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "data": {
+      "type": "user-role",
+      "attributes": {}
+    }
+  }
+}

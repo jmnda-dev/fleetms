@@ -1,0 +1,20 @@
+meta {
+  name: Create vehicle assignment
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/assignments
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "data": {
+      "type": "vehicle-assignment",
+      "attributes": {}
+    }
+  }
+}

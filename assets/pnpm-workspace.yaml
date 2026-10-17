@@ -1,0 +1,6 @@
+# pnpm 10+ blocks (and now errors on) dependency build scripts by default.
+# esbuild's postinstall installs its platform binary, which assets/build.mjs
+# needs, so allow just that one. This is the canonical home for the setting; the
+# package.json `pnpm` field is ignored by pnpm 11+.
+allowBuilds:
+  esbuild: true

@@ -1,0 +1,21 @@
+meta {
+  name: Suspend member
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/v1/members/:id/suspend
+  body: none
+  auth: inherit
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+  x-organization: {{orgPublicId}}
+}
+
+params:path {
+  id:
+}

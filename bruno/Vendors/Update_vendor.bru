@@ -1,0 +1,25 @@
+meta {
+  name: Update vendor
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/vendors/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "vendor",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

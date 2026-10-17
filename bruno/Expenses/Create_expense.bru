@@ -1,0 +1,20 @@
+meta {
+  name: Create expense
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/expenses
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "data": {
+      "type": "expense",
+      "attributes": {}
+    }
+  }
+}

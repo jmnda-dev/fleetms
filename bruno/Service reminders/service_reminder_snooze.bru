@@ -1,0 +1,25 @@
+meta {
+  name: service reminder: snooze
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/service-reminders/:id/snooze
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "service-reminder",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

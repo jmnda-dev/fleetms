@@ -1,0 +1,20 @@
+meta {
+  name: Create work order
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/work-orders
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "data": {
+      "type": "work-order",
+      "attributes": {}
+    }
+  }
+}

@@ -1,0 +1,20 @@
+meta {
+  name: Create part
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/parts
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "data": {
+      "type": "part",
+      "attributes": {}
+    }
+  }
+}

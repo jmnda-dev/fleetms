@@ -1,0 +1,25 @@
+meta {
+  name: Update role
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/roles/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "role",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

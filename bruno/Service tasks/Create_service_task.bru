@@ -1,0 +1,20 @@
+meta {
+  name: Create service task
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/service-tasks
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "data": {
+      "type": "service-task",
+      "attributes": {}
+    }
+  }
+}

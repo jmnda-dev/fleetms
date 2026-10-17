@@ -1,0 +1,25 @@
+meta {
+  name: part stock: adjust
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/part-stocks/:id/adjust
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "part-stock",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

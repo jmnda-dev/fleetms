@@ -1,0 +1,15 @@
+meta {
+  name: Get inspection form version
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/inspection-form-versions/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id:
+}

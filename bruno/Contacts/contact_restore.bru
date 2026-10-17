@@ -1,0 +1,25 @@
+meta {
+  name: contact: restore
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/contacts/:id/restore
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "contact",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

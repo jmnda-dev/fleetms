@@ -1,0 +1,15 @@
+meta {
+  name: Delete part
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/parts/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id:
+}

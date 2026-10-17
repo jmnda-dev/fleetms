@@ -1,0 +1,25 @@
+meta {
+  name: Update vehicle renewal
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/renewals/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "vehicle-renewal",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

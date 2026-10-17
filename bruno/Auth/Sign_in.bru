@@ -1,0 +1,40 @@
+meta {
+  name: Sign in
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/sign-in
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+body:json {
+  {
+    "email": "{{email}}",
+    "password": "{{password}}"
+  }
+}
+
+script:post-response {
+  if (res.getStatus() === 200) {
+    bru.setEnvVar("token", res.getBody().token);
+    const orgs = res.getBody().organizations || [];
+    if (orgs.length) {
+      bru.setEnvVar("orgPublicId", orgs[0].public_id);
+    }
+  }
+}
+
+docs {
+  Signs in with email + password. On success it stores `token` and your first
+  org's `orgPublicId` into the environment, so every other request just works.
+  A long-lived API key (Account Settings in the app) can be used instead by
+  setting `token` directly.
+}

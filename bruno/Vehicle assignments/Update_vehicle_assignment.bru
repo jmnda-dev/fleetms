@@ -1,0 +1,25 @@
+meta {
+  name: Update vehicle assignment
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/assignments/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "vehicle-assignment",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

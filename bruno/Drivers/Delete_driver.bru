@@ -1,0 +1,15 @@
+meta {
+  name: Delete driver
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/drivers/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id:
+}

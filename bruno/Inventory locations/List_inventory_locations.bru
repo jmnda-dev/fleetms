@@ -1,0 +1,11 @@
+meta {
+  name: List inventory locations
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/inventory-locations
+  body: none
+  auth: inherit
+}

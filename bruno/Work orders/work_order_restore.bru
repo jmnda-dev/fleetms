@@ -1,0 +1,25 @@
+meta {
+  name: work order: restore
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/work-orders/:id/restore
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "work-order",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

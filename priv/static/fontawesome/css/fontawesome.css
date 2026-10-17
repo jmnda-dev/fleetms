@@ -1,0 +1,12 @@
+/* FontAwesome, loaded into the `fontawesome` cascade layer.
+ *
+ * FontAwesome's own stylesheet is unlayered and sets `display: inline-block` on
+ * every `.fa-*` icon. In Tailwind v4 the utilities (including `.hidden`) live in
+ * a cascade layer, and unlayered styles always beat layered ones — so without
+ * this wrapper, `.hidden` cannot hide an icon. Importing FA into a named layer
+ * (ordered below `utilities` in assets/css/app.css) lets Tailwind utilities win.
+ *
+ * The nested import keeps FA served as a static asset (no bundling), and the
+ * font url(../webfonts/...) paths in all.min.css still resolve correctly since
+ * they're relative to all.min.css itself. */
+@import url("./all.min.css") layer(fontawesome);

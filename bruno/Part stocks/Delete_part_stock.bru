@@ -1,0 +1,15 @@
+meta {
+  name: Delete part stock
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/part-stocks/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id:
+}

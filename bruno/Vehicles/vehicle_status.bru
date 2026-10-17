@@ -1,0 +1,25 @@
+meta {
+  name: vehicle: status
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/vehicles/:id/status
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "vehicle",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

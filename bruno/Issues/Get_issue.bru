@@ -1,0 +1,15 @@
+meta {
+  name: Get issue
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/issues/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id:
+}

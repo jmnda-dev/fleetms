@@ -1,0 +1,25 @@
+meta {
+  name: issue: resolve
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/issues/:id/resolve
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "issue",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

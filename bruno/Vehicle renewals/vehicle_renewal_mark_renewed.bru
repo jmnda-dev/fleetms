@@ -1,0 +1,25 @@
+meta {
+  name: vehicle renewal: mark renewed
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/renewals/:id/mark-renewed
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "vehicle-renewal",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

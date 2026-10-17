@@ -1,0 +1,21 @@
+meta {
+  name: Remove member
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/members/:id
+  body: none
+  auth: inherit
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+  x-organization: {{orgPublicId}}
+}
+
+params:path {
+  id:
+}

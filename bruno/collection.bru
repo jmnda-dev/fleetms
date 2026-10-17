@@ -1,0 +1,18 @@
+headers {
+  Accept: application/vnd.api+json
+  Content-Type: application/vnd.api+json
+  x-organization: {{orgPublicId}}
+}
+
+auth {
+  mode: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  FleetMS public JSON:API. Run Auth → Sign in first (or set `token` to an API
+  key). The `x-organization` header (your org's public_id) selects the tenant.
+}

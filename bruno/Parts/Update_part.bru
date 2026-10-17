@@ -1,0 +1,25 @@
+meta {
+  name: Update part
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/parts/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "part",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

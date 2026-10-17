@@ -1,0 +1,25 @@
+meta {
+  name: Update vehicle group
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/vehicle-groups/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "vehicle-group",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

@@ -1,0 +1,11 @@
+meta {
+  name: List fuel entries
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/fuel-entries
+  body: none
+  auth: inherit
+}

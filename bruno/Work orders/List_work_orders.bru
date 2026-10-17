@@ -1,0 +1,11 @@
+meta {
+  name: List work orders
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/work-orders
+  body: none
+  auth: inherit
+}

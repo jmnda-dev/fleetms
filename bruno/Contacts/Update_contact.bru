@@ -1,0 +1,25 @@
+meta {
+  name: Update contact
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/contacts/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "contact",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

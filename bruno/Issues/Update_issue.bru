@@ -1,0 +1,25 @@
+meta {
+  name: Update issue
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/issues/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "issue",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

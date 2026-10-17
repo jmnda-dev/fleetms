@@ -1,0 +1,15 @@
+meta {
+  name: Delete work order
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/work-orders/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id:
+}

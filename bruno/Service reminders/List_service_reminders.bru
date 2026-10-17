@@ -1,0 +1,11 @@
+meta {
+  name: List service reminders
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/service-reminders
+  body: none
+  auth: inherit
+}

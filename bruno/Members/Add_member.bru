@@ -1,0 +1,24 @@
+meta {
+  name: Add member
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/members
+  body: json
+  auth: inherit
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+  x-organization: {{orgPublicId}}
+}
+
+body:json {
+  {
+    "email": "",
+    "role_id": null
+  }
+}

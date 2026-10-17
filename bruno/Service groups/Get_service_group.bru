@@ -1,0 +1,15 @@
+meta {
+  name: Get service group
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/service-groups/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id:
+}

@@ -1,0 +1,20 @@
+meta {
+  name: Create vendor
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/vendors
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "data": {
+      "type": "vendor",
+      "attributes": {}
+    }
+  }
+}

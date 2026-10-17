@@ -1,0 +1,20 @@
+meta {
+  name: Create issue
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/issues
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "data": {
+      "type": "issue",
+      "attributes": {}
+    }
+  }
+}

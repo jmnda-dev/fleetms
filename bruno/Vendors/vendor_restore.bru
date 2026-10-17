@@ -1,0 +1,25 @@
+meta {
+  name: vendor: restore
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/vendors/:id/restore
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "vendor",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

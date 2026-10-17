@@ -1,0 +1,17 @@
+meta {
+  name: List members
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/members
+  body: none
+  auth: inherit
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+  x-organization: {{orgPublicId}}
+}

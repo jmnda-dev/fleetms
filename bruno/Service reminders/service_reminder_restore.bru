@@ -1,0 +1,25 @@
+meta {
+  name: service reminder: restore
+  type: http
+  seq: 8
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/service-reminders/:id/restore
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "service-reminder",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

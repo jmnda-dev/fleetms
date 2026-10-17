@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {Application.get_env(:live_debugger, :live_debugger_tags)}
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <.live_title
+      default="FleetMS"
+      suffix={" · " <> gettext("Fleet Maintenance & Management")}
+      phx-no-format
+    >{assigns[:page_title]}</.live_title>
+    <link rel="icon" href={~p"/favicon.ico"} sizes="48x48" />
+    <link rel="icon" href={~p"/images/favicon.svg"} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={~p"/images/apple-touch-icon.png"} />
+    <%!-- PWA: installable app shell (see priv/static/service-worker.js). --%>
+    <link rel="manifest" href={~p"/manifest.json"} />
+    <meta name="theme-color" content="#001a72" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="FleetMS" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    />
+    <link phx-track-static rel="stylesheet" href={~p"/fontawesome/css/fontawesome.css"} />
+    <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
+    </script>
+    <%!-- Apply the persisted light/dark mode and color theme before first paint to
+          avoid a flash. `color-theme` (dark/light) toggles the `dark` class;
+          `app-theme` (midnight/enterprise/forest) sets `data-theme`. Both are managed
+          at runtime by assets/js/layout.js. --%>
+    <script>
+      if (
+        localStorage.getItem("color-theme") === "dark" ||
+        (!("color-theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+      document.documentElement.setAttribute(
+        "data-theme",
+        localStorage.getItem("app-theme") || "midnight"
+      );
+    </script>
+  </head>
+  <body class="bg-gray-50 antialiased dark:bg-gray-900">
+    {@inner_content}
+    <script>
+      // Register the PWA service worker (installable shell + offline fallback).
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("/service-worker.js").catch(function () {});
+        });
+      }
+    </script>
+  </body>
+</html>

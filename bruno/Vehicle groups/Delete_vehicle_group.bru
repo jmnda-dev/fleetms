@@ -1,0 +1,15 @@
+meta {
+  name: Delete vehicle group
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/vehicle-groups/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id:
+}

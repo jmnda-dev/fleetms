@@ -1,0 +1,11 @@
+meta {
+  name: List user roles
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/user-roles
+  body: none
+  auth: inherit
+}

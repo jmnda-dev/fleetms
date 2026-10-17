@@ -1,0 +1,15 @@
+meta {
+  name: Delete contact
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/contacts/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id:
+}

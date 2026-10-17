@@ -1,0 +1,20 @@
+meta {
+  name: Create service reminder
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/service-reminders
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "data": {
+      "type": "service-reminder",
+      "attributes": {}
+    }
+  }
+}

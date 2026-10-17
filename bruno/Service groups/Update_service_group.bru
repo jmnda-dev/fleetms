@@ -1,0 +1,25 @@
+meta {
+  name: Update service group
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/service-groups/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "service-group",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

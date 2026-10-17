@@ -1,0 +1,11 @@
+meta {
+  name: List vehicle renewals
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/renewals
+  body: none
+  auth: inherit
+}

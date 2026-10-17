@@ -1,0 +1,25 @@
+meta {
+  name: Update fuel entry
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/fuel-entries/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "fuel-entry",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

@@ -1,0 +1,25 @@
+meta {
+  name: issue: close
+  type: http
+  seq: 8
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/issues/:id/close
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "issue",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

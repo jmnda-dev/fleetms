@@ -1,0 +1,1127 @@
+## "msgid"s in this file come from POT (.pot) files.
+###
+### Do not add, change, or remove "msgid"s manually here as
+### they're tied to the ones in the corresponding POT file
+### (with the same domain).
+###
+### Use "mix gettext.extract --merge" or "mix gettext.merge"
+### to merge POT files into PO files.
+msgid ""
+msgstr ""
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: lib/fleetms_web/components/layouts.ex:650
+#: lib/fleetms_web/live/settings_live.ex:34
+#, elixir-autogen, elixir-format
+msgid "Account"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:189
+#: lib/fleetms_web/live/settings_live.ex:10
+#: lib/fleetms_web/live/settings_live.ex:24
+#: lib/fleetms_web/live/settings_live.ex:28
+#, elixir-autogen, elixir-format
+msgid "Account Settings"
+msgstr ""
+
+#: lib/fleetms_web/components/core_components.ex:492
+#: lib/fleetms_web/live/user_live.ex:94
+#, elixir-autogen, elixir-format
+msgid "Actions"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:522
+#, elixir-autogen, elixir-format
+msgid "Administration"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:484
+#, elixir-autogen, elixir-format
+msgid "All Vehicles"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:485
+#, elixir-autogen, elixir-format
+msgid "Assignments"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:679
+#: lib/fleetms_web/components/layouts.ex:691
+#, elixir-autogen, elixir-format
+msgid "Attempting to reconnect"
+msgstr ""
+
+#: lib/fleetms_web/components/core_components.ex:589
+#: lib/fleetms_web/components/core_components.ex:734
+#, elixir-autogen, elixir-format
+msgid "Close modal"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:478
+#: lib/fleetms_web/live/dashboard_live.ex:12
+#: lib/fleetms_web/live/dashboard_live.ex:20
+#: lib/fleetms_web/live/profile_live.ex:27
+#: lib/fleetms_web/live/settings_live.ex:23
+#: lib/fleetms_web/live/user_live.ex:70
+#, elixir-autogen, elixir-format
+msgid "Dashboard"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:548
+#, elixir-autogen, elixir-format
+msgid "Documentation"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts/root.html.heex:9
+#, elixir-autogen, elixir-format
+msgid "Fleet Maintenance & Management"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:108
+#: lib/fleetms_web/components/layouts.ex:312
+#: lib/fleetms_web/components/layouts.ex:353
+#: lib/fleetms_web/controllers/page_html/home.html.heex:8
+#: lib/fleetms_web/controllers/page_html/home.html.heex:205
+#, elixir-autogen, elixir-format
+msgid "FleetMS logo"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:516
+#, elixir-autogen, elixir-format
+msgid "Fuel Tracking"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:486
+#, elixir-autogen, elixir-format
+msgid "General Reminders"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:494
+#, elixir-autogen, elixir-format
+msgid "Inspection Forms"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:492
+#: lib/fleetms_web/components/layouts.ex:495
+#: lib/fleetms_web/controllers/page_html/home.html.heex:140
+#, elixir-autogen, elixir-format
+msgid "Inspections"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:511
+#, elixir-autogen, elixir-format
+msgid "Inventory"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:513
+#, elixir-autogen, elixir-format
+msgid "Inventory Locations"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:498
+#: lib/fleetms_web/controllers/page_html/home.html.heex:145
+#, elixir-autogen, elixir-format
+msgid "Issues"
+msgstr ""
+
+#: lib/fleetms_web/components/core_components.ex:253
+#, elixir-autogen, elixir-format
+msgid "Loading..."
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:503
+#, elixir-autogen, elixir-format
+msgid "Maintenance"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:186
+#: lib/fleetms_web/live/profile_live.ex:13
+#: lib/fleetms_web/live/profile_live.ex:28
+#: lib/fleetms_web/live/profile_live.ex:32
+#, elixir-autogen, elixir-format
+msgid "My Profile"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:166
+#, elixir-autogen, elixir-format
+msgid "Open user menu"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:512
+#, elixir-autogen, elixir-format
+msgid "Parts"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:517
+#: lib/fleetms_web/controllers/page_html/home.html.heex:162
+#, elixir-autogen, elixir-format
+msgid "Reports"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:529
+#, elixir-autogen, elixir-format
+msgid "Roles & Permissions"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:115
+#: lib/fleetms_web/components/layouts.ex:125
+#, elixir-autogen, elixir-format
+msgid "Search"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:506
+#, elixir-autogen, elixir-format
+msgid "Service Groups"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:507
+#, elixir-autogen, elixir-format
+msgid "Service Reminders"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:505
+#, elixir-autogen, elixir-format
+msgid "Service Tasks"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:470
+#, elixir-autogen, elixir-format
+msgid "Sidebar"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:198
+#, elixir-autogen, elixir-format
+msgid "Sign Out"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:686
+#, elixir-autogen, elixir-format
+msgid "Something went wrong!"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:148
+#: lib/fleetms_web/components/layouts.ex:321
+#: lib/fleetms_web/components/layouts.ex:362
+#: lib/fleetms_web/controllers/page_html/home.html.heex:26
+#, elixir-autogen, elixir-format
+msgid "Toggle dark mode"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:533
+#, elixir-autogen, elixir-format
+msgid "User Roles"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:525
+#: lib/fleetms_web/live/user_live.ex:15
+#: lib/fleetms_web/live/user_live.ex:71
+#: lib/fleetms_web/live/user_live.ex:75
+#, elixir-autogen, elixir-format
+msgid "Users"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:483
+#: lib/fleetms_web/controllers/page_html/home.html.heex:135
+#, elixir-autogen, elixir-format
+msgid "Vehicles"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:138
+#, elixir-autogen, elixir-format
+msgid "View notifications"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:674
+#, elixir-autogen, elixir-format
+msgid "We can't find the internet"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:508
+#, elixir-autogen, elixir-format
+msgid "Work Orders"
+msgstr ""
+
+#: lib/fleetms_web/components/core_components.ex:101
+#, elixir-autogen, elixir-format
+msgid "close"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:136
+#, elixir-autogen, elixir-format
+msgid "Add and manage your vehicles, store photos and documents, and assign drivers for clearer tracking."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:141
+#, elixir-autogen, elixir-format
+msgid "Build inspection forms (like DVIR checklists) and record submissions so checks are consistent."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:181
+#, elixir-autogen, elixir-format
+msgid "Built with Elixir, the Ash and Phoenix frameworks, PostgreSQL and Tailwind CSS."
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:252
+#, elixir-autogen, elixir-format
+msgid "Change color theme"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:261
+#, elixir-autogen, elixir-format
+msgid "Color theme"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:106
+#, elixir-autogen, elixir-format
+msgid "Control parts and stock"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:188
+#: lib/fleetms_web/live/auth_live/register.ex:15
+#: lib/fleetms_web/live/auth_live/register.ex:25
+#, elixir-autogen, elixir-format
+msgid "Create an account"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:265
+#, elixir-autogen, elixir-format
+msgid "Enterprise"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:128
+#, elixir-autogen, elixir-format
+msgid "Everything in one place"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:17
+#, elixir-autogen, elixir-format
+msgid "Features"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:56
+#, elixir-autogen, elixir-format
+msgid "FleetMS helps you manage the vehicles you own and stay on top of their upkeep. Track inspections, maintenance, repairs, parts and fuel in one place, so nothing slips through the cracks."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:176
+#, elixir-autogen, elixir-format
+msgid "FleetMS is free and open source — a community alternative to closed fleet management tools. Run it yourself and keep your data under your control."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:130
+#, elixir-autogen, elixir-format
+msgid "FleetMS is organised into modules that cover the whole life of a vehicle."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:206
+#, elixir-autogen, elixir-format
+msgid "FleetMS — Fleet Maintenance & Management"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:266
+#, elixir-autogen, elixir-format
+msgid "Forest"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:48
+#, elixir-autogen, elixir-format
+msgid "Free and open source fleet software"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:159
+#, elixir-autogen, elixir-format
+msgid "Fuel tracking"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:66
+#, elixir-autogen, elixir-format
+msgid "Get started"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:213
+#, elixir-autogen, elixir-format
+msgid "GitHub repository"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:149
+#, elixir-autogen, elixir-format
+msgid "Group vehicles by service needs and get automatic reminders so maintenance happens on time."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:92
+#, elixir-autogen, elixir-format
+msgid "Keep every vehicle, document and record in one system instead of scattered spreadsheets and folders."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:52
+#, elixir-autogen, elixir-format
+msgid "Keep your vehicles running, without the spreadsheets"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:107
+#, elixir-autogen, elixir-format
+msgid "Know which parts you have, where they are stored, and what gets used on each job."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:160
+#, elixir-autogen, elixir-format
+msgid "Log fuel-ups and costs to get a clear picture of fuel use across the fleet."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:102
+#, elixir-autogen, elixir-format
+msgid "Log issues, plan services and record repair work so you always know each vehicle's history."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:116
+#, elixir-autogen, elixir-format
+msgid "Make better decisions"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:157
+#, elixir-autogen, elixir-format
+msgid "Manage your parts and stock levels across one or more storage locations."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:96
+#, elixir-autogen, elixir-format
+msgid "Never miss a renewal"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:174
+#, elixir-autogen, elixir-format
+msgid "Open source and yours to run"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:156
+#, elixir-autogen, elixir-format
+msgid "Parts and inventory"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:166
+#, elixir-autogen, elixir-format
+msgid "Real-time location tracking through third-party integrations is planned for the future."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:154
+#, elixir-autogen, elixir-format
+msgid "Record all maintenance and repair work, including what was done and what it cost."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:112
+#, elixir-autogen, elixir-format
+msgid "Record fuel entries to spot trends in spending and efficiency across your fleet."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:146
+#, elixir-autogen, elixir-format
+msgid "Report and follow up on vehicle problems before they turn into bigger repairs."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:84
+#, elixir-autogen, elixir-format
+msgid "Running a fleet means a lot of moving parts. FleetMS gives you one tidy place for the work that keeps vehicles on the road."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:163
+#, elixir-autogen, elixir-format
+msgid "See the numbers behind your fleet to plan budgets and spot problems early."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:148
+#, elixir-autogen, elixir-format
+msgid "Service reminders"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:97
+#, elixir-autogen, elixir-format
+msgid "Set reminders for insurance, inspections and services, and get a heads-up before they are due."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:37
+#: lib/fleetms_web/controllers/page_html/home.html.heex:72
+#: lib/fleetms_web/live/auth_live/register.ex:30
+#: lib/fleetms_web/live/auth_live/sign_in.ex:16
+#, elixir-autogen, elixir-format
+msgid "Sign in"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:91
+#, elixir-autogen, elixir-format
+msgid "Stay organised"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:101
+#, elixir-autogen, elixir-format
+msgid "Track maintenance"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:117
+#, elixir-autogen, elixir-format
+msgid "Turn your day-to-day records into reports that show where time and money are going."
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:165
+#, elixir-autogen, elixir-format
+msgid "Vehicle tracking"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:195
+#, elixir-autogen, elixir-format
+msgid "View on GitHub"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:111
+#, elixir-autogen, elixir-format
+msgid "Watch fuel costs"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:82
+#, elixir-autogen, elixir-format
+msgid "What it helps with"
+msgstr ""
+
+#: lib/fleetms_web/controllers/page_html/home.html.heex:153
+#, elixir-autogen, elixir-format
+msgid "Work orders"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:264
+#, elixir-autogen, elixir-format
+msgid "Midnight"
+msgstr ""
+
+#: lib/fleetms_web/live/org_live/index.ex:60
+#, elixir-autogen, elixir-format
+msgid "%{count} member"
+msgid_plural "%{count} members"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/fleetms_web/live/org_live/new.ex:26
+#, elixir-autogen, elixir-format
+msgid "An organization keeps your vehicles, team and records together."
+msgstr ""
+
+#: lib/fleetms_web/live/org_live/new.ex:42
+#, elixir-autogen, elixir-format
+msgid "Back to your organizations"
+msgstr ""
+
+#: lib/fleetms_web/live/org_live/index.ex:30
+#, elixir-autogen, elixir-format
+msgid "Choose an organization"
+msgstr ""
+
+#: lib/fleetms_web/live/org_live/new.ex:63
+#, elixir-autogen, elixir-format
+msgid "Could not create the organization. Try another name."
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:446
+#: lib/fleetms_web/live/org_live/index.ex:80
+#: lib/fleetms_web/live/org_live/new.ex:36
+#, elixir-autogen, elixir-format
+msgid "Create organization"
+msgstr ""
+
+#: lib/fleetms_web/live/org_live/new.ex:23
+#, elixir-autogen, elixir-format
+msgid "Create your organization"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:543
+#, elixir-autogen, elixir-format
+msgid "Invite people"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:459
+#: lib/fleetms_web/live/user_live.ex:90
+#, elixir-autogen, elixir-format
+msgid "Member"
+msgstr ""
+
+#: lib/fleetms_web/live/org_live/index.ex:70
+#, elixir-autogen, elixir-format
+msgid "Open"
+msgstr ""
+
+#: lib/fleetms_web/live/org_live/new.ex:58
+#, elixir-autogen, elixir-format
+msgid "Organization created."
+msgstr ""
+
+#: lib/fleetms_web/live/org_live/new.ex:32
+#, elixir-autogen, elixir-format
+msgid "Organization name"
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:459
+#: lib/fleetms_web/live/org_live/index.ex:56
+#: lib/fleetms_web/live/user_live.ex:120
+#: lib/fleetms_web/live/user_live.ex:280
+#, elixir-autogen, elixir-format
+msgid "Owner"
+msgstr ""
+
+#: lib/fleetms_web/live/org_live/index.ex:33
+#, elixir-autogen, elixir-format
+msgid "Pick the organization you want to work in."
+msgstr ""
+
+#: lib/fleetms_web/components/layouts.ex:330
+#, elixir-autogen, elixir-format
+msgid "Sign out"
+msgstr ""
+
+#: lib/fleetms_web/live/org_live/index.ex:39
+#, elixir-autogen, elixir-format
+msgid "You don't belong to any organization yet."
+msgstr ""
+
+#: lib/fleetms_web/live/dashboard_live.ex:27
+#, elixir-autogen, elixir-format
+msgid "Your fleet dashboard will appear here as features are added."
+msgstr ""
+
+#: lib/fleetms_web/live/org_live/new.ex:33
+#, elixir-autogen, elixir-format
+msgid "e.g. Acme Logistics"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/register.ex:28
+#, elixir-autogen, elixir-format
+msgid "Already have an account?"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/forgot_password.ex:57
+#: lib/fleetms_web/live/auth_live/reset_password.ex:67
+#: lib/fleetms_web/live/invitation_live/accept.ex:45
+#, elixir-autogen, elixir-format
+msgid "Back to sign in"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/reset_password.ex:28
+#, elixir-autogen, elixir-format
+msgid "Choose a new password for your account."
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/register.ex:63
+#: lib/fleetms_web/live/auth_live/reset_password.ex:54
+#: lib/fleetms_web/live/invitation_live/accept.ex:76
+#: lib/fleetms_web/live/user_live.ex:237
+#, elixir-autogen, elixir-format
+msgid "Confirm password"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/register.ex:70
+#, elixir-autogen, elixir-format
+msgid "Create account"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/reset_password.ex:14
+#: lib/fleetms_web/live/auth_live/reset_password.ex:25
+#, elixir-autogen, elixir-format
+msgid "Create new password"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/register.ex:69
+#, elixir-autogen, elixir-format
+msgid "Creating account..."
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/sign_in.ex:30
+#, elixir-autogen, elixir-format
+msgid "Don't have an account?"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/register.ex:47
+#: lib/fleetms_web/live/auth_live/sign_in.ex:50
+#: lib/fleetms_web/live/settings_live.ex:36
+#: lib/fleetms_web/live/user_live.ex:221
+#, elixir-autogen, elixir-format
+msgid "Email"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/forgot_password.ex:44
+#, elixir-autogen, elixir-format
+msgid "Email address"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/forgot_password.ex:28
+#, elixir-autogen, elixir-format
+msgid "Enter your email and we'll send you a link to reset your password."
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/sign_in.ex:80
+#, elixir-autogen, elixir-format
+msgid "Forgot password?"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/reset_password.ex:46
+#: lib/fleetms_web/live/settings_live.ex:74
+#, elixir-autogen, elixir-format
+msgid "New password"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/register.ex:55
+#: lib/fleetms_web/live/auth_live/sign_in.ex:69
+#: lib/fleetms_web/live/invitation_live/accept.ex:69
+#: lib/fleetms_web/live/user_live.ex:233
+#, elixir-autogen, elixir-format
+msgid "Password"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/reset_password.ex:61
+#, elixir-autogen, elixir-format
+msgid "Reset password"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/forgot_password.ex:15
+#: lib/fleetms_web/live/auth_live/forgot_password.ex:25
+#, elixir-autogen, elixir-format
+msgid "Reset your password"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/forgot_password.ex:51
+#, elixir-autogen, elixir-format
+msgid "Send reset link"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/forgot_password.ex:50
+#, elixir-autogen, elixir-format
+msgid "Sending..."
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/sign_in.ex:85
+#, elixir-autogen, elixir-format
+msgid "Sign in to your account"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/sign_in.ex:92
+#, elixir-autogen, elixir-format
+msgid "Sign in with a username instead"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/sign_in.ex:94
+#, elixir-autogen, elixir-format
+msgid "Sign in with an email instead"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/sign_in.ex:32
+#, elixir-autogen, elixir-format
+msgid "Sign up"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/sign_in.ex:84
+#, elixir-autogen, elixir-format
+msgid "Signing in..."
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/reset_password.ex:60
+#: lib/fleetms_web/live/settings_live.ex:85
+#, elixir-autogen, elixir-format
+msgid "Updating..."
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/sign_in.ex:59
+#: lib/fleetms_web/live/settings_live.ex:39
+#: lib/fleetms_web/live/user_live.ex:232
+#, elixir-autogen, elixir-format
+msgid "Username"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/sign_in.ex:27
+#, elixir-autogen, elixir-format
+msgid "Welcome back"
+msgstr ""
+
+#: lib/fleetms_web/live/auth_live/sign_in.ex:60
+#, elixir-autogen, elixir-format
+msgid "your-username"
+msgstr ""
+
+#: lib/fleetms_web/components/core_components.ex:629
+#, elixir-autogen, elixir-format
+msgid "Breadcrumb"
+msgstr ""
+
+#: lib/fleetms_web/live/invitation_live/accept.ex:82
+#, elixir-autogen, elixir-format
+msgid "Accept and create account"
+msgstr ""
+
+#: lib/fleetms_web/live/invitation_live/accept.ex:19
+#, elixir-autogen, elixir-format
+msgid "Accept invitation"
+msgstr ""
+
+#: lib/fleetms_web/live/invitation_live/accept.ex:55
+#, elixir-autogen, elixir-format
+msgid "Accept your invitation"
+msgstr ""
+
+#: lib/fleetms_web/live/invitation_live/accept.ex:104
+#, elixir-autogen, elixir-format
+msgid "Account created. Sign in to get started."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:122
+#: lib/fleetms_web/live/user_live.ex:526
+#, elixir-autogen, elixir-format
+msgid "Active"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:81
+#: lib/fleetms_web/live/user_live.ex:189
+#, elixir-autogen, elixir-format
+msgid "Add member"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:260
+#: lib/fleetms_web/live/user_live.ex:319
+#: lib/fleetms_web/live/user_live.ex:343
+#, elixir-autogen, elixir-format
+msgid "Cancel"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:286
+#, elixir-autogen, elixir-format
+msgid "Close"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:256
+#, elixir-autogen, elixir-format
+msgid "Create member"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:206
+#, elixir-autogen, elixir-format
+msgid "Create with username"
+msgstr ""
+
+#: lib/fleetms_web/live/invitation_live/accept.ex:63
+#: lib/fleetms_web/live/profile_live.ex:56
+#: lib/fleetms_web/live/user_live.ex:229
+#, elixir-autogen, elixir-format
+msgid "First name"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:224
+#, elixir-autogen, elixir-format
+msgid "For people without an email. They sign in with the username and password you set."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:91
+#: lib/fleetms_web/live/user_live.ex:274
+#, elixir-autogen, elixir-format
+msgid "Identifier"
+msgstr ""
+
+#: lib/fleetms_web/live/invitation_live/accept.ex:27
+#, elixir-autogen, elixir-format
+msgid "Invitation"
+msgstr ""
+
+#: lib/fleetms_web/live/invitation_live/accept.ex:37
+#, elixir-autogen, elixir-format
+msgid "Invitation not found"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:387
+#, elixir-autogen, elixir-format
+msgid "Invitation sent."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:198
+#, elixir-autogen, elixir-format
+msgid "Invite by email"
+msgstr ""
+
+#: lib/fleetms_web/live/invitation_live/accept.ex:64
+#: lib/fleetms_web/live/profile_live.ex:57
+#: lib/fleetms_web/live/user_live.ex:230
+#, elixir-autogen, elixir-format
+msgid "Last name"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:388
+#, elixir-autogen, elixir-format
+msgid "Member added."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:389
+#, elixir-autogen, elixir-format
+msgid "Member created."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:417
+#, elixir-autogen, elixir-format
+msgid "Member reactivated."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:429
+#, elixir-autogen, elixir-format
+msgid "Member removed."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:413
+#, elixir-autogen, elixir-format
+msgid "Member suspended."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:273
+#, elixir-autogen, elixir-format
+msgid "Name"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:176
+#, elixir-autogen, elixir-format
+msgid "No members yet."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:246
+#, elixir-autogen, elixir-format
+msgid "No role"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:77
+#, elixir-autogen, elixir-format
+msgid "People who belong to %{org}."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:161
+#, elixir-autogen, elixir-format
+msgid "Reactivate"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:168
+#, elixir-autogen, elixir-format
+msgid "Remove"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:333
+#, elixir-autogen, elixir-format
+msgid "Remove %{name} from %{org}? Their account is kept, but they lose access here."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:331
+#: lib/fleetms_web/live/user_live.ex:340
+#, elixir-autogen, elixir-format
+msgid "Remove member"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:245
+#, elixir-autogen, elixir-format
+msgid "Role"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:92
+#: lib/fleetms_web/live/user_live.ex:275
+#: lib/fleetms_web/live/user_live.ex:299
+#, elixir-autogen, elixir-format
+msgid "Roles"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:254
+#, elixir-autogen, elixir-format
+msgid "Send invitation"
+msgstr ""
+
+#: lib/fleetms_web/live/invitation_live/accept.ex:58
+#, elixir-autogen, elixir-format
+msgid "Set up your account for %{email}."
+msgstr ""
+
+#: lib/fleetms_web/live/invitation_live/accept.ex:81
+#, elixir-autogen, elixir-format
+msgid "Setting up..."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:557
+#, elixir-autogen, elixir-format
+msgid "Something went wrong."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:93
+#: lib/fleetms_web/live/user_live.ex:278
+#, elixir-autogen, elixir-format
+msgid "Status"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:152
+#, elixir-autogen, elixir-format
+msgid "Suspend"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:125
+#: lib/fleetms_web/live/user_live.ex:527
+#, elixir-autogen, elixir-format
+msgid "Suspended"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:57
+#, elixir-autogen, elixir-format
+msgid "That member could not be found."
+msgstr ""
+
+#: lib/fleetms_web/live/invitation_live/accept.ex:40
+#, elixir-autogen, elixir-format
+msgid "This invitation link is invalid or has expired. Ask whoever invited you to send a new one."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:135
+#, elixir-autogen, elixir-format
+msgid "View"
+msgstr ""
+
+#: lib/fleetms_web/live/invitation_live/accept.ex:117
+#, elixir-autogen, elixir-format
+msgid "We couldn't complete your sign-up. Please try again."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:219
+#, elixir-autogen, elixir-format
+msgid "We'll email them a link to set up their account and join."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:555
+#, elixir-autogen, elixir-format
+msgid "You can't %{what}."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:473
+#, elixir-autogen, elixir-format
+msgid "You don't have access to manage users here."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:554
+#, elixir-autogen, elixir-format
+msgid "You're not allowed to do that."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:143
+#, elixir-autogen, elixir-format
+msgid "Edit"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:297
+#, elixir-autogen, elixir-format
+msgid "Edit %{name}"
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:301
+#, elixir-autogen, elixir-format
+msgid "No roles defined yet. Create some under Roles & Permissions."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:409
+#, elixir-autogen, elixir-format
+msgid "Roles updated."
+msgstr ""
+
+#: lib/fleetms_web/live/user_live.ex:317
+#, elixir-autogen, elixir-format
+msgid "Save changes"
+msgstr ""
+
+#: lib/fleetms_web/live/profile_live.ex:65
+#, elixir-autogen, elixir-format
+msgid "Address"
+msgstr ""
+
+#: lib/fleetms_web/live/settings_live.ex:55
+#, elixir-autogen, elixir-format
+msgid "Change password"
+msgstr ""
+
+#: lib/fleetms_web/live/profile_live.ex:67
+#, elixir-autogen, elixir-format
+msgid "City"
+msgstr ""
+
+#: lib/fleetms_web/live/settings_live.ex:81
+#, elixir-autogen, elixir-format
+msgid "Confirm new password"
+msgstr ""
+
+#: lib/fleetms_web/live/settings_live.ex:67
+#, elixir-autogen, elixir-format
+msgid "Current password"
+msgstr ""
+
+#: lib/fleetms_web/live/profile_live.ex:64
+#, elixir-autogen, elixir-format
+msgid "Date of birth"
+msgstr ""
+
+#: lib/fleetms_web/live/settings_live.ex:44
+#, elixir-autogen, elixir-format
+msgid "Edit your name and contact details on your"
+msgstr ""
+
+#: lib/fleetms_web/live/settings_live.ex:29
+#, elixir-autogen, elixir-format
+msgid "Manage your account and password."
+msgstr ""
+
+#: lib/fleetms_web/live/profile_live.ex:59
+#, elixir-autogen, elixir-format
+msgid "Other name"
+msgstr ""
+
+#: lib/fleetms_web/live/settings_live.ex:106
+#, elixir-autogen, elixir-format
+msgid "Password updated."
+msgstr ""
+
+#: lib/fleetms_web/live/profile_live.ex:61
+#, elixir-autogen, elixir-format
+msgid "Phone number"
+msgstr ""
+
+#: lib/fleetms_web/live/profile_live.ex:69
+#, elixir-autogen, elixir-format
+msgid "Postal code"
+msgstr ""
+
+#: lib/fleetms_web/live/profile_live.ex:96
+#, elixir-autogen, elixir-format
+msgid "Profile saved."
+msgstr ""
+
+#: lib/fleetms_web/live/profile_live.ex:74
+#, elixir-autogen, elixir-format
+msgid "Save profile"
+msgstr ""
+
+#: lib/fleetms_web/live/profile_live.ex:73
+#, elixir-autogen, elixir-format
+msgid "Saving..."
+msgstr ""
+
+#: lib/fleetms_web/live/profile_live.ex:62
+#, elixir-autogen, elixir-format
+msgid "Secondary phone"
+msgstr ""
+
+#: lib/fleetms_web/live/profile_live.ex:68
+#, elixir-autogen, elixir-format
+msgid "State"
+msgstr ""
+
+#: lib/fleetms_web/live/settings_live.ex:86
+#, elixir-autogen, elixir-format
+msgid "Update password"
+msgstr ""
+
+#: lib/fleetms_web/live/profile_live.ex:33
+#, elixir-autogen, elixir-format
+msgid "Your personal details."
+msgstr ""
+
+#: lib/fleetms_web/live/settings_live.ex:49
+#, elixir-autogen, elixir-format
+msgid "profile"
+msgstr ""

@@ -1,0 +1,15 @@
+meta {
+  name: Delete service task
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/service-tasks/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id:
+}

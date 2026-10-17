@@ -1,0 +1,25 @@
+meta {
+  name: work order: reopen
+  type: http
+  seq: 8
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/work-orders/:id/reopen
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "work-order",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

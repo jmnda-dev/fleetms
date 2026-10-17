@@ -1,0 +1,25 @@
+meta {
+  name: work order: start
+  type: http
+  seq: 9
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/work-orders/:id/start
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "work-order",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

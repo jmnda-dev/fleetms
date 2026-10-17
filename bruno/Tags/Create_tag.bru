@@ -1,0 +1,20 @@
+meta {
+  name: Create tag
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/tags
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "data": {
+      "type": "tag",
+      "attributes": {}
+    }
+  }
+}

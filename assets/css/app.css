@@ -1,0 +1,353 @@
+/* See the Tailwind configuration guide for advanced usage
+   https://tailwindcss.com/docs/configuration */
+
+/* Declare cascade layer order so FontAwesome (loaded into the `fontawesome`
+   layer via priv/static/fontawesome/css/fontawesome.css) ranks BELOW Tailwind's
+   utilities. Without this, FA's unlayered `display:inline-block` on icons beats
+   Tailwind's `.hidden`, breaking JS toggles (theme icon, sidebar chevrons). */
+@layer fontawesome, theme, base, components, utilities;
+
+@import "tailwindcss" source(none);
+
+/* Flowbite v4 design-token theme. Defines the semantic tokens the v4 components
+   use (brand / neutral / default / success / danger / warning, plus heading /
+   body / radius), with light values in @theme and dark values under `.dark {}`.
+   The tokens resolve to underlying Tailwind ramps (brand→blue, neutral→gray,
+   success→emerald, danger→rose, warning→orange). We re-map those ramps to our
+   palette further down, which flows through to every token in both modes. */
+@import "flowbite/src/themes/default";
+
+/* Tom Select: base structural CSS (layout/positioning) from the package, then
+   our overrides that restyle it to the Flowbite design tokens (see tom_select.css). */
+@import "tom-select/dist/css/tom-select.css";
+@import "./tom_select.css";
+
+@source "../../deps/ash_authentication_phoenix";
+@source "../css";
+@source "../js";
+@source "../svelte";
+@source "../node_modules/flowbite";
+@source "../../lib/fleetms_web";
+
+/* A Tailwind plugin that makes "hero-#{ICON}" classes available.
+   The heroicons installation itself is managed by your mix.exs.
+   Retained until CoreComponents is migrated off Heroicons. */
+@plugin "../vendor/heroicons";
+
+/* Flowbite Tailwind plugin: component styles, variants and JS-component hooks. */
+@plugin "flowbite/plugin";
+
+/* Flowbite Typography: `.format` / `.dark:format-invert` prose classes used to
+   style the rich-text (Tiptap WYSIWYG) editor surface and rendered output. */
+@plugin "flowbite-typography";
+
+/* Add variants based on LiveView classes */
+@custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
+@custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
+@custom-variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);
+
+/* Flowbite uses class-based dark mode: the `.dark` class is toggled on <html>.
+   This overrides Tailwind v4's default `prefers-color-scheme` dark variant. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ===========================================================================
+   FleetMS palette
+   ---------------------------------------------------------------------------
+   These overrides come AFTER the Flowbite theme import so they win. We change
+   the underlying ramps the Flowbite tokens point at, so both Flowbite v4
+   components (bg-brand, text-heading, bg-success-soft, ...) and Flowbite Blocks
+   (primary-*, gray-*, ...) pick up our colors automatically, in light + dark.
+   =========================================================================== */
+@theme {
+  /* Inter — our default UI font. Tailwind v4 uses `--font-sans` as the default
+     document font, so this flows app-wide. Loaded via Google Fonts in
+     root.html.heex. */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* "Sea blue" accent ramp. Deep navy reads poorly on a dark background, so dark
+     mode swaps the brand accent to this lighter blue — see the `.dark {}` block
+     below. Stops named 20–100 to match the navy ramp's lightness scale. */
+  --color-seablue-20: #e1f3fa;
+  --color-seablue-40: #b5e1f1;
+  --color-seablue-60: #87cce8;
+  --color-seablue-80: #5bb9e0;
+  --color-seablue-100: #38acdd;
+
+  /* Brand = deep navy. Used directly by Flowbite Blocks as `primary-*`, and
+     mapped onto the `brand` tokens below for v4 components. */
+  --color-primary-50: #ecf0fb;
+  --color-primary-100: #d3ddf6;
+  --color-primary-200: #a8bbec;
+  --color-primary-300: #7793de;
+  --color-primary-400: #4d6bcb;
+  --color-primary-500: #2e4bb0;
+  --color-primary-600: #213a8e;
+  --color-primary-700: #001a72;
+  --color-primary-800: #021556;
+  --color-primary-900: #04103b;
+  --color-primary-950: #060a24;
+
+  /* Neutrals = cool slate. Flowbite's neutral/default/body/heading tokens all
+     resolve to `gray-*`, so re-mapping gray to slate makes the whole UI cool —
+     including the navbar/sidebar utilities in layout.ex — with one override. */
+  --color-gray-50: #f8fafc;
+  --color-gray-100: #f1f5f9;
+  --color-gray-200: #e2e8f0;
+  --color-gray-300: #cbd5e1;
+  --color-gray-400: #94a3b8;
+  --color-gray-500: #64748b;
+  --color-gray-600: #475569;
+  --color-gray-700: #334155;
+  --color-gray-800: #1e293b;
+  --color-gray-900: #0f172a;
+  --color-gray-950: #020617;
+
+  /* --- Brand tokens → primary (deep navy) [light mode] --- */
+  --color-fg-brand-subtle: var(--color-primary-200);
+  --color-fg-brand: var(--color-primary-700);
+  --color-fg-brand-strong: var(--color-primary-900);
+  --color-brand-softer: var(--color-primary-50);
+  --color-brand-soft: var(--color-primary-100);
+  --color-brand: var(--color-primary-700);
+  --color-brand-medium: var(--color-primary-200);
+  --color-brand-strong: var(--color-primary-800);
+  --color-brand-subtle: var(--color-primary-200);
+  --color-brand-light: var(--color-primary-600);
+
+  /* --- Danger tokens → red (Flowbite defaults to rose) [light mode] --- */
+  --color-fg-danger: var(--color-red-700);
+  --color-fg-danger-strong: var(--color-red-900);
+  --color-danger-soft: var(--color-red-50);
+  --color-danger: var(--color-red-600);
+  --color-danger-medium: var(--color-red-100);
+  --color-danger-strong: var(--color-red-700);
+  --color-danger-subtle: var(--color-red-200);
+
+  /* --- Warning tokens → amber (Flowbite defaults to orange) [light mode] --- */
+  --color-fg-warning-subtle: var(--color-amber-600);
+  --color-fg-warning: var(--color-amber-900);
+  --color-warning-soft: var(--color-amber-50);
+  --color-warning: var(--color-amber-500);
+  --color-warning-medium: var(--color-amber-100);
+  --color-warning-strong: var(--color-amber-700);
+  --color-warning-subtle: var(--color-amber-200);
+
+  /* success stays on Flowbite's default emerald, which matches our palette. */
+}
+
+/* Dark-mode overrides for the re-mapped brand/danger/warning tokens. Comes after
+   Flowbite's own `.dark {}` block (from the theme import) so these win. Neutrals
+   need no dark block here: Flowbite's `.dark` already re-points them to gray-*,
+   which now resolves to our slate values. */
+.dark {
+  /* brand accent → sea blue (deep navy is too dark to read on a dark bg).
+     Foreground/solid tokens use sea blue; the soft/subtle bg + ring tints stay
+     dark navy so panels and focus rings remain subtle, not glowing. The primary
+     button gets dark text in dark mode (see core_components) since its bg is now
+     light. */
+  --color-fg-brand-subtle: var(--color-seablue-80);
+  --color-fg-brand: var(--color-seablue-60);
+  --color-fg-brand-strong: var(--color-seablue-40);
+  /* `brand-softer` is the info-alert background — one step up from near-black so
+     the alert reads as a tinted panel, not a void. */
+  --color-brand-softer: var(--color-primary-900);
+  --color-brand-soft: var(--color-primary-900);
+  --color-brand: var(--color-seablue-60);
+  --color-brand-medium: var(--color-primary-800);
+  --color-brand-strong: var(--color-seablue-80);
+  --color-brand-subtle: var(--color-primary-900);
+  --color-brand-light: var(--color-seablue-80);
+
+  /* danger → red */
+  --color-fg-danger: var(--color-red-500);
+  --color-fg-danger-strong: var(--color-red-200);
+  --color-danger-soft: var(--color-red-900);
+  --color-danger: var(--color-red-700);
+  --color-danger-medium: var(--color-red-900);
+  --color-danger-strong: var(--color-red-800);
+  --color-danger-subtle: var(--color-red-900);
+
+  /* warning → amber */
+  --color-fg-warning-subtle: var(--color-amber-500);
+  --color-fg-warning: var(--color-amber-200);
+  --color-warning-soft: var(--color-amber-900);
+  --color-warning: var(--color-amber-600);
+  --color-warning-medium: var(--color-amber-900);
+  --color-warning-strong: var(--color-amber-700);
+  --color-warning-subtle: var(--color-amber-900);
+
+  /* success → emerald. We otherwise keep Flowbite's emerald, but its dark
+     `success-soft` is emerald-950 (near-black); lift the alert bg/text to match
+     the other alerts. */
+  --color-fg-success-strong: var(--color-emerald-200);
+  --color-success-soft: var(--color-emerald-900);
+}
+
+/* ===========================================================================
+   Alternate color themes (user-selectable)
+   ---------------------------------------------------------------------------
+   The default theme is the "midnight" navy palette defined above (`@theme` +
+   `.dark`), which applies when `<html>` has no `data-theme` (or
+   `data-theme="midnight"`).
+
+   These alternate themes re-point the same ramps the tokens resolve to —
+   `brand`/`fg-brand` (the accent) and `gray-*`/`primary-*` (neutrals + the
+   numbered utilities used by Flowbite Blocks). Only the accent + neutrals
+   change per theme; danger/warning/success stay shared across all themes.
+
+   Theme is orthogonal to light/dark, so each theme has a light block
+   (`:not(.dark)`) and a dark block (`.dark`). Both selectors carry the same
+   specificity (0,2,1) — higher than the default `:root`/`.dark` (0,1,0) — and
+   are mutually exclusive, so the right one always wins.
+
+   `data-theme` is set on <html> by the no-flash script in root.html.heex and
+   toggled at runtime by assets/js/layout.js. The accent/neutral choices mirror
+   the default (midnight) structure: solid `brand` is a *light* tone in dark mode (so the
+   primary button's `dark:text-primary-900` reads as dark-on-light), while the
+   soft/subtle background + ring tints stay dark.
+   =========================================================================== */
+
+/* --- Enterprise: cyan accent, zinc neutrals (from flowbite enterprise.css) -- */
+html[data-theme="enterprise"]:not(.dark) {
+  /* neutrals → zinc */
+  --color-gray-50: var(--color-zinc-50);
+  --color-gray-100: var(--color-zinc-100);
+  --color-gray-200: var(--color-zinc-200);
+  --color-gray-300: var(--color-zinc-300);
+  --color-gray-400: var(--color-zinc-400);
+  --color-gray-500: var(--color-zinc-500);
+  --color-gray-600: var(--color-zinc-600);
+  --color-gray-700: var(--color-zinc-700);
+  --color-gray-800: var(--color-zinc-800);
+  --color-gray-900: var(--color-zinc-900);
+  --color-gray-950: var(--color-zinc-950);
+
+  /* brand ramp (Blocks `primary-*` + button dark text) → cyan */
+  --color-primary-50: var(--color-cyan-50);
+  --color-primary-100: var(--color-cyan-100);
+  --color-primary-200: var(--color-cyan-200);
+  --color-primary-300: var(--color-cyan-300);
+  --color-primary-400: var(--color-cyan-400);
+  --color-primary-500: var(--color-cyan-500);
+  --color-primary-600: var(--color-cyan-600);
+  --color-primary-700: var(--color-cyan-700);
+  --color-primary-800: var(--color-cyan-800);
+  --color-primary-900: var(--color-cyan-900);
+  --color-primary-950: var(--color-cyan-950);
+
+  /* brand tokens → cyan (light) */
+  --color-fg-brand-subtle: var(--color-cyan-200);
+  --color-fg-brand: var(--color-cyan-700);
+  --color-fg-brand-strong: var(--color-cyan-900);
+  --color-brand-softer: var(--color-cyan-50);
+  --color-brand-soft: var(--color-cyan-100);
+  --color-brand: var(--color-cyan-700);
+  --color-brand-medium: var(--color-cyan-200);
+  --color-brand-strong: var(--color-cyan-800);
+  --color-brand-subtle: var(--color-cyan-200);
+  --color-brand-light: var(--color-cyan-600);
+}
+
+html[data-theme="enterprise"].dark {
+  /* neutrals → zinc (override the @theme :root slate, which else leaks in dark) */
+  --color-gray-50: var(--color-zinc-50);
+  --color-gray-100: var(--color-zinc-100);
+  --color-gray-200: var(--color-zinc-200);
+  --color-gray-300: var(--color-zinc-300);
+  --color-gray-400: var(--color-zinc-400);
+  --color-gray-500: var(--color-zinc-500);
+  --color-gray-600: var(--color-zinc-600);
+  --color-gray-700: var(--color-zinc-700);
+  --color-gray-800: var(--color-zinc-800);
+  --color-gray-900: var(--color-zinc-900);
+  --color-gray-950: var(--color-zinc-950);
+
+  --color-primary-50: var(--color-cyan-50);
+  --color-primary-100: var(--color-cyan-100);
+  --color-primary-200: var(--color-cyan-200);
+  --color-primary-300: var(--color-cyan-300);
+  --color-primary-400: var(--color-cyan-400);
+  --color-primary-500: var(--color-cyan-500);
+  --color-primary-600: var(--color-cyan-600);
+  --color-primary-700: var(--color-cyan-700);
+  --color-primary-800: var(--color-cyan-800);
+  --color-primary-900: var(--color-cyan-900);
+  --color-primary-950: var(--color-cyan-950);
+
+  /* brand tokens → cyan (dark): light accents, dark soft surfaces */
+  --color-fg-brand-subtle: var(--color-cyan-500);
+  --color-fg-brand: var(--color-cyan-400);
+  --color-fg-brand-strong: var(--color-cyan-300);
+  --color-brand-softer: var(--color-cyan-950);
+  --color-brand-soft: var(--color-cyan-900);
+  --color-brand: var(--color-cyan-400);
+  --color-brand-medium: var(--color-cyan-900);
+  --color-brand-strong: var(--color-cyan-500);
+  --color-brand-subtle: var(--color-cyan-900);
+  --color-brand-light: var(--color-cyan-500);
+}
+
+/* --- Forest: emerald accent, slate neutrals (slate = our default neutral) --- */
+html[data-theme="forest"]:not(.dark) {
+  /* neutrals already slate via @theme — only the accent changes */
+  --color-primary-50: var(--color-emerald-50);
+  --color-primary-100: var(--color-emerald-100);
+  --color-primary-200: var(--color-emerald-200);
+  --color-primary-300: var(--color-emerald-300);
+  --color-primary-400: var(--color-emerald-400);
+  --color-primary-500: var(--color-emerald-500);
+  --color-primary-600: var(--color-emerald-600);
+  --color-primary-700: var(--color-emerald-700);
+  --color-primary-800: var(--color-emerald-800);
+  --color-primary-900: var(--color-emerald-900);
+  --color-primary-950: var(--color-emerald-950);
+
+  --color-fg-brand-subtle: var(--color-emerald-200);
+  --color-fg-brand: var(--color-emerald-700);
+  --color-fg-brand-strong: var(--color-emerald-900);
+  --color-brand-softer: var(--color-emerald-50);
+  --color-brand-soft: var(--color-emerald-100);
+  --color-brand: var(--color-emerald-700);
+  --color-brand-medium: var(--color-emerald-200);
+  --color-brand-strong: var(--color-emerald-800);
+  --color-brand-subtle: var(--color-emerald-200);
+  --color-brand-light: var(--color-emerald-600);
+}
+
+html[data-theme="forest"].dark {
+  --color-primary-50: var(--color-emerald-50);
+  --color-primary-100: var(--color-emerald-100);
+  --color-primary-200: var(--color-emerald-200);
+  --color-primary-300: var(--color-emerald-300);
+  --color-primary-400: var(--color-emerald-400);
+  --color-primary-500: var(--color-emerald-500);
+  --color-primary-600: var(--color-emerald-600);
+  --color-primary-700: var(--color-emerald-700);
+  --color-primary-800: var(--color-emerald-800);
+  --color-primary-900: var(--color-emerald-900);
+  --color-primary-950: var(--color-emerald-950);
+
+  --color-fg-brand-subtle: var(--color-emerald-500);
+  --color-fg-brand: var(--color-emerald-400);
+  --color-fg-brand-strong: var(--color-emerald-300);
+  --color-brand-softer: var(--color-emerald-950);
+  --color-brand-soft: var(--color-emerald-900);
+  --color-brand: var(--color-emerald-400);
+  --color-brand-medium: var(--color-emerald-900);
+  --color-brand-strong: var(--color-emerald-500);
+  --color-brand-subtle: var(--color-emerald-900);
+  --color-brand-light: var(--color-emerald-500);
+}
+
+/* Tell the browser which color scheme is active so it paints native form-control
+   chrome (the `<select>` button face, date pickers, scrollbars) to match. Without
+   this, a `<select>` renders with a white background in dark mode even though our
+   bg token is dark. Keyed off the `.dark` class, same as every other dark style. */
+html { color-scheme: light; }
+html.dark { color-scheme: dark; }
+
+/* Make LiveView wrapper divs transparent for layout */
+[data-phx-session], [data-phx-teleported-src] { display: contents }
+
+/* This file is for your main application CSS */

@@ -1,0 +1,25 @@
+meta {
+  name: Update expense
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/expenses/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "expense",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

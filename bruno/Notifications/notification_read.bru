@@ -1,0 +1,25 @@
+meta {
+  name: notification: read
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/notifications/:id/read
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "data": {
+      "type": "notification",
+    "id": ":id",
+      "attributes": {}
+    }
+  }
+}

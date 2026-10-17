@@ -1,0 +1,15 @@
+meta {
+  name: Delete service reminder
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/service-reminders/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id:
+}
