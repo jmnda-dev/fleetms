@@ -21,10 +21,36 @@ defmodule FleetmsWeb.OrgLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.org_shell>
+    <Layouts.org_shell current_user={@current_user}>
       <Layouts.flash_group flash={@flash} />
 
       <div class="mx-auto w-full max-w-3xl">
+        <div
+          :if={@current_user.is_super_admin}
+          class="mb-8 flex flex-col gap-3 rounded-lg border border-brand-subtle bg-brand-softer p-5 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div class="flex items-start gap-3">
+            <i class="fa-solid fa-shield-halved mt-0.5 text-fg-brand-strong"></i>
+            <div>
+              <p class="text-sm font-semibold text-heading">
+                {gettext("You're signed in as platform staff")}
+              </p>
+              <p class="mt-0.5 text-sm text-body">
+                {gettext(
+                  "This page is your personal workspaces. To manage clients across the whole platform — provisioning, the individuals pool, feature flags — open the Platform Admin console."
+                )}
+              </p>
+            </div>
+          </div>
+          <.link
+            navigate={~p"/admin"}
+            class="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-lg bg-brand px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-strong sm:self-auto dark:text-primary-900"
+          >
+            {gettext("Open Platform Admin")}
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+          </.link>
+        </div>
+
         <div class="text-center">
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
             {gettext("Choose an organization")}

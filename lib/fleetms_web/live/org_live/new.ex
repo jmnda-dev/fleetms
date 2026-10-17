@@ -19,7 +19,7 @@ defmodule FleetmsWeb.OrgLive.New do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.org_shell>
+    <Layouts.org_shell current_user={@current_user}>
       <Layouts.flash_group flash={@flash} />
 
       <div class="mx-auto w-full max-w-md">

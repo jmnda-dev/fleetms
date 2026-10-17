@@ -524,6 +524,10 @@ defmodule FleetmsWeb.Layouts do
   and org creation). Provides the logo, dark-mode + theme toggles and sign-out,
   but none of the dashboard chrome (there is no organization context yet).
   """
+  attr :current_user, :any,
+    default: nil,
+    doc: "the signed-in user, so the shell can show who they are and a staff shortcut"
+
   slot :inner_block, required: true
 
   def org_shell(assigns) do
@@ -535,6 +539,21 @@ defmodule FleetmsWeb.Layouts do
           <img src={~p"/images/logo_dark.svg"} class="hidden h-8 dark:block" alt={gettext("FleetMS")} />
         </.link>
         <div class="flex items-center gap-1">
+          <span
+            :if={@current_user}
+            class="mr-1 hidden max-w-[16rem] truncate text-sm text-gray-500 sm:inline dark:text-gray-400"
+            title={to_string(@current_user.email)}
+          >
+            {to_string(@current_user.email)}
+          </span>
+          <.link
+            :if={@current_user && @current_user.is_super_admin}
+            navigate={~p"/admin"}
+            class="mr-1 inline-flex items-center gap-1.5 rounded-lg border border-brand-subtle bg-brand-softer px-3 py-2 text-sm font-medium text-fg-brand-strong hover:bg-brand-soft"
+          >
+            <i class="fa-solid fa-shield-halved text-xs"></i>
+            {gettext("Platform Admin")}
+          </.link>
           <button
             id="theme-toggle"
             type="button"

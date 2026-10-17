@@ -128,6 +128,74 @@ the app, start in `lib/fleetms/` (the domains and resources), not the web layer.
 - **Oban** for background jobs
 - **Flutter** for the [mobile app](mobile/) (offline-first, talks to the JSON API)
 
+## How it's organized
+
+### The accounts model (and why it looks the way it does)
+
+The one idea worth understanding before reading the code is **who the tenants are**.
+
+- **Organization = tenant.** Every organization gets its **own PostgreSQL schema**,
+  so one company's data is physically isolated from another's. You're always working
+  "inside" an org, reached by the URL `/o/:org_id`. A normal business signs up, owns
+  its org, and invites members who get roles and permissions.
+
+- **Two kinds of client, because real customers come in two shapes.** The project is
+  built to be run as a managed service, where staff onboard clients for them. A
+  **business client** is just a normal organization (its own schema), provisioned by
+  staff. But giving a *solo* owner-operator a whole dedicated schema is wasteful and
+  heavy — so an **individual client** instead joins one shared, hidden
+  **"individuals pool"** organization. Everyone in the pool lives in a single schema
+  and is kept apart not by a wall of schemas but by **authorization**: each record
+  carries an `owner_id`, and a policy filters every read to the current person's own
+  rows. Same app, two containers — a separate schema when it's worth it, a shared
+  pool when it isn't. (The individuals pool is gated by a feature flag; with it off,
+  FleetMS is a plain schema-per-org app.)
+
+- **Platform admin = the staff view across all tenants.** Because someone has to run
+  the managed service, a user flagged `is_super_admin` is **platform staff**. They
+  get a separate, tenant-less console at **`/admin`** — a rollup across every org,
+  the client list, the individuals pool, provisioning (KYC), the access log and
+  feature flags. It's deliberately outside any single org, because its whole job is
+  to sit *above* them. Staff signing in first land on the workspace picker; the
+  "Platform Admin" shortcut there (and in the in-app menu) takes them into the console.
+
+If that model makes sense, the rest of the code reads easily. The deeper rationale
+lives in the module docs — start with `Fleetms.Individuals`, `Fleetms.Provisioning`
+and `FleetmsWeb.AdminLive.Dashboard`.
+
+### Code layout
+
+```
+lib/
+  fleetms/            # The heart of the app: Ash domains & resources (business logic)
+    accounts/         #   organizations, users, roles, invitations, API keys
+    vehicle_management/#  vehicles, renewals, assignments
+    maintenance/      #   work orders, service tasks & reminders
+    inspections/      #   inspection forms, assignments, workflows
+    inventory/        #   parts & stock
+    vehicle_issues/   #   fault reports
+    fuel_management/ expenses/ drivers/ contacts/ …   # the rest of the domains
+    individuals/      #   the shared "individuals pool" logic
+    billing/          #   subscriptions & payment providers
+    emails.ex  dashboard.ex  provisioning.ex  scope.ex  …   # supporting modules
+  fleetms_web/        # The thin web layer (Phoenix)
+    live/             #   LiveViews — one folder per feature (+ admin_live/, org_live/)
+    components/       #   layouts & shared UI components
+    controllers/      #   a few plain controllers (auth, JSON:API edges, uploads)
+    plugs/            #   request pipeline (tenant resolution, super-admin gate, …)
+assets/               # JS/CSS, Tailwind config, Svelte islands (charts, form builder)
+priv/repo/            # migrations (public schema) + tenant_migrations (per-org schema)
+config/               # app configuration (config, dev, prod, runtime, test)
+test/                 # mirrors lib/ — resource tests + LiveView tests
+docs/                 # the user & admin manual, and the README screenshots
+mobile/               # the Flutter app
+bruno/                # a Bruno collection for exercising the JSON API
+```
+
+Each domain context now lives inside its own folder with the context module next to
+its resources (e.g. `lib/fleetms/accounts/accounts.ex`), so everything for a context
+is in one place.
+
 ## Running it locally
 
 **You will need:** Elixir ~> 1.15, Erlang/OTP, PostgreSQL 13+, and
