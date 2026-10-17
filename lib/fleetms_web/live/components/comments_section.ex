@@ -317,7 +317,7 @@ defmodule FleetmsWeb.CommentsSection do
   defp rendered_body(body, []), do: escape(body)
 
   defp rendered_body(body, names) do
-    pattern = names |> Enum.map(&Regex.escape("@" <> &1)) |> Enum.join("|")
+    pattern = Enum.map_join(names, "|", &Regex.escape("@" <> &1))
     regex = Regex.compile!("(#{pattern})")
     mentions = MapSet.new(names, &("@" <> &1))
 

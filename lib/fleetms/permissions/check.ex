@@ -31,16 +31,14 @@ defmodule Fleetms.Permissions.Check do
   def match?(nil, _context, _options), do: false
 
   def match?(actor, context, options) do
-    cond do
-      super_admin?(actor) ->
-        true
+    if super_admin?(actor) do
+      true
+    else
+      tenant = tenant(context)
 
-      true ->
-        tenant = tenant(context)
-
-        options
-        |> permission_names()
-        |> Enum.any?(&Fleetms.Permissions.UserCache.has_permission?(actor.id, tenant, &1))
+      options
+      |> permission_names()
+      |> Enum.any?(&Fleetms.Permissions.UserCache.has_permission?(actor.id, tenant, &1))
     end
   end
 

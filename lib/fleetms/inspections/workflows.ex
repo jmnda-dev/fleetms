@@ -191,11 +191,9 @@ defmodule Fleetms.Inspections.Workflows do
 
       _ ->
         items =
-          failures
-          |> Enum.map(fn failure ->
+          Enum.map_join(failures, fn failure ->
             "<li><strong>#{escape(failure.item_label)}</strong>: #{escape(failure.value_snapshot)}</li>"
           end)
-          |> Enum.join()
 
         intro <> "<p>Failed checks:</p><ul>#{items}</ul>"
     end

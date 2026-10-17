@@ -65,6 +65,7 @@ defmodule Fleetms.MixProject do
       {:ash_json_api, "~> 1.7"},
       {:open_api_spex, "~> 3.22"},
       {:igniter, "~> 0.6", only: [:dev, :test]},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:phoenix, "~> 1.8.7"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.13"},

@@ -34,16 +34,23 @@ defmodule FleetmsWeb.WorkOrderLiveTest do
   test "filters the list by status", %{conn: conn, org: org, scope: scope} do
     open_v = vehicle_fixture(scope, %{name: "Openvan"})
     done_v = vehicle_fixture(scope, %{name: "Donewagon"})
-    work_order_fixture(scope, %{vehicle_id: open_v.id})
+    open_wo = work_order_fixture(scope, %{vehicle_id: open_v.id})
     done = work_order_fixture(scope, %{vehicle_id: done_v.id})
     Maintenance.complete_work_order!(done, scope: scope)
 
     {:ok, view, _html} = live(conn, ~p"/o/#{org}/work-orders")
 
-    html = render_change(element(view, "form[phx-change=filter]"), %{status: "completed"})
+    # Filtering happens through the filter drawer, which submits "apply-filters"
+    # and patches to the filtered URL. Assert on work-order ids (which only
+    # appear in listed rows), not vehicle names (those also appear in the
+    # drawer's vehicle picker).
+    html =
+      view
+      |> form("#work-order-filters", %{"status" => ["completed"]})
+      |> render_submit()
 
-    assert html =~ "Donewagon"
-    refute html =~ "Openvan"
+    assert html =~ done.id
+    refute html =~ open_wo.id
   end
 
   test "creates a bare work order", %{conn: conn, org: org, scope: scope} do

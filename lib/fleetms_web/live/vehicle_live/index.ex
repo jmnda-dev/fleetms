@@ -631,7 +631,7 @@ defmodule FleetmsWeb.VehicleLive.Index do
 
   defp total_pages(count), do: max(1, ceil(count / @limit))
 
-  defp range_label(_count = 0, _page), do: "0"
+  defp range_label(0, _page), do: "0"
 
   defp range_label(count, page) do
     from = (page - 1) * @limit + 1

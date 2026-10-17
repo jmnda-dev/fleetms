@@ -3,7 +3,11 @@ defmodule Fleetms.DashboardTest do
   The dashboard summary counts: vehicle status breakdown, open/overdue issues and work
   orders in progress, scoped to the organization and excluding archived records.
   """
-  use Fleetms.DataCase, async: true
+  # async: false — the "isolated per organization" test creates a second
+  # organization, which runs CREATE SCHEMA + tenant migrations as DDL. Running
+  # that concurrently with another async test's schema creation can deadlock on
+  # shared catalog locks, so this module stays out of the async pool.
+  use Fleetms.DataCase, async: false
 
   import Fleetms.FuelFixtures
   import Fleetms.InventoryFixtures

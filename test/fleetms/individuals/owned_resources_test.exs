@@ -19,6 +19,9 @@ defmodule Fleetms.Individuals.OwnedResourcesTest do
 
   # The user-facing operational resources isolated per individual client.
   @owned [
+    Fleetms.Contacts.Contact,
+    Fleetms.Drivers.Driver,
+    Fleetms.Expenses.Expense,
     Fleetms.FuelManagement.FuelEntry,
     Fleetms.Inspections.Inspection,
     Fleetms.Maintenance.ServiceReminder,

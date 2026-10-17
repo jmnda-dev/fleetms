@@ -213,11 +213,11 @@ defmodule FleetmsWeb.AssignmentLive.Form do
   # picks one, clear the other so the two selects stay mutually exclusive (the
   # resource enforces it too).
   defp exclusive_assignee(params, ["assignment", "assignee_id"]) do
-    if params["assignee_id"] not in [nil, ""], do: Map.put(params, "driver_id", ""), else: params
+    if params["assignee_id"] in [nil, ""], do: params, else: Map.put(params, "driver_id", "")
   end
 
   defp exclusive_assignee(params, ["assignment", "driver_id"]) do
-    if params["driver_id"] not in [nil, ""], do: Map.put(params, "assignee_id", ""), else: params
+    if params["driver_id"] in [nil, ""], do: params, else: Map.put(params, "assignee_id", "")
   end
 
   defp exclusive_assignee(params, _target), do: params

@@ -22,6 +22,10 @@ config :ash,
   bulk_actions_default_to_errors?: true,
   transaction_rollback_on_error?: true,
   redact_sensitive_values_in_errors?: true,
+  # Ash 3.36+ requires an explicit string-length counting mode. `:mixed` keeps the
+  # historical behaviour (byte_size for min, String.length for max), so existing
+  # string_length validations and constraints behave exactly as before this upgrade.
+  default_string_length_count: :mixed,
   known_types: [AshPostgres.Timestamptz, AshPostgres.TimestamptzUsec],
   # NOTE: AshMoney.Types.Money is deliberately NOT in `known_types`. Doing so
   # enables Money's operator overloads (e.g. `> [Money, :decimal]`), which Ash then

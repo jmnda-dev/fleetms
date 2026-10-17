@@ -139,7 +139,7 @@ defmodule Fleetms.VehicleManagement.VehicleImport do
       v ->
         case match_enum(v, values) do
           nil ->
-            allowed = values |> Enum.map(&to_string/1) |> Enum.join(", ")
+            allowed = Enum.map_join(values, ", ", &to_string/1)
             {nil, [~s(#{field} "#{v}" is not one of: #{allowed}) | errors]}
 
           atom ->

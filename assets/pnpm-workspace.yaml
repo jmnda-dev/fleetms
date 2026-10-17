@@ -4,3 +4,13 @@
 # package.json `pnpm` field is ignored by pnpm 11+.
 allowBuilds:
   esbuild: true
+
+# Force patched versions of transitive dependencies that have security
+# advisories (pulled in via the Svelte and tiptap toolchains). All are
+# same-major patch bumps. This is the canonical home for overrides in pnpm 11+.
+overrides:
+  devalue: "^5.9.3"
+  nanoid: "^3.3.18"
+  postcss: "^8.5.23"
+  source-map-js: "^1.2.2"
+  prosemirror-view: "^1.42.3"

@@ -33,9 +33,8 @@ defmodule Fleetms.Billing.Checkout do
   def pay_invoice(invoice, provider, actor) do
     with :ok <- authorize(invoice.organization_id, actor),
          {:ok, payment} <-
-           create_payment(invoice.organization_id, invoice.subscription_id, invoice, provider),
-         {:ok, payment} <- Payments.initiate(payment) do
-      {:ok, payment}
+           create_payment(invoice.organization_id, invoice.subscription_id, invoice, provider) do
+      Payments.initiate(payment)
     end
   end
 

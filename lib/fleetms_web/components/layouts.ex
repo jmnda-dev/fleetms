@@ -1015,12 +1015,13 @@ defmodule FleetmsWeb.Layouts do
 
           <.nav_group
             :if={
-              Fleetms.Scope.has_any_permission?(@current_scope, [
-                :view_users,
-                :view_roles,
-                :view_user_roles,
-                :view_tags
-              ])
+              not Fleetms.Scope.individual?(@current_scope) and
+                Fleetms.Scope.has_any_permission?(@current_scope, [
+                  :view_users,
+                  :view_roles,
+                  :view_user_roles,
+                  :view_tags
+                ])
             }
             id="dropdown-administration"
             icon="fa-users-gear"

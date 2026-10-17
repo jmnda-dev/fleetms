@@ -30,17 +30,26 @@ defmodule FleetmsWeb.DashboardLive do
   @impl true
   def handle_params(_params, _uri, socket) do
     scope = socket.assigns.current_scope
+    {:noreply, assign_async(socket, :dashboard_data, fn -> load_dashboard(scope) end)}
+  end
 
-    {:noreply,
-     socket
-     |> assign(:summary, Dashboard.summary(scope))
-     |> assign(:charts, build_charts(scope))
-     |> assign(:reminders, Dashboard.due_reminders(scope))
-     |> assign(:renewals, Dashboard.due_renewals(scope))
-     |> assign(:recent_issues, Dashboard.recent_issues(scope))
-     |> assign(:low_stock, Dashboard.low_stock_parts(scope))
-     |> assign(:billing_notice, billing_notice(scope))
-     |> assign_onboarding(scope)}
+  # Loads everything the dashboard shows in one background task, so the page
+  # shell (nav, header) paints immediately and the body fills in when the data
+  # is ready instead of blocking the first render on ~11 queries.
+  defp load_dashboard(scope) do
+    {:ok,
+     %{
+       dashboard_data: %{
+         summary: Dashboard.summary(scope),
+         charts: build_charts(scope),
+         reminders: Dashboard.due_reminders(scope),
+         renewals: Dashboard.due_renewals(scope),
+         recent_issues: Dashboard.recent_issues(scope),
+         low_stock: Dashboard.low_stock_parts(scope),
+         billing_notice: billing_notice(scope),
+         onboarding: onboarding(scope)
+       }
+     }}
   end
 
   # Only the owner sees (and can act on) billing; others aren't shown dunning.
@@ -53,7 +62,7 @@ defmodule FleetmsWeb.DashboardLive do
   # A getting-started checklist for a fresh org, shown only to members who can
   # set the fleet up and only until all steps are done. Steps are derived from
   # real data, so they tick themselves off as the user works.
-  defp assign_onboarding(socket, scope) do
+  defp onboarding(scope) do
     if Fleetms.Scope.has_permission?(scope, :create_vehicle) do
       counts = Dashboard.onboarding(scope)
 
@@ -81,13 +90,13 @@ defmodule FleetmsWeb.DashboardLive do
         }
       ]
 
-      assign(socket,
-        onboarding_steps: steps,
-        onboarding_done: Enum.count(steps, & &1.done?),
-        onboarding_complete: Enum.all?(steps, & &1.done?)
-      )
+      %{
+        steps: steps,
+        done: Enum.count(steps, & &1.done?),
+        complete: Enum.all?(steps, & &1.done?)
+      }
     else
-      assign(socket, onboarding_steps: [], onboarding_done: 0, onboarding_complete: true)
+      %{steps: [], done: 0, complete: true}
     end
   end
 
@@ -144,276 +153,313 @@ defmodule FleetmsWeb.DashboardLive do
         <:subtitle>{Fleetms.Scope.workspace_name(@current_scope)}</:subtitle>
       </.header>
 
-      <div
-        :if={@billing_notice}
-        class={[
-          "mt-4 flex flex-wrap items-center justify-between gap-3 rounded-base border p-4",
-          if(@billing_notice == :expired,
-            do: "border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-900/20",
-            else: "border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20"
-          )
-        ]}
-      >
-        <div class="flex items-start gap-3">
-          <.icon
-            name="fa-triangle-exclamation"
-            class="mt-0.5 size-5 text-amber-600 dark:text-amber-400"
-          />
-          <div>
-            <p class="font-semibold text-heading">
-              {if @billing_notice == :expired,
-                do: gettext("Your subscription has expired"),
-                else: gettext("A payment is due")}
-            </p>
-            <p class="text-sm text-body">
-              {if @billing_notice == :expired,
-                do: gettext("Renew to keep full access to your fleet."),
-                else: gettext("Settle your open invoice to stay active.")}
-            </p>
+      <.async_result :let={data} assign={@dashboard_data}>
+        <:loading><.dashboard_skeleton /></:loading>
+        <:failed>
+          <div class="mt-6 rounded-base border border-red-300 bg-red-50 p-6 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
+            {gettext("We couldn't load your dashboard just now — please refresh to try again.")}
           </div>
-        </div>
-        <.link
-          navigate={~p"/o/#{@current_scope.organization}/billing"}
-          class="shrink-0 rounded-base bg-primary-700 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-800"
-        >
-          {gettext("Go to billing")}
-        </.link>
-      </div>
+        </:failed>
 
-      <div
-        :if={not @onboarding_complete and Fleetms.FeatureFlags.onboarding_checklist?()}
-        id="onboarding-checklist"
-        data-key={"onboarding-dismissed:#{@current_scope.organization.id}"}
-        phx-hook="Dismissable"
-        class="mt-6 rounded-base border border-primary-200 bg-primary-50 p-5 dark:border-primary-900 dark:bg-primary-900/20"
-      >
-        <div class="flex items-start justify-between gap-4">
-          <div>
-            <h2 class="text-base font-semibold text-heading">
-              <.icon name="fa-rocket" class="me-1 text-primary-600" /> {gettext("Get started")}
-            </h2>
-            <p class="mt-0.5 text-sm text-body">
-              {gettext("A few steps to set your fleet up. %{done} of %{total} done.",
-                done: @onboarding_done,
-                total: length(@onboarding_steps)
-              )}
-            </p>
-          </div>
-          <button
-            type="button"
-            data-dismiss
-            class="shrink-0 rounded-lg p-1.5 text-gray-400 hover:bg-primary-100 hover:text-gray-600 dark:hover:bg-primary-900/40"
-            aria-label={gettext("Dismiss")}
-          >
-            <.icon name="fa-xmark" />
-          </button>
-        </div>
-
-        <ul class="mt-4 space-y-2">
-          <li
-            :for={step <- @onboarding_steps}
-            class="flex items-center gap-3 rounded-lg bg-white px-3 py-2.5 dark:bg-gray-800"
-          >
-            <i class={[
-              "fa-solid text-lg",
-              step.done? && "fa-circle-check text-green-500",
-              !step.done? && "fa-circle text-gray-300 dark:text-gray-600"
-            ]}>
-            </i>
-            <div class="min-w-0 flex-1">
-              <p class={[
-                "text-sm font-medium",
-                step.done? && "text-body line-through",
-                !step.done? && "text-heading"
-              ]}>
-                {step.title}
-              </p>
-              <p :if={not step.done?} class="text-xs text-body">{step.desc}</p>
-            </div>
-            <.button :if={not step.done?} navigate={step.path} size="sm" variant="secondary">
-              {step.cta}
-            </.button>
-          </li>
-        </ul>
-      </div>
-
-      <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <.stat_card
-          :if={Fleetms.Scope.has_permission?(@current_scope, :view_vehicles)}
-          label={gettext("Active vehicles")}
-          value={active_vehicles(@summary)}
-          sub={gettext("of %{n} in fleet", n: fleet_size(@summary))}
-          icon="fa-truck"
-          tone="brand"
-          navigate={~p"/o/#{org(assigns)}/vehicles"}
-        />
-        <.stat_card
-          :if={Fleetms.Scope.has_permission?(@current_scope, :view_issues)}
-          label={gettext("Open issues")}
-          value={@summary.open_issues}
-          sub={
-            if @summary.overdue_issues > 0,
-              do: gettext("%{n} overdue", n: @summary.overdue_issues)
-          }
-          sub_tone={:danger}
-          icon="fa-triangle-exclamation"
-          tone="amber"
-          navigate={~p"/o/#{org(assigns)}/issues"}
-        />
-        <.stat_card
-          :if={Fleetms.Scope.has_permission?(@current_scope, :view_work_orders)}
-          label={gettext("Work orders in progress")}
-          value={@summary.work_orders_in_progress}
-          sub={gettext("%{n} open", n: @summary.work_orders_open)}
-          icon="fa-screwdriver-wrench"
-          tone="blue"
-          navigate={~p"/o/#{org(assigns)}/work-orders"}
-        />
-        <.stat_card
-          :if={Fleetms.Scope.has_permission?(@current_scope, :view_service_reminders)}
-          label={gettext("Coming due")}
-          value={@summary.reminders_due + @summary.renewals_due}
-          sub={
-            gettext("%{r} services · %{v} renewals",
-              r: @summary.reminders_due,
-              v: @summary.renewals_due
+        <div
+          :if={data.billing_notice}
+          class={[
+            "mt-4 flex flex-wrap items-center justify-between gap-3 rounded-base border p-4",
+            if(data.billing_notice == :expired,
+              do: "border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-900/20",
+              else: "border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20"
             )
-          }
-          icon="fa-bell"
-          tone="purple"
-          navigate={~p"/o/#{org(assigns)}/service-reminders"}
-        />
-      </div>
-
-      <section
-        :if={Fleetms.Scope.has_permission?(@current_scope, :view_vehicles)}
-        class="mt-6 rounded-base border border-default bg-white p-6 shadow-sm dark:bg-gray-800"
-      >
-        <div class="mb-4 flex items-baseline justify-between">
-          <h2 class="text-sm font-semibold uppercase text-heading">{gettext("Fleet status")}</h2>
-          <span class="text-sm text-body">
-            {gettext("%{n} vehicles", n: total_vehicles(@summary))}
-          </span>
-        </div>
-
-        <.status_bar summary={@summary} />
-
-        <div class="mt-4 flex flex-wrap gap-x-6 gap-y-2">
-          <div :for={{status, dot, text} <- status_legend(@summary)} class="flex items-center gap-2">
-            <span class={["h-2.5 w-2.5 rounded-full", dot]} />
-            <span class="text-sm text-body">{humanize_status(status)}</span>
-            <span class={["text-sm font-semibold", text]}>{@summary.vehicle_status[status]}</span>
+          ]}
+        >
+          <div class="flex items-start gap-3">
+            <.icon
+              name="fa-triangle-exclamation"
+              class="mt-0.5 size-5 text-amber-600 dark:text-amber-400"
+            />
+            <div>
+              <p class="font-semibold text-heading">
+                {if data.billing_notice == :expired,
+                  do: gettext("Your subscription has expired"),
+                  else: gettext("A payment is due")}
+              </p>
+              <p class="text-sm text-body">
+                {if data.billing_notice == :expired,
+                  do: gettext("Renew to keep full access to your fleet."),
+                  else: gettext("Settle your open invoice to stay active.")}
+              </p>
+            </div>
           </div>
-          <p :if={total_vehicles(@summary) == 0} class="text-sm text-body">
-            {gettext("No vehicles yet.")}
-          </p>
+          <.link
+            navigate={~p"/o/#{@current_scope.organization}/billing"}
+            class="shrink-0 rounded-base bg-primary-700 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-800"
+          >
+            {gettext("Go to billing")}
+          </.link>
         </div>
-      </section>
 
-      <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <.chart_card
-          :if={Fleetms.Scope.has_permission?(@current_scope, :view_issues)}
-          id="chart-issues-trend"
-          title={gettext("Issues opened vs resolved")}
-          sub={gettext("Last 6 months")}
-          spec={@charts.issues_trend}
-          class="lg:col-span-2"
-        />
-        <.chart_card
-          :if={Fleetms.Scope.has_permission?(@current_scope, :view_work_orders)}
-          id="chart-spend"
-          title={gettext("Spend")}
-          sub={gettext("Maintenance & fuel · last 6 months")}
-          spec={@charts.spend}
-        />
-        <.chart_card
-          :if={Fleetms.Scope.has_permission?(@current_scope, :view_issues)}
-          id="chart-issues-priority"
-          title={gettext("Open issues by priority")}
-          spec={@charts.issues_priority}
-        />
-      </div>
-
-      <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <.attention_card
-          :if={Fleetms.Scope.has_permission?(@current_scope, :view_service_reminders)}
-          title={gettext("Service due")}
-          icon="fa-bell"
-          empty={gettext("Nothing due right now.")}
-          view_all={~p"/o/#{org(assigns)}/service-reminders"}
-          rows={@reminders}
+        <div
+          :if={not data.onboarding.complete and Fleetms.FeatureFlags.onboarding_checklist?()}
+          id="onboarding-checklist"
+          data-key={"onboarding-dismissed:#{@current_scope.organization.id}"}
+          phx-hook="Dismissable"
+          class="mt-6 rounded-base border border-primary-200 bg-primary-50 p-5 dark:border-primary-900 dark:bg-primary-900/20"
         >
-          <:row :let={r}>
-            <.attention_row
-              primary={r.task}
-              secondary={r.vehicle}
-              href={~p"/o/#{org(assigns)}/service-reminders/#{r.id}/edit"}
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h2 class="text-base font-semibold text-heading">
+                <.icon name="fa-rocket" class="me-1 text-primary-600" /> {gettext("Get started")}
+              </h2>
+              <p class="mt-0.5 text-sm text-body">
+                {gettext("A few steps to set your fleet up. %{done} of %{total} done.",
+                  done: data.onboarding.done,
+                  total: length(data.onboarding.steps)
+                )}
+              </p>
+            </div>
+            <button
+              type="button"
+              data-dismiss
+              class="shrink-0 rounded-lg p-1.5 text-gray-400 hover:bg-primary-100 hover:text-gray-600 dark:hover:bg-primary-900/40"
+              aria-label={gettext("Dismiss")}
             >
-              <.due_pill overdue={r.status == :overdue} />
-            </.attention_row>
-          </:row>
-        </.attention_card>
+              <.icon name="fa-xmark" />
+            </button>
+          </div>
 
-        <.attention_card
-          :if={Fleetms.Scope.has_permission?(@current_scope, :view_renewals)}
-          title={gettext("Renewals due")}
-          icon="fa-file-contract"
-          empty={gettext("No renewals coming up.")}
-          view_all={~p"/o/#{org(assigns)}/renewals"}
-          rows={@renewals}
-        >
-          <:row :let={r}>
-            <.attention_row primary={r.type} secondary={r.vehicle}>
-              <div class="flex items-center gap-2">
-                <span class="text-xs text-body">{Format.date(r.due_date, org(assigns))}</span>
-                <.due_pill overdue={r.status == "Overdue"} />
-              </div>
-            </.attention_row>
-          </:row>
-        </.attention_card>
-
-        <.attention_card
-          :if={Fleetms.Scope.has_permission?(@current_scope, :view_issues)}
-          title={gettext("Recently reported issues")}
-          icon="fa-triangle-exclamation"
-          empty={gettext("No issues reported yet.")}
-          view_all={~p"/o/#{org(assigns)}/issues"}
-          rows={@recent_issues}
-        >
-          <:row :let={i}>
-            <.attention_row
-              primary={i.title}
-              secondary={i.vehicle}
-              href={~p"/o/#{org(assigns)}/issues/#{i.id}"}
+          <ul class="mt-4 space-y-2">
+            <li
+              :for={step <- data.onboarding.steps}
+              class="flex items-center gap-3 rounded-lg bg-white px-3 py-2.5 dark:bg-gray-800"
             >
-              <span class="whitespace-nowrap text-xs text-body">
-                {Format.date(i.reported_at, org(assigns))}
-              </span>
-            </.attention_row>
-          </:row>
-        </.attention_card>
-
-        <.attention_card
-          :if={Fleetms.Scope.has_permission?(@current_scope, :view_parts)}
-          title={gettext("Low stock")}
-          icon="fa-box-open"
-          empty={gettext("Stock levels look healthy.")}
-          view_all={~p"/o/#{org(assigns)}/parts"}
-          rows={@low_stock}
-        >
-          <:row :let={p}>
-            <.attention_row primary={p.name || p.part_number} secondary={p.part_number}>
-              <span class={[
-                "rounded-full px-2 py-0.5 text-xs font-medium",
-                stock_pill(p.status)
+              <i class={[
+                "fa-solid text-lg",
+                step.done? && "fa-circle-check text-green-500",
+                !step.done? && "fa-circle text-gray-300 dark:text-gray-600"
               ]}>
-                {gettext("%{n} on hand", n: Format.number(p.on_hand))}
+              </i>
+              <div class="min-w-0 flex-1">
+                <p class={[
+                  "text-sm font-medium",
+                  step.done? && "text-body line-through",
+                  !step.done? && "text-heading"
+                ]}>
+                  {step.title}
+                </p>
+                <p :if={not step.done?} class="text-xs text-body">{step.desc}</p>
+              </div>
+              <.button :if={not step.done?} navigate={step.path} size="sm" variant="secondary">
+                {step.cta}
+              </.button>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <.stat_card
+            :if={Fleetms.Scope.has_permission?(@current_scope, :view_vehicles)}
+            label={gettext("Active vehicles")}
+            value={active_vehicles(data.summary)}
+            sub={gettext("of %{n} in fleet", n: fleet_size(data.summary))}
+            icon="fa-truck"
+            tone="brand"
+            navigate={~p"/o/#{org(assigns)}/vehicles"}
+          />
+          <.stat_card
+            :if={Fleetms.Scope.has_permission?(@current_scope, :view_issues)}
+            label={gettext("Open issues")}
+            value={data.summary.open_issues}
+            sub={
+              if data.summary.overdue_issues > 0,
+                do: gettext("%{n} overdue", n: data.summary.overdue_issues)
+            }
+            sub_tone={:danger}
+            icon="fa-triangle-exclamation"
+            tone="amber"
+            navigate={~p"/o/#{org(assigns)}/issues"}
+          />
+          <.stat_card
+            :if={Fleetms.Scope.has_permission?(@current_scope, :view_work_orders)}
+            label={gettext("Work orders in progress")}
+            value={data.summary.work_orders_in_progress}
+            sub={gettext("%{n} open", n: data.summary.work_orders_open)}
+            icon="fa-screwdriver-wrench"
+            tone="blue"
+            navigate={~p"/o/#{org(assigns)}/work-orders"}
+          />
+          <.stat_card
+            :if={Fleetms.Scope.has_permission?(@current_scope, :view_service_reminders)}
+            label={gettext("Coming due")}
+            value={data.summary.reminders_due + data.summary.renewals_due}
+            sub={
+              gettext("%{r} services · %{v} renewals",
+                r: data.summary.reminders_due,
+                v: data.summary.renewals_due
+              )
+            }
+            icon="fa-bell"
+            tone="purple"
+            navigate={~p"/o/#{org(assigns)}/service-reminders"}
+          />
+        </div>
+
+        <section
+          :if={Fleetms.Scope.has_permission?(@current_scope, :view_vehicles)}
+          class="mt-6 rounded-base border border-default bg-white p-6 shadow-sm dark:bg-gray-800"
+        >
+          <div class="mb-4 flex items-baseline justify-between">
+            <h2 class="text-sm font-semibold uppercase text-heading">{gettext("Fleet status")}</h2>
+            <span class="text-sm text-body">
+              {gettext("%{n} vehicles", n: total_vehicles(data.summary))}
+            </span>
+          </div>
+
+          <.status_bar summary={data.summary} />
+
+          <div class="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+            <div
+              :for={{status, dot, text} <- status_legend(data.summary)}
+              class="flex items-center gap-2"
+            >
+              <span class={["h-2.5 w-2.5 rounded-full", dot]} />
+              <span class="text-sm text-body">{humanize_status(status)}</span>
+              <span class={["text-sm font-semibold", text]}>
+                {data.summary.vehicle_status[status]}
               </span>
-            </.attention_row>
-          </:row>
-        </.attention_card>
-      </div>
+            </div>
+            <p :if={total_vehicles(data.summary) == 0} class="text-sm text-body">
+              {gettext("No vehicles yet.")}
+            </p>
+          </div>
+        </section>
+
+        <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <.chart_card
+            :if={Fleetms.Scope.has_permission?(@current_scope, :view_issues)}
+            id="chart-issues-trend"
+            title={gettext("Issues opened vs resolved")}
+            sub={gettext("Last 6 months")}
+            spec={data.charts.issues_trend}
+            class="lg:col-span-2"
+          />
+          <.chart_card
+            :if={Fleetms.Scope.has_permission?(@current_scope, :view_work_orders)}
+            id="chart-spend"
+            title={gettext("Spend")}
+            sub={gettext("Maintenance & fuel · last 6 months")}
+            spec={data.charts.spend}
+          />
+          <.chart_card
+            :if={Fleetms.Scope.has_permission?(@current_scope, :view_issues)}
+            id="chart-issues-priority"
+            title={gettext("Open issues by priority")}
+            spec={data.charts.issues_priority}
+          />
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <.attention_card
+            :if={Fleetms.Scope.has_permission?(@current_scope, :view_service_reminders)}
+            title={gettext("Service due")}
+            icon="fa-bell"
+            empty={gettext("Nothing due right now.")}
+            view_all={~p"/o/#{org(assigns)}/service-reminders"}
+            rows={data.reminders}
+          >
+            <:row :let={r}>
+              <.attention_row
+                primary={r.task}
+                secondary={r.vehicle}
+                href={~p"/o/#{org(assigns)}/service-reminders/#{r.id}/edit"}
+              >
+                <.due_pill overdue={r.status == :overdue} />
+              </.attention_row>
+            </:row>
+          </.attention_card>
+
+          <.attention_card
+            :if={Fleetms.Scope.has_permission?(@current_scope, :view_renewals)}
+            title={gettext("Renewals due")}
+            icon="fa-file-contract"
+            empty={gettext("No renewals coming up.")}
+            view_all={~p"/o/#{org(assigns)}/renewals"}
+            rows={data.renewals}
+          >
+            <:row :let={r}>
+              <.attention_row primary={r.type} secondary={r.vehicle}>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-body">{Format.date(r.due_date, org(assigns))}</span>
+                  <.due_pill overdue={r.status == "Overdue"} />
+                </div>
+              </.attention_row>
+            </:row>
+          </.attention_card>
+
+          <.attention_card
+            :if={Fleetms.Scope.has_permission?(@current_scope, :view_issues)}
+            title={gettext("Recently reported issues")}
+            icon="fa-triangle-exclamation"
+            empty={gettext("No issues reported yet.")}
+            view_all={~p"/o/#{org(assigns)}/issues"}
+            rows={data.recent_issues}
+          >
+            <:row :let={i}>
+              <.attention_row
+                primary={i.title}
+                secondary={i.vehicle}
+                href={~p"/o/#{org(assigns)}/issues/#{i.id}"}
+              >
+                <span class="whitespace-nowrap text-xs text-body">
+                  {Format.date(i.reported_at, org(assigns))}
+                </span>
+              </.attention_row>
+            </:row>
+          </.attention_card>
+
+          <.attention_card
+            :if={Fleetms.Scope.has_permission?(@current_scope, :view_parts)}
+            title={gettext("Low stock")}
+            icon="fa-box-open"
+            empty={gettext("Stock levels look healthy.")}
+            view_all={~p"/o/#{org(assigns)}/parts"}
+            rows={data.low_stock}
+          >
+            <:row :let={p}>
+              <.attention_row primary={p.name || p.part_number} secondary={p.part_number}>
+                <span class={[
+                  "rounded-full px-2 py-0.5 text-xs font-medium",
+                  stock_pill(p.status)
+                ]}>
+                  {gettext("%{n} on hand", n: Format.number(p.on_hand))}
+                </span>
+              </.attention_row>
+            </:row>
+          </.attention_card>
+        </div>
+      </.async_result>
     </Layouts.app>
+    """
+  end
+
+  # Placeholder shown while the dashboard data loads in the background.
+  defp dashboard_skeleton(assigns) do
+    ~H"""
+    <div class="mt-6 animate-pulse space-y-6" aria-hidden="true">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div
+          :for={_ <- 1..4}
+          class="h-28 rounded-base border border-default bg-white dark:bg-gray-800"
+        >
+        </div>
+      </div>
+      <div class="h-24 rounded-base border border-default bg-white dark:bg-gray-800"></div>
+      <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div
+          :for={_ <- 1..4}
+          class="h-72 rounded-base border border-default bg-white dark:bg-gray-800"
+        >
+        </div>
+      </div>
+    </div>
     """
   end
 

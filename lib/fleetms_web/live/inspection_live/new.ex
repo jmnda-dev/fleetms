@@ -144,7 +144,7 @@ defmodule FleetmsWeb.InspectionLive.New do
 
   defp flag_missing_photos(socket, params, missing) do
     errors = Map.new(missing, fn {item, count} -> {item.id, photo_error_message(count)} end)
-    labels = missing |> Enum.map(fn {item, _count} -> item.label end) |> Enum.join(", ")
+    labels = Enum.map_join(missing, ", ", fn {item, _count} -> item.label end)
 
     socket
     |> assign(answers: Map.get(params, "answers", socket.assigns.answers), photo_errors: errors)

@@ -1,4 +1,5 @@
 defmodule Fleetms.Accounts.Token do
+  @moduledoc false
   use Ash.Resource,
     otp_app: :fleetms,
     domain: Fleetms.Accounts,

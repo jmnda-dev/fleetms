@@ -50,16 +50,25 @@ defmodule FleetmsWeb.ServiceReminderLiveTest do
     task = service_task_fixture(scope)
     fresh = vehicle_fixture(scope, %{name: "Freshvan", mileage: Decimal.new("10000")})
     late = vehicle_fixture(scope, %{name: "Latewagon", mileage: Decimal.new("10000")})
-    service_reminder_fixture(scope, fresh, task, %{mileage_interval: Decimal.new("5000")})
-    service_reminder_fixture(scope, late, task, %{mileage_interval: Decimal.new("5000")})
+    fresh_rem =
+      service_reminder_fixture(scope, fresh, task, %{mileage_interval: Decimal.new("5000")})
+
+    late_rem =
+      service_reminder_fixture(scope, late, task, %{mileage_interval: Decimal.new("5000")})
+
     VehicleManagement.update_vehicle!(late, %{mileage: Decimal.new("20000")}, scope: scope)
 
     {:ok, view, _html} = live(conn, ~p"/o/#{org}/service-reminders")
 
-    html = render_change(element(view, "form[phx-change=filter]"), %{status: "overdue"})
+    # Assert on reminder ids (only present in listed rows), not vehicle names,
+    # which also appear in the drawer's vehicle picker.
+    html =
+      view
+      |> form("#reminder-filters", %{"due_status" => ["overdue"]})
+      |> render_submit()
 
-    assert html =~ "Latewagon"
-    refute html =~ "Freshvan"
+    assert html =~ late_rem.id
+    refute html =~ fresh_rem.id
   end
 
   test "creates a reminder", %{conn: conn, org: org, scope: scope} do

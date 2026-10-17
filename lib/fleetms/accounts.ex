@@ -1,4 +1,8 @@
 defmodule Fleetms.Accounts do
+  @moduledoc """
+  Accounts domain: users and authentication, API keys, and the roles and
+  permissions that govern what members can do within an organization.
+  """
   use Ash.Domain, otp_app: :fleetms, extensions: [AshAdmin.Domain, AshPhoenix, AshJsonApi.Domain]
 
   admin do

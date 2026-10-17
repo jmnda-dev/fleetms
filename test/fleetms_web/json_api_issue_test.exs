@@ -48,6 +48,6 @@ defmodule FleetmsWeb.JsonApiIssueTest do
     issue_fixture(scope, %{title: "Listed"})
     conn = get(conn, "/api/v1/issues")
     assert %{"data" => data} = json_response(conn, 200)
-    assert length(data) >= 1
+    assert data != []
   end
 end

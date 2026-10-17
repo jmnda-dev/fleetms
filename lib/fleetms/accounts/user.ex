@@ -1,4 +1,8 @@
 defmodule Fleetms.Accounts.User do
+  @moduledoc """
+  A person who can sign in. Users authenticate with a password, belong to one or
+  more organizations, and carry the roles that determine their permissions.
+  """
   use Ash.Resource,
     otp_app: :fleetms,
     domain: Fleetms.Accounts,
